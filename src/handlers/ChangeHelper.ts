@@ -1,0 +1,34 @@
+import { ButtonInteraction, SelectMenuInteraction } from "discord.js";
+import DataBase from "../utils/db";
+import { MessageUtils } from "../utils/MessageUtils";
+import { Conversation } from "../utils/types";
+import { Utils } from "../utils/Utils";
+
+class ChangeHelperHandler {
+    private conversation: Conversation = {} as any;
+    constructor(private interaction: SelectMenuInteraction) {
+        this.interaction = interaction;
+    }
+
+    async loadConversation(): Promise<void> {
+        this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any;
+    }
+
+    async saveConversation() {
+        await DataBase.conversationsCollection.updateOne({ channelId: this.interaction.channelId, open: true }, { $set: this.conversation }, { upsert: true })
+    }
+
+    async handle() {
+        await this.loadConversation();
+        if (this.interaction.customId === "helpers_list") {
+            this.conversation.staffMemberId = (this.interaction.values || "") as any;
+        }
+        await this.saveConversation();
+        const newPermission = await Utils.updatePermissionToChannel(this.conversation); //Can't import messageUtils from Utils
+        if (!newPermission) return;
+        await newPermission.channel.send({ embeds: [MessageUtils.EmbedMessages.staffMemberAttached(newPermission.usernames.join(', '))] });
+        await this.interaction.deferUpdate();
+    }
+}
+
+export default ChangeHelperHandler;
