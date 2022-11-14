@@ -14,7 +14,7 @@ namespace Logger {
             returnType: ExportReturnType.Attachment,
             filename: 'question_log.html',
         });
-        await logChannel.send({ embeds: [await MessageUtils.EmbedMessages.ticketLog(ticketChannel.name)], files: [attachment] })
+        await logChannel.send({ embeds: [await MessageUtils.EmbedMessages.ticketLog(ticketChannel.name.replaceAll('-', ' '))], files: [attachment] })
     }
 
 }

@@ -2,15 +2,15 @@ import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, SelectMenuBuilder, Butto
 import { Utils } from "./Utils";
 
 export namespace MessageUtils {
-    const author = { iconURL: 'https://i.imgur.com/ATfQQi7.png', name: 'AngeLove - אנונימי' };
+    const author = { iconURL: 'https://i.imgur.com/ATfQQi7.png', name: 'Mercy - אנונימי' };
 
     export namespace EmbedMessages {
         export const StartConversationAsk = new EmbedBuilder({
             author,
             color: 0x0099ff,
-            title: "אתה עומד לפתוח צ'אט אנונימי",
-            description: "לחיצה על כפתור ההסכמה תתחיל צ'אט אנונימי עם אחד מחברי הצוות לקבלת עזרה, פריקה ושיתוף. כל הודעה שתכתב אצלך תופיע לאיש צוות בצ'אנל נפרד בשרת הראשי, שים לב שהמערכת אנונימית למעט מקרים העוברים על חוקי המדינה וידרשו פעולות דיווח.",
-            footer: { text: "בלחיצה על כפתור ההסכמה אתה מאשר את תנאי השימוש בשרת ומודע לכך שצוות השרת אינו צוות מוסמך" }
+            title: "אתם עומדים לפתוח צ'אט אנונימי",
+            description: "לחיצה על כפתור ההסכמה תפתח צ'אט אנונימי עם אחד מחברי צוות השרת, וכל הודעה שתשלחו תופיע לאיש הצוות בצ'אנל נפרד בשרת. אתם מוזמנים לשתף אותנו בכל אשר על ליבכם - ברגשות, במחשבות, בבעיות ובפחדים, והצוות ישמח להעניק לכם מענה חם ואוהב בחזרה. שימו לב כי המערכת אנונימית - למעט מקרים העוברים על חוקי המדינה או מקרים חריגים אחרים אשר ידרשו פעולות דיווח.",
+            footer: { text: "בלחיצה על כפתור ההסכמה אתם מאשרים את תנאי השימוש של השרת ומודעים לכך שצוות השרת אינו צוות מוסמך או מקצועי." }
         });
         export function newChatStaff(numberOfConversation: number) {
             return new EmbedBuilder({
@@ -26,7 +26,7 @@ export namespace MessageUtils {
                 author,
                 color: 0xCD6870,
                 title: `צ'אט מספר ${numberOfConversation}`,
-                description: `היי, צוות התומכים קיבל את הודעתכם בהצלחה! כל הודעה שתשלח כאן תגיע באופן אנונימי לצוות התומכים`
+                description: `צוות השרת קיבל את הודעתכם בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`
             });
         }
 
@@ -78,16 +78,16 @@ export namespace MessageUtils {
             author,
             color: 0x27A5AC,
             title: "חלף הזמן",
-            description: "היי, לא הצלחתי לזהות בחירה ממך, אם אתה מעוניין לפתוח צ'אט אתה תמיד מוזמן לכתוב לי פעם נוספת",
-            footer: { text: "לפתיחת צ'אט אנא כתוב הודעה פעם נוספת" }
+            description: "לא הצלחתי לזהות בחירה מכם. אם אתם מעוניינים לפתוח צ'אט אתם תמיד מוזמנים לשלוח לי הודעה פעם נוספת.",
+            footer: { text: "לפתיחת צ'אט יש לשלוח הודעה נוספת." }
         });
 
         export const userChooseNo = new EmbedBuilder({
             author,
             color: 0x27A5AC,
             title: "הפעולה בוטלה",
-            description: "בחרת שלא לפתוח צ'אט, אתה תמיד מוזמן לכתוב לי פעם נוספת - אני כאן",
-            footer: { text: "לפתיחת צ'אט אנא כתוב הודעה פעם נוספת" }
+            description: "בחרתם לא לפתוח צ'אט אנונימי. אתם תמיד מוזמנים לכתוב לי פעם נוספת - אני כאן.",
+            footer: { text: "לפתיחת צ'אט יש לשלוח הודעה נוספת." }
         });
 
         export const helpersReseted = new EmbedBuilder({
@@ -97,11 +97,11 @@ export namespace MessageUtils {
             description: "כל הרשאות התומכים של צ'אט זה אופסו, ניתן כעת להגדיר תומכים חדשים",
         });
 
-        export function chatClosed(closedBy: string) {
+        export function chatClosed(closedBy: string, chatTitle: string) {
             return new EmbedBuilder({
                 author,
                 color: 0x27A5AC,
-                title: "צ'אט נסגר",
+                title: `${chatTitle.replaceAll('-', ' ')} נסגר`,
                 description: `הצ'אט נסגר על ידי ${closedBy}`,
             });
         }

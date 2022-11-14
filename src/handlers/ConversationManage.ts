@@ -36,7 +36,7 @@ class ConversationManageHandler {
     }
 
     public async closeConversation(closedBy: string, interaction?: ButtonInteraction) {
-        const closedMessage = { embeds: [MessageUtils.EmbedMessages.chatClosed(closedBy)] };
+        const closedMessage = { embeds: [MessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };
         this.conversation.open = false;
         await this.channel.send(closedMessage);
         await Logger.logTicket(this.channel);
