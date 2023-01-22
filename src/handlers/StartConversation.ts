@@ -1,45 +1,31 @@
 import { Utils } from "../utils/Utils";
-import { ChannelType, Message, ComponentType, ActionRowBuilder } from "discord.js"
+import { ChannelType, Message, ActionRowBuilder, ButtonInteraction } from "discord.js"
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { config } from "..";
 
 class StartConversation {
 
-    constructor(private message: Message) {
-        this.message = message;
+    constructor(private interaction: ButtonInteraction) {
+        this.interaction = interaction;
     }
 
-    async askStartConversation() {
-        const askConvMessage = await this.message.reply({ embeds: [MessageUtils.EmbedMessages.StartConversationAsk], components: [MessageUtils.Actions.YesNo] });
-        const collector = askConvMessage.createMessageComponentCollector({ componentType: ComponentType.Button, time: 10 * 1000, max: 1 });
-
-        collector.on('collect', async i => {
-            const hasOpenConversation = await Utils.hasOpenConversation(this.message.author.id);
-            if (hasOpenConversation) return;
-            if (i.customId === "yes_conv") {
-                await this.createConversation()
-            } else if (i.customId === "no_conv") {
-                await this.message.channel.send({ embeds: [MessageUtils.EmbedMessages.userChooseNo] });
-            }
-
-        });
-
-        collector.on('end', async (collected) => {
-            await askConvMessage.edit({ components: [] });
-            if (!collected.size)
-                await this.message.channel.send({ embeds: [MessageUtils.EmbedMessages.answerOpenConversationTimeEnd] });
-        })
+    async precondition() {
+        if (!await Utils.hasOpenConversation(this.interaction.user.id)) {
+            await this.createConversation();
+        } else {
+            await this.interaction.reply({ content: "היי, נראה שכבר יש לך צ'אט פתוח", ephemeral: true })
+        }
     }
 
-    async createConversation() {
+    private async createConversation() {
         const numberOfConversation = await Utils.getNumberOfConversationFromDB() + 1;
         const convChannel = await (await (await Utils.getGuild().channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: ChannelType.GuildText,
         })).setParent(config.ticketCatagoryId));
 
-        await this.message.channel.send({
+        await this.interaction.user.send({
             embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
             components: [new ActionRowBuilder().addComponents([
                 MessageUtils.Actions.tools_close, MessageUtils.Actions.user_report_helper]) as any]
@@ -47,12 +33,12 @@ class StartConversation {
 
         (await convChannel.send({
             content: `<@&${config.helperRole}>`,
-            embeds: [MessageUtils.EmbedMessages.newChatStaff(numberOfConversation)],
+            embeds: [MessageUtils.EmbedMessages.newChatStaff()],
             components: [MessageUtils.Actions.supporterTools]
         })).edit({ content: null });
 
         await DataBase.conversationsCollection.insertOne({
-            userId: this.message.author.id,
+            userId: this.interaction.user.id,
             guildId: Utils.getGuild().id,
             channelId: convChannel.id,
             open: true
