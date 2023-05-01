@@ -20,7 +20,7 @@ export namespace Utils {
     }
 
     export async function getNumberOfConversationFromDB() {
-        return (await DataBase.conversationsCollection.find().toArray()).length;
+        return (await DataBase.conversationsCollection.find().toArray()).length || 0;
     };
 
     export async function getChannelById(channelId: string): Promise<Channel | null> {

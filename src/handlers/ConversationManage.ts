@@ -23,8 +23,8 @@ class ConversationManageHandler {
 
     async loadConversation(): Promise<void> {
         this.interaction.channel?.isDMBased()
-        ? this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.interaction.user.id, open: true }) as any
-        : this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any
+            ? this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.interaction.user.id, open: true }) as any
+            : this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any
         this.channel = await Utils.getChannelById(this.conversation.channelId) as TextChannel;
     }
 
@@ -52,8 +52,6 @@ class ConversationManageHandler {
     async attachHelper(staffMemberId: string): Promise<void> {
         if (!this.conversation.staffMemberId || this.conversation.staffMemberId.length === 0) {
             this.conversation.staffMemberId = [staffMemberId];
-            console.log(this.conversation);
-            
             await Utils.updatePermissionToChannel(this.conversation);
             await this.interaction.reply({ embeds: [MessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] })
             return;
@@ -81,17 +79,17 @@ class ConversationManageHandler {
     async changeHelpersMessage() {
         const helpersList = (await Utils.getUsersWithRoleId('1036014794806939648')).map(m => m);
         console.log('helpersList', helpersList);
-        
-            if (helpersList.length) {
-                await this.interaction.reply({
-                    ephemeral: true,
-                    embeds: [MessageUtils.EmbedMessages.changeHelper],
-                    components: [MessageUtils.Actions.changeHelper(helpersList),
-                    MessageUtils.Actions.resetHelpers]
-                });
-            } else {
-                await this.interaction.reply({content: "לא קיים משתמש עם דרגת תומך בשרת", ephemeral: true});
-            }
+
+        if (helpersList.length) {
+            await this.interaction.reply({
+                ephemeral: true,
+                embeds: [MessageUtils.EmbedMessages.changeHelper],
+                components: [MessageUtils.Actions.changeHelper(helpersList),
+                MessageUtils.Actions.resetHelpers]
+            });
+        } else {
+            await this.interaction.reply({ content: "לא קיים משתמש עם דרגת תומך בשרת", ephemeral: true });
+        }
     }
 
     async userReportOnHelper() {

@@ -3,7 +3,7 @@ import { Utils } from "./utils/Utils";
 import ConversationStaffToolsHandler from "./handlers/ConversationStaffTools";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
 import ReportHandler from "./handlers/Report";
-import { ButtonInteraction, ModalSubmitInteraction, SelectMenuInteraction } from "discord.js";
+import { ButtonInteraction, CommandInteraction, ModalSubmitInteraction, SelectMenuInteraction } from "discord.js";
 import LeaveGuildHandler from "./handlers/LeaveGuild";
 import ConfigHandler from "./handlers/Config";
 import { Config } from "./utils/types";
@@ -56,10 +56,12 @@ bot.on('messageCreate', async message => {
 bot.on('interactionCreate', async interaction => {
     const actionHandler: any = {
         openChatButton: async () => {
-            await new StartConversation(interaction as ButtonInteraction).precondition();
+            const startConversationHandler = new StartConversation(interaction as ButtonInteraction);
+            await startConversationHandler.precondition();
         },
         manager_attach_report: async () => {
-            await new ConversationStaffToolsHandler(interaction as ButtonInteraction).managerAttachReport();
+            const conversationStaffToolHandler = new ConversationStaffToolsHandler(interaction as ButtonInteraction);
+            await conversationStaffToolHandler.managerAttachReport();
         },
         tools_attach: async () => {
             const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
@@ -90,26 +92,42 @@ bot.on('interactionCreate', async interaction => {
             await conversationManage.resetHelpers();
             await conversationManage.saveConversation();
         },
-        tools_report: async () => {
+        tools_report: async () => { //
             await (interaction as ButtonInteraction).showModal(MessageUtils.Modals.reportChatModal);
         },
         user_report_helper: async () => {
             const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
             await conversationManage.userReportOnHelper();
         },
-        reportHelperModal: async () => {
-            await new ReportHandler(interaction as ModalSubmitInteraction).handle();
+        reportHelperModal: async () => { //User report on helper submit modal
+            const reportHelper = new ReportHandler(interaction as ModalSubmitInteraction);
+            await reportHelper.handle();
+        },
+        reportModal: async () => { //Helper report on user chat sunbmit handler
+            const reportHelper = new ReportHandler(interaction as ModalSubmitInteraction);
+            await reportHelper.handle();
         },
         helpers_list: async () => {
             await new ChangeHelperHandler(interaction as SelectMenuInteraction).handle();
-        }
+        },
+    }
+
+    if (interaction.isChatInputCommand()) {
+        interaction.reply({ content: "", ephemeral: true })
     }
 
     if (interaction.isButton() || interaction.isModalSubmit() || interaction.isSelectMenu()) {
+        console.log(`User clicked on ${interaction.customId}`);
+
         await actionHandler[interaction.customId]();
         if (!(interaction.deferred || interaction.replied)) {
-            await interaction.deferUpdate();
+            try {
+                await interaction.deferUpdate();
+            } catch (error) {
+                console.log(error);
+            }
         }
+        return;
     }
 
 });
