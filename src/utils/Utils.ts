@@ -1,4 +1,4 @@
-import { Client, Partials, Channel, User, TextChannel } from "discord.js";
+import { Client, Partials, Channel, User, TextChannel, ChannelType } from "discord.js";
 import { config } from "..";
 import DataBase from "./db";
 import { Conversation } from "./types";
@@ -52,7 +52,7 @@ export namespace Utils {
 
     export async function isTicketChannel(channel: Channel) {
         // const config: Config = await new ConfigHandler().getConfig();
-        return channel.isTextBased() && (channel as TextChannel).parentId === config.ticketCatagoryId;
+        return channel.type === ChannelType.GuildText && (channel as TextChannel).parentId === config.ticketCatagoryId;
     }
 
     export async function isGuildMember(userId: string) {

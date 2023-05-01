@@ -2,7 +2,6 @@ require("dotenv").config();
 import { Utils } from "./utils/Utils";
 import ConversationStaffToolsHandler from "./handlers/ConversationStaffTools";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
-import ReportHandler from "./handlers/Report";
 import { ButtonInteraction, ModalSubmitInteraction, SelectMenuInteraction } from "discord.js";
 import LeaveGuildHandler from "./handlers/LeaveGuild";
 import ConfigHandler from "./handlers/Config";
@@ -12,6 +11,8 @@ import StartConversation from "./handlers/StartConversation";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
 import { MessageUtils } from "./utils/MessageUtils";
 import ConversationManageHandler from "./handlers/ConversationManage";
+import { ReportOnHelperHandler } from "./handlers/ReportOnHelper";
+import { ReportOnConversationHandler } from "./handlers/ReportOnConversation";
 
 export let config: Config = {} as any;
 
@@ -98,7 +99,10 @@ bot.on('interactionCreate', async interaction => {
             await conversationManage.userReportOnHelper();
         },
         reportHelperModal: async () => {
-            await new ReportHandler(interaction as ModalSubmitInteraction).handle();
+            await new ReportOnHelperHandler(interaction as ModalSubmitInteraction).handle();
+        },
+        reportModal: async () => {
+            await new ReportOnConversationHandler(interaction as ModalSubmitInteraction).handle();
         },
         helpers_list: async () => {
             await new ChangeHelperHandler(interaction as SelectMenuInteraction).handle();

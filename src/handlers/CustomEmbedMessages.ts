@@ -28,12 +28,12 @@ class CustomEmbedMessages {
 
     async sendMessage() {
         const channel = await Utils.getChannelById(this.channelId) as TextChannel;
+        const color: any = !!this.message?.color ? this.message?.color : '#F9E900';
         const embedMessage = new EmbedBuilder({
             author: { iconURL: 'https://i.imgur.com/ATfQQi7.png', name: 'AngeLove - אנונימי' },
-            color: Number.parseInt(this.message.color),
             title: this.message.title,
             description: this.message.description
-        })
+        }).setColor(color);
         await channel.send({ embeds: [embedMessage] })
     }
 
