@@ -11,8 +11,8 @@ import StartConversation from "./handlers/StartConversation";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
 import { MessageUtils } from "./utils/MessageUtils";
 import ConversationManageHandler from "./handlers/ConversationManage";
-import { ReportOnHelperHandler } from "./handlers/ReportOnHelper";
-import { ReportOnConversationHandler } from "./handlers/ReportOnConversation";
+import { ReportOnHelperHandler } from "./handlers/SubmitReportOnHelper";
+import { ReportOnConversationHandler } from "./handlers/SubmitReportOnConversation";
 import DataBase from "./utils/db";
 import CommandHandler from "./handlers/Command";
 
@@ -157,4 +157,8 @@ client.on('guildMemberRemove', async member => {
 client.on('guildMemberAdd', async member => {
     const memberRole = await Utils.getRoleById(config.memberRole);
     memberRole && member.roles.add(memberRole);
+});
+
+client.on('channelDelete', async channel => {
+    await DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
 })
