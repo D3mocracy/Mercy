@@ -1,4 +1,4 @@
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, SelectMenuBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { Utils } from "./Utils";
 
 export namespace MessageUtils {
@@ -148,7 +148,14 @@ export namespace MessageUtils {
             color: colors.blue,
             title: `אתם לא לבד - דברו איתנו!`,
             description: `על מנת לפתוח צ'אט ולשוחח עם אחד התומכים באופן אנונימי יש ללחוץ על הכפתור מטה, והצ'אט יפתח באופן אוטומטי. לאחר פתיחתו תקבלו הודעה פרטית מהבוט האנונימי שלנו כי הצ'אט אכן נפתח. באמצעות ההודעה הפרטית אתם מוזמנים לכתוב לנו ולפרוק בחופשיות את כל מה שעל ליבכם, ונשמח להעניק לכם אוזן קשבת ומענה חם ואוהב בחזרה. שימו לב שיש לקרוא את תנאי השימוש בקפידה לפני שימושכם בשרת ובצ'אטים (מידע-ותנאי-השימוש-ישן). `
-        })  
+        });
+
+        export const sureMessageToClose = new EmbedBuilder({
+            author,
+            color: colors.pink,
+            title: "האם את/ה בטוח/ה שברצונך לסגור את הצ'אט?",
+            description: "פעולה זו אינה הפיכה"
+        })
 
 
     }
@@ -194,6 +201,21 @@ export namespace MessageUtils {
                     url,
                     style: ButtonStyle.Link
                 }),
+            ])
+        }
+
+        export function tools_sure_close_yes_no(): any {
+            return new ActionRowBuilder().addComponents([
+                new ButtonBuilder({
+                    label: "אני בטוח/ה",
+                    customId: 'sure_yes',
+                    style: ButtonStyle.Success
+                }),
+                new ButtonBuilder({
+                    label: "התחרטתי",
+                    customId: "sure_no",
+                    style: ButtonStyle.Danger
+                })
             ])
         }
 
@@ -255,14 +277,14 @@ export namespace MessageUtils {
         ]);
 
         export function changeHelper(helpers: any[]): any {
-            const selectMenu = new SelectMenuBuilder({
+            const selectMenu = new StringSelectMenuBuilder({
                 customId: "helpers_list",
                 placeholder: "בחר תומך אחד או יותר",
                 minValues: 1,
                 maxValues: helpers.length,
             });
             helpers.forEach(helper => {
-                const s = selectMenu.addOptions({ label: helper.displayName, description: "Helper", value: helper.id, emoji: {} });
+                selectMenu.addOptions({ label: helper.displayName, description: "Helper", value: helper.id, emoji: '🇭' });
             });
             return new ActionRowBuilder().addComponents(selectMenu);
         };

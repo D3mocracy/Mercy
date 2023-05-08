@@ -11,25 +11,28 @@ class StartConversation {
     }
 
     async precondition() {
-        if (!await Utils.hasOpenConversation(this.interaction.user.id)) {
-            await this.createConversation();
-        } else {
-            await this.interaction.reply({ content: "היי, נראה שכבר יש לך צ'אט פתוח", ephemeral: true })
-        }
+        await Utils.hasOpenConversation(this.interaction.user.id)
+            ? await this.interaction.reply({ content: "היי, נראה שכבר יש לך צ'אט פתוח", ephemeral: true })
+            : await this.createConversation();
     }
 
     private async createConversation() {
         const numberOfConversation = await Utils.getNumberOfConversationFromDB() + 1;
-        const convChannel = await (await (await Utils.getGuild().channels.create({
+        const convChannel = await (await Utils.getGuild().channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: ChannelType.GuildText,
-        })).setParent(config.ticketCatagoryId));
+        })).setParent(config.ticketCatagoryId);
 
-        await this.interaction.user.send({
-            embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
-            components: [new ActionRowBuilder().addComponents([
-                MessageUtils.Actions.tools_close, MessageUtils.Actions.user_report_helper]) as any]
-        });
+        try {
+            await this.interaction.user.send({
+                embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
+                components: [new ActionRowBuilder().addComponents([
+                    MessageUtils.Actions.tools_close, MessageUtils.Actions.user_report_helper]) as any]
+            });
+        } catch (error) {
+            console.log(`Can't sent message to ${this.interaction.user.tag}`);
+
+        }
 
         (await convChannel.send({
             content: `<@&${config.helperRole}>`,
