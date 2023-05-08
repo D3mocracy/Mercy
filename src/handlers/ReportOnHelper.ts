@@ -1,15 +1,12 @@
-import { ActionRow, ActionRowBuilder, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { ModalSubmitInteraction, TextChannel } from "discord.js";
 import { config } from "..";
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
-import ConfigHandler from "./Config";
 
 export class ReportOnHelperHandler {
-    constructor(private interaction: ModalSubmitInteraction) {
-        this.interaction = interaction;
-    }
+    constructor(private interaction: ModalSubmitInteraction) { }
 
     private async reply() {
         await this.interaction.reply({ content: "הדיווח שלך נשלח בהצלחה למנהלים", ephemeral: true });

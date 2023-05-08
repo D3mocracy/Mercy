@@ -29,9 +29,8 @@ class CommunicateConversationHandler {
 
     async sendMessage() {
         if (this.type === ChannelType.DM) {
-            console.log('dsa');
-
             await ((await Utils.getChannelById(this.conversation.channelId)) as TextChannel).send(this.message.content);
+
         } else if (this.type === ChannelType.GuildText) {
             if (this.message.content.startsWith('!')) {
                 if (this.message.content === "!manage") {

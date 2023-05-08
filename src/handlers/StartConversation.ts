@@ -25,9 +25,9 @@ class StartConversation {
 
         try {
             await this.interaction.user.send({
-                embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
+                embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation, convChannel.id)],
                 components: [new ActionRowBuilder().addComponents([
-                    MessageUtils.Actions.tools_close, MessageUtils.Actions.user_report_helper]) as any]
+                    MessageUtils.Actions.tools_close, /*MessageUtils.Actions.user_report_helper*/]) as any]
             });
         } catch (error) {
             console.log(`Can't sent message to ${this.interaction.user.tag}`);

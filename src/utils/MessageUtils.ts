@@ -16,21 +16,31 @@ export namespace MessageUtils {
             description: "לחיצה על כפתור ההסכמה תפתח צ'אט אנונימי עם אחד מחברי צוות השרת, וכל הודעה שתשלחו תופיע לאיש הצוות בצ'אנל נפרד בשרת. אתם מוזמנים לשתף אותנו בכל אשר על ליבכם - ברגשות, במחשבות, בבעיות ובפחדים, והצוות ישמח להעניק לכם מענה חם ואוהב בחזרה. שימו לב כי המערכת אנונימית - למעט מקרים העוברים על חוקי המדינה או מקרים חריגים אחרים אשר ידרשו פעולות דיווח.",
             footer: { text: "בלחיצה על כפתור ההסכמה אתם מאשרים את תנאי השימוש של השרת ומודעים לכך שצוות השרת אינו צוות מוסמך או מקצועי." }
         });
+
+        export const chatIsNotAvailable = new EmbedBuilder({
+            author,
+            color: colors.pink,
+            title: "צ'אט לא פעיל",
+            description: "צ'אט זה אינו פעיל יותר עקב סגירתו ולכן לא ניתן לבצע בו פעולות נוספות",
+            footer: { text: "למידע נוסף ניתן לפנות לצוות התומכים" }
+        })
+
         export function newChatStaff() {
             return new EmbedBuilder({
                 author,
                 color: colors.pink,
                 title: `ניהול צ'אט נוכחי`,
-                description: `משתמש פתח צ'אט, נא לתת סיוע בהתאם!`
+                description: `משתמש פתח צ'אט, נא לתת סיוע בהתאם!`,
             });
         }
 
-        export function newChatUser(numberOfConversation: number) {
+        export function newChatUser(numberOfConversation: number, channelId: string) {
             return new EmbedBuilder({
                 author,
                 color: colors.pink,
                 title: `צ'אט מספר ${numberOfConversation}`,
-                description: `צוות השרת קיבל את הודעתכם בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`
+                description: `צוות השרת קיבל את הודעתכם בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`,
+                footer: { text: channelId }
             });
         }
 

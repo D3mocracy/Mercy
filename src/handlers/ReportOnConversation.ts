@@ -1,10 +1,7 @@
-import { ActionRow, ActionRowBuilder, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { ModalSubmitInteraction, TextChannel } from "discord.js";
 import { config } from "..";
-import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
-import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
-import ConfigHandler from "./Config";
 
 export class ReportOnConversationHandler {
     constructor(private interaction: ModalSubmitInteraction) {

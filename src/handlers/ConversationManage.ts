@@ -4,6 +4,7 @@ import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
 import Logger from "./Logger";
+import { CantLoadConversationFromDB } from "../utils/Errors";
 
 
 class ConversationManageHandler {
@@ -24,8 +25,12 @@ class ConversationManageHandler {
     async loadConversation(): Promise<void> {
         this.interaction.channel?.isDMBased()
             ? this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.interaction.user.id, open: true }) as any
-            : this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any
-        this.channel = await Utils.getChannelById(this.conversation.channelId) as TextChannel;
+            : this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any;
+        if (this.conversation) {
+            this.channel = await Utils.getChannelById(this.conversation.channelId) as TextChannel;
+        } else {
+            throw new CantLoadConversationFromDB();
+        }
     }
 
     async saveConversation() {
@@ -35,10 +40,6 @@ class ConversationManageHandler {
     async sendSureMessageToClose() {
         await this.interaction.reply({ embeds: [MessageUtils.EmbedMessages.sureMessageToClose], components: [MessageUtils.Actions.tools_sure_close_yes_no()] });
     }
-
-    // static async removeSureButtons(interaction: ) {
-    //     this.interaction.message.edit({ components: [] });
-    // }
 
     async closeConversation(closedBy: string) {
         const closedMessage = { embeds: [MessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };

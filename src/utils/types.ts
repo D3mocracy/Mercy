@@ -11,6 +11,7 @@ export type Config = {
     ticketLogId: string,
     managerRole: string,
     helperRole: string,
+    memberRole: string,
     guildId: string,
     reportChannelId: string,
     reportHelperChannelId: string,

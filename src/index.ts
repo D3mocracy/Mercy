@@ -2,7 +2,7 @@ require("dotenv").config();
 import { Utils } from "./utils/Utils";
 import ConversationStaffToolsHandler from "./handlers/ConversationStaffTools";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
-import { ButtonInteraction, ModalSubmitInteraction, SelectMenuInteraction, ChannelType } from "discord.js";
+import { ButtonInteraction, ModalSubmitInteraction, SelectMenuInteraction, PermissionsBitField, ChatInputCommandInteraction } from "discord.js";
 import LeaveGuildHandler from "./handlers/LeaveGuild";
 import ConfigHandler from "./handlers/Config";
 import { Config } from "./utils/types";
@@ -13,40 +13,31 @@ import { MessageUtils } from "./utils/MessageUtils";
 import ConversationManageHandler from "./handlers/ConversationManage";
 import { ReportOnHelperHandler } from "./handlers/ReportOnHelper";
 import { ReportOnConversationHandler } from "./handlers/ReportOnConversation";
+import DataBase from "./utils/db";
+import CommandHandler from "./handlers/Command";
 
 export let config: Config = {} as any;
+const client = Utils.client;
 
-Utils.turnOnBot().then(async () => {
+DataBase.client.connect().then(async () => {
+    await Utils.turnOnBot();
     config = await new ConfigHandler().getConfig();
 });
 
-const bot = Utils.client;
-
-bot.once('ready', () => {
-    console.log(`Logged in as ${bot!.user?.tag}!`);
+client.once('ready', () => {
+    console.log(`Logged in as ${client!.user?.tag}!`);
 });
 
-bot.on('messageCreate', async message => {
+client.on('messageCreate', async message => {
     try {
         if (message.author.bot
             || message.attachments.size > 0
             || message.stickers.size > 0
             || !message.channel.isTextBased()) return;
-        if (message.author.id === '844537722466205706' || message.author.id === '243380679763558400') {
-            if (message.content === '!openchat') {
-                await message.channel.send({
-                    embeds: [MessageUtils.EmbedMessages.openChat],
-                    components: [MessageUtils.Actions.openChatButton]
-                })
-                await message.delete();
-            }
-        }
-
 
         if (message.content.startsWith('&')) {
             await (await CustomEmbedMessages.createHandler(CustomEmbedMessages.getKeyFromMessage(message.content), message.channelId)).sendMessage();
         }
-
 
         if (await Utils.isGuildMember(message.author.id)) {
             const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
@@ -61,7 +52,8 @@ bot.on('messageCreate', async message => {
     }
 });
 
-bot.on('interactionCreate', async interaction => {
+client.on('interactionCreate', async interaction => {
+
     const actionHandler: any = {
         openChatButton: async () => {
             await new StartConversation(interaction as ButtonInteraction).precondition();
@@ -75,14 +67,24 @@ bot.on('interactionCreate', async interaction => {
             await conversationManage.saveConversation();
         },
         tools_close: async () => {
-            const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
-            await conversationManage.sendSureMessageToClose();
+            try {
+                const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
+                await conversationManage.sendSureMessageToClose();
+            } catch (error) {
+                (interaction as ButtonInteraction).message.edit({ components: [] });
+                interaction.channel?.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
+            }
         },
         sure_yes: async () => {
-            const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
-            await (interaction as ButtonInteraction).message.edit({ components: [] });
-            await conversationManage.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
-            await conversationManage.saveConversation();
+            try {
+                const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
+                await (interaction as ButtonInteraction).message.edit({ components: [] });
+                await conversationManage.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
+                await conversationManage.saveConversation();
+            } catch (error) {
+                (interaction as ButtonInteraction).message.edit({ components: [] });
+                interaction.channel?.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
+            }
         },
         sure_no: async () => {
             await interaction.channel?.send('הפעולה בוטלה');
@@ -122,23 +124,37 @@ bot.on('interactionCreate', async interaction => {
         },
         helpers_list: async () => {
             await new ChangeHelperHandler(interaction as SelectMenuInteraction).handle();
+        },
+        openchat: async () => {
+            await new CommandHandler(interaction as ChatInputCommandInteraction).openChat();
+
         }
     }
     try {
-        if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu()) {
-            await actionHandler[interaction.customId]();
-            if (!(interaction.deferred || interaction.replied)) {
-                await interaction.deferUpdate();
+        if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu() || interaction.isChatInputCommand()) {
+            interaction.isChatInputCommand()
+                ? await actionHandler[interaction.commandName]()
+                : await actionHandler[interaction.customId]();
+
+            if (!(interaction.deferred || interaction.replied)) { //interaction.isChatInputCommand don't have deferUpdate()
+                interaction.isChatInputCommand()
+                    ? await interaction.deferReply()
+                    : await interaction.deferUpdate();
             }
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error(error)
     }
 
 });
 
-bot.on('guildMemberRemove', async member => {
+client.on('guildMemberRemove', async member => {
     const leaveGuildHandler = new LeaveGuildHandler(member.user.id);
     await leaveGuildHandler.loadConversation();
     await leaveGuildHandler.closeConversation()
 });
+
+client.on('guildMemberAdd', async member => {
+    const memberRole = await Utils.getRoleById(config.memberRole);
+    memberRole && member.roles.add(memberRole);
+})

@@ -1,15 +1,15 @@
-import { Client, Partials, Channel, User, TextChannel, ChannelType } from "discord.js";
+import { Channel, User, TextChannel, ChannelType, Client, Partials } from "discord.js";
 import { config } from "..";
 import DataBase from "./db";
 import { Conversation } from "./types";
+import { Command } from "./Commands";
 export namespace Utils {
     export const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
 
     export async function turnOnBot() {
-        await DataBase.client.connect().then(async () => {
-            await client.login(process.env.TOKEN);
-        });
-    };
+        await client.application?.commands.set(Command.commands);
+        await client.login(process.env.TOKEN);
+    }
 
     export function getGuild() {
         return Utils.client.guilds.cache.get("1035880269460295720")!;
@@ -27,13 +27,17 @@ export namespace Utils {
         return await Utils.client.channels.fetch(channelId);
     }
 
+    export async function getRoleById(roleId: string) {
+        return await Utils.getGuild().roles.fetch(roleId);
+    }
+
     export async function getUserByID(userId: string): Promise<User> {
-        return await client.users.fetch(userId);
+        return await Utils.client.users.fetch(userId);
     }
 
     export async function getUsersWithRoleId(roleId: string) {
         // const config: Config = await new ConfigHandler().getConfig();
-        return (await client.guilds.fetch(config.guildId)).members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
+        return (await Utils.client.guilds.fetch(config.guildId)).members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
     }
 
     export async function updatePermissionToChannel(conversation: Conversation) {
@@ -57,7 +61,7 @@ export namespace Utils {
 
     export async function isGuildMember(userId: string) {
         // const config: Config = await new ConfigHandler().getConfig();
-        return (await client.guilds.fetch(config.guildId)).members.cache.find((member) => member.id === userId);
+        return (await Utils.client.guilds.fetch(config.guildId)).members.cache.find((member) => member.id === userId);
     }
 
     export function getMembersById(...userId: string[]) {
