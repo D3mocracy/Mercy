@@ -1,5 +1,5 @@
 import { Utils } from "../utils/Utils";
-import { ChannelType, Message, ActionRowBuilder, ButtonInteraction } from "discord.js"
+import { ChannelType, CategoryChannel, ActionRowBuilder, ButtonInteraction, ButtonBuilder } from "discord.js"
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { config } from "..";
@@ -18,34 +18,35 @@ class StartConversation {
 
     private async createConversation() {
         const numberOfConversation = await Utils.getNumberOfConversationFromDB() + 1;
-        const convChannel = await (await Utils.getGuild().channels.create({
+        const convChannel = await Utils.getGuild().channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: ChannelType.GuildText,
-        })).setParent(config.ticketCatagoryId);
+            parent: await Utils.getGuild().channels.fetch(config.ticketCatagoryId) as CategoryChannel
+        });
 
-        try {
-            await this.interaction.user.send({
-                embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation, convChannel.id)],
-                components: [new ActionRowBuilder().addComponents([
-                    MessageUtils.Actions.tools_close, /*MessageUtils.Actions.user_report_helper*/]) as any]
-            });
-        } catch (error) {
-            console.log(`Can't sent message to ${this.interaction.user.tag}`);
+        await Promise.all([
+            this.interaction.user.send({
+                embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
+                components: [new ActionRowBuilder<ButtonBuilder>().addComponents(MessageUtils.Actions.tools_close)]
+            }),
 
-        }
+            convChannel.send({
+                content: `<@&${config.helperRole}>`,
+                embeds: [MessageUtils.EmbedMessages.newChatStaff()],
+                components: [MessageUtils.Actions.supporterTools]
+            }).then(message => message.edit({ content: null })),
 
-        (await convChannel.send({
-            content: `<@&${config.helperRole}>`,
-            embeds: [MessageUtils.EmbedMessages.newChatStaff()],
-            components: [MessageUtils.Actions.supporterTools]
-        })).edit({ content: null });
+            DataBase.conversationsCollection.insertOne({
+                userId: this.interaction.user.id,
+                guildId: Utils.getGuild().id,
+                channelId: convChannel.id,
+                open: true
+            }),
 
-        await DataBase.conversationsCollection.insertOne({
-            userId: this.interaction.user.id,
-            guildId: Utils.getGuild().id,
-            channelId: convChannel.id,
-            open: true
-        })
+            convChannel.lockPermissions()
+        ]);
+
+        await this.interaction.deferUpdate();
     }
 
 }

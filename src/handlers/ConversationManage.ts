@@ -12,9 +12,7 @@ class ConversationManageHandler {
     channel: TextChannel = {} as any;
     conversation: Conversation = {} as any;
 
-    private constructor(private interaction: ButtonInteraction) {
-        this.interaction = interaction;
-    }
+    private constructor(private interaction: ButtonInteraction) { }
 
     static async createHandler(interaction: ButtonInteraction) {
         const handler = new ConversationManageHandler(interaction);
@@ -44,7 +42,7 @@ class ConversationManageHandler {
                 components: [MessageUtils.Actions.supporterTools]
             });
         } else {
-            await interaction.reply({ content: "ניתן לבצע את הפקודה הזו רק בטיקטים", ephemeral: true });
+            await interaction.reply({ content: "ניתן לבצע את הפקודה הזו רק בצ'אטים", ephemeral: true });
         }
 
     }
@@ -56,18 +54,14 @@ class ConversationManageHandler {
     async closeConversation(closedBy: string) {
         const closedMessage = { embeds: [MessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };
         this.conversation.open = false;
+        await this.channel.send(closedMessage);
         await Promise.all([
-            this.channel.send(closedMessage),
             Logger.logTicket(this.channel),
-            this.interaction?.channel?.isDMBased() ? this.interaction.message.edit({ components: [] }) : Promise.resolve()
+            this.interaction.message.edit({ components: [] }),
+            Utils.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
+            this.interaction.deferUpdate()
         ]);
         await this.channel.delete();
-
-        try {
-            await Utils.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "";
-        } catch (error) {
-            console.log("Can't send message to this member. User kicked/banned/left the server");
-        }
     }
 
     async attachHelper(staffMemberId: string): Promise<void> {

@@ -154,6 +154,7 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.on('guildMemberRemove', async member => {
+    if (!await Utils.hasOpenConversation(member.id)) return;
     const leaveGuildHandler = new LeaveGuildHandler(member.user.id);
     await leaveGuildHandler.loadConversation();
     await leaveGuildHandler.closeConversation()

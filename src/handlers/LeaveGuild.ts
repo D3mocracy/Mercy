@@ -8,9 +8,7 @@ import Logger from "./Logger";
 
 class LeaveGuildHandler {
     private conversation: Conversation = {} as any;
-    constructor(private userId: string) {
-        this.userId = userId;
-    }
+    constructor(private userId: string) { }
 
     async loadConversation(): Promise<void> {
         this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.userId, open: true }) as any;

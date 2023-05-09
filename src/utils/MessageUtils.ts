@@ -35,13 +35,12 @@ export namespace MessageUtils {
             });
         }
 
-        export function newChatUser(numberOfConversation: number, channelId: string) {
+        export function newChatUser(numberOfConversation: number) {
             return new EmbedBuilder({
                 author,
                 color: colors.pink,
                 title: `צ'אט מספר ${numberOfConversation}`,
                 description: `צוות השרת קיבל את הודעתכם בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`,
-                footer: { text: channelId }
             });
         }
 
@@ -184,20 +183,8 @@ export namespace MessageUtils {
     }
 
     export namespace Actions {
-        // export const YesNo: any = new ActionRowBuilder().addComponents([
-        //     new ButtonBuilder({
-        //         customId: "yes_conv",
-        //         label: "כן",
-        //         style: ButtonStyle.Success
-        //     }),
-        //     new ButtonBuilder({
-        //         customId: "no_conv",
-        //         label: "לא",
-        //         style: ButtonStyle.Danger
-        //     }),
-        // ]);
 
-        export const openChatButton: any = new ActionRowBuilder().addComponents([
+        export const openChatButton = new ActionRowBuilder<ButtonBuilder>().addComponents([
             new ButtonBuilder({
                 customId: 'openChatButton',
                 label: "פתיחת צ'אט אנונימי",
@@ -205,8 +192,8 @@ export namespace MessageUtils {
             })
         ])
 
-        export function attachReport(isAttached: boolean): any {
-            return new ActionRowBuilder().addComponents(
+        export function attachReport(isAttached: boolean) {
+            return new ActionRowBuilder<ButtonBuilder>().addComponents(
                 new ButtonBuilder({
                     customId: 'manager_attach_report',
                     label: 'שייך דיווח',
@@ -217,8 +204,8 @@ export namespace MessageUtils {
             );
 
         }
-        export function tools_report_link(url: string): any {
-            return new ActionRowBuilder().addComponents([
+        export function tools_report_link(url: string) {
+            return new ActionRowBuilder<ButtonBuilder>().addComponents([
                 new ButtonBuilder({
                     label: "העבר אותי לצ'אט",
                     url,
@@ -227,8 +214,8 @@ export namespace MessageUtils {
             ])
         }
 
-        export function tools_sure_close_yes_no(): any {
-            return new ActionRowBuilder().addComponents([
+        export function tools_sure_close_yes_no() {
+            return new ActionRowBuilder<ButtonBuilder>().addComponents([
                 new ButtonBuilder({
                     label: "אני בטוח/ה",
                     customId: 'sure_yes',
@@ -242,49 +229,53 @@ export namespace MessageUtils {
             ])
         }
 
-        export const tools_attach: any = new ButtonBuilder({
+        export const tools_attach = new ButtonBuilder({
             customId: "tools_attach",
             label: "שיוך צ'אט אליי",
             emoji: "🔀",
             style: ButtonStyle.Success
         });
 
-        export const tools_manager: any = new ButtonBuilder({
+        export const tools_manager = new ButtonBuilder({
             customId: "tools_manager",
             label: "הגדרות ניהול",
             emoji: '🧑‍💼',
             style: ButtonStyle.Primary
         });
 
-        export const tools_close: any = new ButtonBuilder({
+        export const tools_close = new ButtonBuilder({
             customId: "tools_close",
             label: "סגירת צ'אט",
             emoji: '✖️',
             style: ButtonStyle.Danger
-        });
+        })
 
-        export const tools_report: any = new ButtonBuilder({
+        export const tools_report = new ButtonBuilder({
             customId: "tools_report",
             label: "דיווח",
             emoji: '🚩',
             style: ButtonStyle.Secondary
         });
 
-        export const user_report_helper: any = new ButtonBuilder({
+        /**
+        * This feature is deprecated.
+        * @deprecated
+        */
+        export const user_report_helper = new ButtonBuilder({
             customId: "user_report_helper",
             label: "דווח על תומך",
             emoji: '🚩',
             style: ButtonStyle.Secondary
         });
 
-        export const supporterTools: any = new ActionRowBuilder().addComponents([
+        export const supporterTools = new ActionRowBuilder<ButtonBuilder>().addComponents([
             tools_close,
             tools_manager,
             tools_report,
             tools_attach,
         ]);
 
-        export const managerTools: any = new ActionRowBuilder().addComponents([
+        export const managerTools = new ActionRowBuilder<ButtonBuilder>().addComponents([
             new ButtonBuilder({
                 customId: "tools_manager_change_supporter",
                 label: "החלפת תומך",
@@ -299,7 +290,7 @@ export namespace MessageUtils {
             }),
         ]);
 
-        export function changeHelper(helpers: any[]): any {
+        export function changeHelper(helpers: any[]) {
             const selectMenu = new StringSelectMenuBuilder({
                 customId: "helpers_list",
                 placeholder: "בחר תומך אחד או יותר",
@@ -309,10 +300,10 @@ export namespace MessageUtils {
             helpers.forEach(helper => {
                 selectMenu.addOptions({ label: helper.displayName, description: "Helper", value: helper.id, emoji: '🇭' });
             });
-            return new ActionRowBuilder().addComponents(selectMenu);
+            return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
         };
 
-        export const resetHelpers = new ActionRowBuilder().addComponents(
+        export const resetHelpers = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder({
                 label: "מחיקת הרשאות לכל התומכים",
                 customId: 'tools_reset_helpers',
@@ -324,10 +315,6 @@ export namespace MessageUtils {
     };
 
     export namespace Modals {
-        export const reportChatModal = new ModalBuilder({
-            customId: 'reportModal',
-            title: "דיווח על צ'אט חריג"
-        });
 
         const reportCause = new TextInputBuilder({
             customId: 'reportCause',
@@ -335,13 +322,13 @@ export namespace MessageUtils {
             style: TextInputStyle.Paragraph,
             required: true
         });
-        const reportCauseActionRow = new ActionRowBuilder().addComponents(reportCause) as any;
-        reportChatModal.addComponents(reportCauseActionRow);
 
-        export const reportHelperModal = new ModalBuilder({
-            customId: 'reportHelperModal',
-            title: "דיווח על תומך"
-        });
+        const reportCauseActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reportCause);
+        export const reportChatModal = new ModalBuilder({
+            customId: 'reportModal',
+            title: "דיווח על צ'אט חריג"
+        }).addComponents(reportCauseActionRow);
+
 
         const reportHelperCause = new TextInputBuilder({
             customId: 'reportHelperCause',
@@ -349,8 +336,11 @@ export namespace MessageUtils {
             style: TextInputStyle.Paragraph,
             required: true
         });
-        const reportHelperCauseActionRow = new ActionRowBuilder().addComponents(reportHelperCause) as any;
-        reportHelperModal.addComponents(reportHelperCauseActionRow);
+        const reportHelperCauseActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reportHelperCause) as any;
+        export const reportHelperModal = new ModalBuilder({
+            customId: 'reportHelperModal',
+            title: "דיווח על תומך"
+        }).addComponents(reportHelperCauseActionRow);
     }
 
 } 
