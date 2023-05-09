@@ -1,4 +1,4 @@
-import { ButtonInteraction, Client, Guild, GuildMember, TextChannel, User } from "discord.js";
+import { ButtonInteraction, Client, TextChannel, ChatInputCommandInteraction } from "discord.js";
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
@@ -35,6 +35,18 @@ class ConversationManageHandler {
 
     async saveConversation() {
         await DataBase.conversationsCollection.updateOne({ channelId: this.conversation.channelId }, { $set: this.conversation }, { upsert: true })
+    }
+
+    static async sendManageTools(interaction: ChatInputCommandInteraction) {
+        if (await Utils.isTicketChannel(interaction.channel as TextChannel)) {
+            await interaction.reply({
+                embeds: [MessageUtils.EmbedMessages.newChatStaff()],
+                components: [MessageUtils.Actions.supporterTools]
+            });
+        } else {
+            await interaction.reply({ content: "ניתן לבצע את הפקודה הזו רק בטיקטים", ephemeral: true });
+        }
+
     }
 
     async sendSureMessageToClose() {

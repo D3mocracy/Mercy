@@ -29,15 +29,8 @@ class CommunicateConversationHandler {
             await ((await Utils.getChannelById(this.conversation.channelId)) as TextChannel).send(this.message.content);
 
         } else if (this.type === ChannelType.GuildText) {
-            if (this.message.content.startsWith('!')) {
-                if (this.message.content === "!manage" || this.message.content === "!ניהול") {
-                    await this.message.reply({
-                        embeds: [MessageUtils.EmbedMessages.newChatStaff()],
-                        components: [MessageUtils.Actions.supporterTools]
-                    });
-                }
-                return;
-            }
+            if (this.message.content.startsWith('!')) return;
+
             (await Utils.client.users.fetch(this.conversation.userId)).send(this.message.content);
         }
 

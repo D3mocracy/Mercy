@@ -130,6 +130,9 @@ client.on('interactionCreate', async interaction => {
         },
         'תומך החודש': async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).makeHelperOfTheMonth();
+        },
+        manage: async () => {
+            await ConversationManageHandler.sendManageTools(interaction as ChatInputCommandInteraction)
         }
     }
     try {
