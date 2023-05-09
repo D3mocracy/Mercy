@@ -7,8 +7,8 @@ export namespace Utils {
     export const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
 
     export async function turnOnBot() {
-        await client.application?.commands.set(Command.commands);
         await client.login(process.env.TOKEN);
+        await client.application?.commands.set(Command.commands);
     }
 
     export function getGuild() {

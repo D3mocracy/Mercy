@@ -15,6 +15,8 @@ export type Config = {
     guildId: string,
     reportChannelId: string,
     reportHelperChannelId: string,
+    staffChannelId: string,
+    helperOfTheMonthRoleId: string,
 }
 
 export type CustomMessage = {

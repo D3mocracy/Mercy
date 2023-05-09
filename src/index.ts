@@ -42,7 +42,7 @@ client.on('messageCreate', async message => {
         if (await Utils.isGuildMember(message.author.id)) {
             const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
             if ((message.channel.isDMBased() && hasOpenConversation) || await Utils.isTicketChannel(message.channel)) {
-                await new CommunicateConversationHandler(message, message.channel.type).createHandler();
+                await new CommunicateConversationHandler(message, message.channel.type).handle();
             }
         } else {
             await message.reply("היי, לא נראה שאתה חלק מהשרת האנונימי");
@@ -127,17 +127,19 @@ client.on('interactionCreate', async interaction => {
         },
         openchat: async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).openChat();
-
+        },
+        'תומך החודש': async () => {
+            await new CommandHandler(interaction as ChatInputCommandInteraction).makeHelperOfTheMonth();
         }
     }
     try {
-        if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu() || interaction.isChatInputCommand()) {
-            interaction.isChatInputCommand()
+        if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu() || interaction.isCommand()) {
+            interaction.isCommand()
                 ? await actionHandler[interaction.commandName]()
                 : await actionHandler[interaction.customId]();
 
             if (!(interaction.deferred || interaction.replied)) { //interaction.isChatInputCommand don't have deferUpdate()
-                interaction.isChatInputCommand()
+                interaction.isCommand()
                     ? await interaction.deferReply()
                     : await interaction.deferUpdate();
             }

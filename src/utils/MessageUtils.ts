@@ -1,11 +1,12 @@
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { Utils } from "./Utils";
 
 export namespace MessageUtils {
     const author = { iconURL: 'https://i.imgur.com/ATfQQi7.png', name: 'Mercy - אנונימי' };
     const colors = {
         blue: 0x86b5dd,
-        pink: 0xfe929f
+        pink: 0xfe929f,
+        gold: 0xfcc22d
     }
 
     export namespace EmbedMessages {
@@ -166,6 +167,18 @@ export namespace MessageUtils {
             title: "האם את/ה בטוח/ה שברצונך לסגור את הצ'אט?",
             description: "פעולה זו אינה הפיכה"
         })
+
+        export function helperOfTheMonth(helper: GuildMember) {
+            return new EmbedBuilder({
+                author: { name: "Mercy - הנהלה", iconURL: author.iconURL },
+                color: colors.gold,
+                title: "תומך החודש!",
+                description: `שאו ברכה ואיחולים לתומך החודש - לא אחר מאשר ${helper}! \n
+                דבר המזכה אותך בחודש של Discord Nitro \n
+                כל הכבוד המשך כך!`,
+                footer: { text: "בברכה, מנהלי הקהילה", iconURL: author.iconURL }
+            })
+        }
 
 
     }

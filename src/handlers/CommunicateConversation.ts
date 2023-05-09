@@ -7,12 +7,9 @@ import { MessageUtils } from "../utils/MessageUtils";
 
 class CommunicateConversationHandler {
     private conversation: Conversation = {} as any;
-    constructor(private message: Message, private type: ChannelType) {
-        this.message = message;
-        this.type = type;
-    }
+    constructor(private message: Message, private type: ChannelType) { }
 
-    async createHandler() {
+    async handle() {
         await this.loadConversation();
         await this.sendMessage();
     }
