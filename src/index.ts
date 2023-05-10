@@ -21,7 +21,7 @@ const client = Utils.client;
 DataBase.client.connect().then(async () => {
     await Utils.turnOnBot();
     await new ConfigHandler().loadConfig();
-});
+}).catch((error) => Logger.logError(error));
 
 client.once('ready', () => {
     console.log(`Logged in as ${client!.user?.tag}!`);
