@@ -1,4 +1,4 @@
-import { SelectMenuInteraction } from "discord.js";
+import { StringSelectMenuInteraction } from "discord.js";
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
@@ -6,7 +6,7 @@ import { Utils } from "../utils/Utils";
 
 class ChangeHelperHandler {
     private conversation: Conversation = {} as any;
-    constructor(private interaction: SelectMenuInteraction) { }
+    constructor(private interaction: StringSelectMenuInteraction) { }
 
     async loadConversation(): Promise<void> {
         this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any;

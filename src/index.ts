@@ -1,20 +1,20 @@
 require("dotenv").config();
-import { Utils } from "./utils/Utils";
-import ConversationStaffToolsHandler from "./handlers/ConversationStaffTools";
+import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction } from "discord.js";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
-import { ButtonInteraction, ModalSubmitInteraction, SelectMenuInteraction, PermissionsBitField, ChatInputCommandInteraction } from "discord.js";
-import LeaveGuildHandler from "./handlers/LeaveGuild";
-import ConfigHandler from "./handlers/Config";
-import { Config } from "./utils/types";
-import CustomEmbedMessages from "./handlers/CustomEmbedMessages";
-import StartConversation from "./handlers/StartConversation";
-import CommunicateConversationHandler from "./handlers/CommunicateConversation";
-import { MessageUtils } from "./utils/MessageUtils";
-import ConversationManageHandler from "./handlers/ConversationManage";
-import { ReportOnHelperHandler } from "./handlers/SubmitReportOnHelper";
-import { ReportOnConversationHandler } from "./handlers/SubmitReportOnConversation";
-import DataBase from "./utils/db";
 import CommandHandler from "./handlers/Command";
+import CommunicateConversationHandler from "./handlers/CommunicateConversation";
+import ConfigHandler from "./handlers/Config";
+import ConversationManageHandler from "./handlers/ConversationManage";
+import ConversationStaffToolsHandler from "./handlers/ConversationStaffTools";
+import CustomEmbedMessages from "./handlers/CustomEmbedMessages";
+import LeaveGuildHandler from "./handlers/LeaveGuild";
+import StartConversation from "./handlers/StartConversation";
+import { ReportOnConversationHandler } from "./handlers/SubmitReportOnConversation";
+import { ReportOnHelperHandler } from "./handlers/SubmitReportOnHelper";
+import { MessageUtils } from "./utils/MessageUtils";
+import { Utils } from "./utils/Utils";
+import DataBase from "./utils/db";
+import { Config } from "./utils/types";
 
 export let config: Config = {} as any;
 const client = Utils.client;
@@ -123,7 +123,7 @@ client.on('interactionCreate', async interaction => {
             await new ReportOnConversationHandler(interaction as ModalSubmitInteraction).handle();
         },
         helpers_list: async () => {
-            await new ChangeHelperHandler(interaction as SelectMenuInteraction).handle();
+            await new ChangeHelperHandler(interaction as StringSelectMenuInteraction).handle();
         },
         openchat: async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).openChat();
