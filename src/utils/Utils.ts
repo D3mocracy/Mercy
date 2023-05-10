@@ -3,6 +3,7 @@ import DataBase from "./db";
 import { Conversation } from "./types";
 import { Command } from "./Commands";
 import ConfigHandler from "../handlers/Config";
+import { WithId } from "mongodb";
 export namespace Utils {
     export const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
 
@@ -17,6 +18,11 @@ export namespace Utils {
 
     export async function hasOpenConversation(userId: string) {
         return !!(await DataBase.conversationsCollection.findOne({ userId, open: true }));
+    }
+
+    export async function getOpenConversation(userId: string) {
+        const coversation = (await DataBase.conversationsCollection.findOne({ userId, open: true }));
+        return coversation ? coversation : undefined;
     }
 
     export async function getNumberOfConversationFromDB() {

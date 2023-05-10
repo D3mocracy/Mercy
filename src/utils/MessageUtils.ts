@@ -227,6 +227,16 @@ export namespace MessageUtils {
             })
         ])
 
+        export function linkButton(url: string, label: string) {
+            return new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder({
+                    style: ButtonStyle.Link,
+                    label,
+                    url
+                })
+            )
+        }
+
         export function attachReport(isAttached: boolean) {
             return new ActionRowBuilder<ButtonBuilder>().addComponents(
                 new ButtonBuilder({
