@@ -9,16 +9,16 @@ namespace DataBase {
     channelId: string,
     open: boolean,
     */
-    export const conversationsCollection = DataBase.client.db("AngeLove").collection("Conversations");
+    export const conversationsCollection = DataBase.client.db("Mercy").collection("Conversations");
 
     /*
     ticketCatagoryId: string,
     managerRole: string,
     helperRole: string,
     */
-    export const configCollection = DataBase.client.db("AngeLove").collection("Config");
+    export const configCollection = DataBase.client.db("Mercy").collection("Config");
 
-    export const embedMessagesCollection = DataBase.client.db("AngeLove").collection("EmbedMessages");
+    export const embedMessagesCollection = DataBase.client.db("Mercy").collection("EmbedMessages");
 }
 
 export default DataBase;
