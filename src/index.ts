@@ -14,14 +14,13 @@ import { ReportOnHelperHandler } from "./handlers/SubmitReportOnHelper";
 import { MessageUtils } from "./utils/MessageUtils";
 import { Utils } from "./utils/Utils";
 import DataBase from "./utils/db";
-import { Config } from "./utils/types";
+import Logger from "./handlers/Logger";
 
-export let config: Config = {} as any;
 const client = Utils.client;
 
 DataBase.client.connect().then(async () => {
     await Utils.turnOnBot();
-    config = await new ConfigHandler().getConfig();
+    await new ConfigHandler().loadConfig();
 });
 
 client.once('ready', () => {
@@ -41,14 +40,15 @@ client.on('messageCreate', async message => {
 
         if (await Utils.isGuildMember(message.author.id)) {
             const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
+
             if ((message.channel.isDMBased() && hasOpenConversation) || await Utils.isTicketChannel(message.channel)) {
                 await new CommunicateConversationHandler(message, message.channel.type).handle();
             }
         } else {
             await message.reply("היי, לא נראה שאתה חלק מהשרת האנונימי");
         }
-    } catch (error) {
-        console.error(error);
+    } catch (error: any) {
+        Logger.logError(error);
     }
 });
 
@@ -148,23 +148,35 @@ client.on('interactionCreate', async interaction => {
             }
         }
     } catch (error: any) {
-        console.error(error)
+        Logger.logError(error);
     }
 
 });
 
 client.on('guildMemberRemove', async member => {
-    if (!await Utils.hasOpenConversation(member.id)) return;
-    const leaveGuildHandler = new LeaveGuildHandler(member.user.id);
-    await leaveGuildHandler.loadConversation();
-    await leaveGuildHandler.closeConversation()
+    try {
+        if (!await Utils.hasOpenConversation(member.id)) return;
+        const leaveGuildHandler = new LeaveGuildHandler(member.user.id);
+        await leaveGuildHandler.loadConversation();
+        await leaveGuildHandler.closeConversation();
+    } catch (error: any) {
+        Logger.logError(error);
+    }
 });
 
 client.on('guildMemberAdd', async member => {
-    const memberRole = await Utils.getRoleById(config.memberRole);
-    memberRole && member.roles.add(memberRole);
+    try {
+        const memberRole = ConfigHandler.config.memberRole;
+        memberRole && member.roles.add(memberRole);
+    } catch (error: any) {
+        Logger.logError(error);
+    }
 });
 
 client.on('channelDelete', async channel => {
-    await DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
+    try {
+        await DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
+    } catch (error: any) {
+        Logger.logError(error);
+    }
 })

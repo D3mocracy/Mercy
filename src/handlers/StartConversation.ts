@@ -2,7 +2,7 @@ import { Utils } from "../utils/Utils";
 import { ChannelType, CategoryChannel, ActionRowBuilder, ButtonInteraction, ButtonBuilder } from "discord.js"
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
-import { config } from "..";
+import ConfigHandler from "./Config";
 
 class StartConversation {
 
@@ -21,7 +21,7 @@ class StartConversation {
         const convChannel = await Utils.getGuild().channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: ChannelType.GuildText,
-            parent: await Utils.getGuild().channels.fetch(config.ticketCatagoryId) as CategoryChannel
+            parent: ConfigHandler.config.ticketCatagory
         });
 
         await Promise.all([
@@ -31,7 +31,7 @@ class StartConversation {
             }),
 
             convChannel.send({
-                content: `<@&${config.helperRole}>`,
+                content: `<@&${ConfigHandler.config.helperRole}>`,
                 embeds: [MessageUtils.EmbedMessages.newChatStaff()],
                 components: [MessageUtils.Actions.supporterTools]
             }).then(message => message.edit({ content: null })),

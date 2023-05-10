@@ -6,7 +6,8 @@ export namespace MessageUtils {
     const colors = {
         blue: 0x86b5dd,
         pink: 0xfe929f,
-        gold: 0xfcc22d
+        gold: 0xfcc22d,
+        red: 0xff0000
     }
 
     export namespace EmbedMessages {
@@ -25,6 +26,17 @@ export namespace MessageUtils {
             description: "צ'אט זה אינו פעיל יותר עקב סגירתו ולכן לא ניתן לבצע בו פעולות נוספות",
             footer: { text: "למידע נוסף ניתן לפנות לצוות התומכים" }
         })
+
+        export function errorLog(error: Error) {
+            return new EmbedBuilder({
+                author: { name: "Mercy - מתכנתים", iconURL: author.iconURL },
+                title: `שגיאה נזרקה! - ${error.name}`,
+                description: `${error.message}`,
+                fields: [{ name: "Cause", value: `${error.cause}` }],
+                color: colors.red,
+                timestamp: new Date(),
+            })
+        }
 
         export function newChatStaff() {
             return new EmbedBuilder({
@@ -122,7 +134,7 @@ export namespace MessageUtils {
 
         export async function ticketLog(channelTitle: string) {
             return new EmbedBuilder({
-                author,
+                author: { name: 'Mercy - הנהלה', iconURL: author.iconURL },
                 color: colors.blue,
                 title: `לוג ${channelTitle}`,
                 description: "על מנת לראות את לוג השאלה יש להוריד את קובץ הhtml ולפתוח אותו על המחשב"

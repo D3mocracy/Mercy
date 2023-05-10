@@ -3,7 +3,6 @@ import { Conversation } from "../utils/types";
 import { ChannelType, Message, TextChannel } from "discord.js"
 import { Utils } from "../utils/Utils";
 import { CantLoadConversationFromDB } from "../utils/Errors";
-import { MessageUtils } from "../utils/MessageUtils";
 
 class CommunicateConversationHandler {
     private conversation: Conversation = {} as any;
@@ -25,10 +24,14 @@ class CommunicateConversationHandler {
     }
 
     async sendMessage() {
+        console.log(this.type);
+
         if (this.type === ChannelType.DM) {
             await ((await Utils.getChannelById(this.conversation.channelId)) as TextChannel).send(this.message.content);
 
         } else if (this.type === ChannelType.GuildText) {
+            console.log('check');
+
             if (this.message.content.startsWith('!')) return;
 
             (await Utils.client.users.fetch(this.conversation.userId)).send(this.message.content);

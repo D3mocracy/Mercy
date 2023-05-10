@@ -1,9 +1,9 @@
 import { ModalSubmitInteraction, TextChannel } from "discord.js";
-import { config } from "..";
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
+import ConfigHandler from "./Config";
 
 export class ReportOnHelperHandler {
     constructor(private interaction: ModalSubmitInteraction) { }
@@ -17,12 +17,12 @@ export class ReportOnHelperHandler {
             await DataBase.conversationsCollection.find({ userId: this.interaction.user.id, open: false }).sort({ _id: -1 }).limit(1).next() as any;
         if (!conversation.staffMemberId) return;
         const helpers = Utils.getMembersById(...conversation.staffMemberId).map(member => member?.displayName).join(', ');
-        const reportChannel: TextChannel = await Utils.client.channels.fetch(config.reportHelperChannelId) as any;
+        const reportChannel: TextChannel = ConfigHandler.config.reportHelperChannel;
         if (!reportChannel) return;
         await reportChannel.send({
-            content: `<@&${config.managerRole}>`,
+            content: `<@&${ConfigHandler.config.managerRole}>`,
             embeds: [await MessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
-            components: [MessageUtils.Actions.attachReport(false), MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${config.guildId}/${conversation.channelId}`)]
+            components: [MessageUtils.Actions.attachReport(false), MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild.id}/${conversation.channelId}`)]
         });
     }
 

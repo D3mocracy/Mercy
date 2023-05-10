@@ -1,8 +1,7 @@
 import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember } from "discord.js"
 import { MessageUtils } from "../utils/MessageUtils";
-import DataBase from "../utils/db";
 import { Utils } from "../utils/Utils";
-import { config } from "..";
+import ConfigHandler from "./Config";
 
 class CommandHandler {
 
@@ -18,8 +17,8 @@ class CommandHandler {
 
     async makeHelperOfTheMonth() {
         const helper = (this.interaction as UserContextMenuCommandInteraction).targetMember as GuildMember;
-        const helperOfTheMonth = await Utils.getRoleById(config.helperOfTheMonthRoleId);
-        const staffChannel = await Utils.getChannelById(config.staffChannelId);
+        const helperOfTheMonth = ConfigHandler.config.helperOfTheMonthRole;
+        const staffChannel = ConfigHandler.config.staffChannel;
         if (!helper || !helperOfTheMonth || !staffChannel || !staffChannel.isTextBased()) return;
         Utils.getGuild().members.cache.filter(member => member.roles.cache.has(helperOfTheMonth.id)).forEach(async helper => await helper.roles.remove(helperOfTheMonth));
         helper.roles.add(helperOfTheMonth);

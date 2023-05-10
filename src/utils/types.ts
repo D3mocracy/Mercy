@@ -1,3 +1,5 @@
+import { CategoryChannelResolvable, TextChannel, Role, Guild } from "discord.js";
+
 export type Conversation = {
     userId: string,
     staffMemberId?: string[],
@@ -6,7 +8,7 @@ export type Conversation = {
     open: boolean
 }
 
-export type Config = {
+export type ConfigDocument = {
     ticketCatagoryId: string,
     ticketLogId: string,
     managerRole: string,
@@ -17,6 +19,21 @@ export type Config = {
     reportHelperChannelId: string,
     staffChannelId: string,
     helperOfTheMonthRoleId: string,
+    errorChannel: string,
+}
+
+export type Config = {
+    ticketCatagory: CategoryChannelResolvable,
+    ticketLog: TextChannel,
+    reportChannel: TextChannel,
+    reportHelperChannel: TextChannel,
+    staffChannel: TextChannel,
+    errorChannel: TextChannel,
+    managerRole: Role,
+    helperRole: Role,
+    memberRole: Role,
+    helperOfTheMonthRole: Role,
+    guild: Guild,
 }
 
 export type CustomMessage = {

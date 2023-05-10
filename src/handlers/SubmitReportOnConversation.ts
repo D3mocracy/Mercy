@@ -1,7 +1,7 @@
 import { ModalSubmitInteraction, TextChannel } from "discord.js";
-import { config } from "..";
 import { MessageUtils } from "../utils/MessageUtils";
 import { Utils } from "../utils/Utils";
+import ConfigHandler from "./Config";
 
 export class ReportOnConversationHandler {
     constructor(private interaction: ModalSubmitInteraction) {
@@ -13,12 +13,12 @@ export class ReportOnConversationHandler {
     }
 
     private async conversationReport() {
-        const reportChannel: TextChannel = await Utils.client.channels.fetch(config.reportChannelId) as any;
+        const reportChannel: TextChannel = ConfigHandler.config.reportChannel;
         if (!reportChannel) return;
         await reportChannel.send({
-            content: `<@&${config.managerRole}>`,
+            content: `<@&${ConfigHandler.config.managerRole}>`,
             embeds: [await MessageUtils.EmbedMessages.reportConversationMessage(this.interaction)],
-            components: [MessageUtils.Actions.attachReport(false), MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${config.guildId}/${this.interaction.channelId}`)]
+            components: [MessageUtils.Actions.attachReport(false), MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild.id}/${this.interaction.channelId}`)]
         });
     }
 
