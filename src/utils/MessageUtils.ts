@@ -179,14 +179,32 @@ export namespace MessageUtils {
             description: "פעולה זו אינה הפיכה"
         })
 
+        const monthNames: { [num: number]: string } = {
+            0: "ינואר",
+            1: "פברואר",
+            2: "מרץ",
+            3: "אפריל",
+            4: "מאי",
+            5: "יוני",
+            6: "יולי",
+            7: "אוגוסט",
+            8: "ספטמבר",
+            9: "אוקטובר",
+            10: "נובמבר",
+            11: "דצמבר",
+        }
+
         export function helperOfTheMonth(helper: GuildMember) {
+            const nameOfMonth = monthNames[new Date().getMonth()]
             return new EmbedBuilder({
                 author: { name: "Mercy - הנהלה", iconURL: author.iconURL },
                 color: colors.gold,
-                title: "תומך החודש!",
+                title: `👑 תומך החודש - ${nameOfMonth} 👑`,
                 description: `שאו ברכה ואיחולים לתומך החודש - לא אחר מאשר ${helper}! \n
-                דבר המזכה אותך בחודש של Discord Nitro \n
-                כל הכבוד המשך כך!`,
+                מזל טוב! זכית ב... 
+                \`\`\`Discord Nitro 👾\`\`\`
+                **כל הכבוד המשך כך!**`,
+                thumbnail: { url: "https://cdn-icons-png.flaticon.com/512/6941/6941697.png" },
                 footer: { text: "בברכה, מנהלי הקהילה", iconURL: author.iconURL }
             })
         }
