@@ -1,0 +1,1 @@
+{"version":3,"file":"ConversationStaffTools.d.ts","sourceRoot":"","sources":["../../src/handlers/ConversationStaffTools.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,iBAAiB,EAAgB,MAAM,YAAY,CAAA;AAE5D,cAAM,6BAA6B;IACnB,OAAO,CAAC,WAAW;gBAAX,WAAW,EAAE,iBAAiB;IAI5C,mBAAmB;CAM5B;AACD,eAAe,6BAA6B,CAAC"}

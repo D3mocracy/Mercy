@@ -1,0 +1,1 @@
+{"version":3,"file":"StartConversation.d.ts","sourceRoot":"","sources":["../../src/handlers/StartConversation.ts"],"names":[],"mappings":"AACA,OAAO,EAAkD,iBAAiB,EAAiB,MAAM,YAAY,CAAA;AAK7G,cAAM,iBAAiB;IAEP,OAAO,CAAC,WAAW;gBAAX,WAAW,EAAE,iBAAiB;IAI5C,YAAY;YAWJ,kBAAkB;CAkCnC;AAED,eAAe,iBAAiB,CAAC"}
