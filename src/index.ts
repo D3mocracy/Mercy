@@ -21,7 +21,10 @@ const client = Utils.client;
 DataBase.client.connect().then(async () => {
     await Utils.turnOnBot();
     await new ConfigHandler().loadConfig();
-}).catch((error) => Logger.logError(error));
+}).catch((error) => {
+    console.error(error);
+    Logger.logError(error)
+});
 
 client.once('ready', () => {
     console.log(`Logged in as ${client!.user?.tag}!`);
@@ -48,6 +51,7 @@ client.on('messageCreate', async message => {
             await message.reply("היי, לא נראה שאתה חלק מהשרת האנונימי");
         }
     } catch (error: any) {
+        console.error(error);
         Logger.logError(error);
     }
 });
@@ -151,6 +155,7 @@ client.on('interactionCreate', async interaction => {
             }
         }
     } catch (error: any) {
+        console.error(error);
         Logger.logError(error);
     }
 
@@ -172,6 +177,7 @@ client.on('guildMemberAdd', async member => {
         const memberRole = ConfigHandler.config.memberRole;
         memberRole && member.roles.add(memberRole);
     } catch (error: any) {
+        console.error(error);
         Logger.logError(error);
     }
 });
@@ -180,6 +186,7 @@ client.on('channelDelete', async channel => {
     try {
         await DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
     } catch (error: any) {
+        console.error(error);
         Logger.logError(error);
     }
 })

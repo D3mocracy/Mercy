@@ -23,7 +23,10 @@ const client = Utils_1.Utils.client;
 db_1.default.client.connect().then(async () => {
     await Utils_1.Utils.turnOnBot();
     await new Config_1.default().loadConfig();
-}).catch((error) => Logger_1.default.logError(error));
+}).catch((error) => {
+    console.log(error);
+    Logger_1.default.logError(error);
+});
 client.once('ready', () => {
     console.log(`Logged in as ${client.user?.tag}!`);
 });
@@ -48,6 +51,7 @@ client.on('messageCreate', async (message) => {
         }
     }
     catch (error) {
+        console.log(error);
         Logger_1.default.logError(error);
     }
 });
@@ -150,6 +154,7 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     catch (error) {
+        console.log(error);
         Logger_1.default.logError(error);
     }
 });
@@ -171,6 +176,7 @@ client.on('guildMemberAdd', async (member) => {
         memberRole && member.roles.add(memberRole);
     }
     catch (error) {
+        console.log(error);
         Logger_1.default.logError(error);
     }
 });
@@ -179,6 +185,7 @@ client.on('channelDelete', async (channel) => {
         await db_1.default.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
     }
     catch (error) {
+        console.log(error);
         Logger_1.default.logError(error);
     }
 });
