@@ -156,42 +156,6 @@ var MessageUtils;
         }
         EmbedMessages.referManager = referManager;
         ;
-        function suggestIdea(interaction) {
-            return new discord_js_1.EmbedBuilder({
-                author: { iconURL: author.iconURL, name: "Mercy - כללי" },
-                title: "התקבלה הצעת ייעול / דיווח על באג",
-                description: `**תיאור ההצעה**
-                ${interaction.fields.getTextInputValue("suggest_explain")}
-                **הערות נוספות**
-                ${interaction.fields.getTextInputValue("suggest_comments")}`,
-                fields: [
-                    {
-                        name: "משתמש מציע:",
-                        value: `${interaction.member}`
-                    }
-                ],
-                timestamp: new Date(),
-                color: colors.green
-            });
-        }
-        EmbedMessages.suggestIdea = suggestIdea;
-        async function reportHelperMessage(interaction, helpers) {
-            return new discord_js_1.EmbedBuilder({
-                author: { iconURL: author.iconURL, name: "Mercy - דיווחים" },
-                color: colors.blue,
-                title: `התקבל דיווח על תומך`,
-                description: `**סיבת הדיווח:**
-                ${interaction.fields.getTextInputValue('reportHelperCause')}
-                `,
-                thumbnail: { url: "https://cdn3.iconfinder.com/data/icons/action-states-vol-1-flat/48/Action___States_Vol._1-28-512.png" }
-            }).addFields([
-                { name: "שם התומך על פי המשתמש", value: `${interaction.fields.getTextInputValue("helperName")}`, inline: true },
-                { name: "תומך אחרון שזוהה לפי המערכת", value: `${helpers}`, inline: true },
-                { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
-            ]);
-        }
-        EmbedMessages.reportHelperMessage = reportHelperMessage;
-        ;
         EmbedMessages.openChat = new discord_js_1.EmbedBuilder({
             author,
             color: colors.blue,
@@ -238,18 +202,6 @@ var MessageUtils;
             });
         }
         EmbedMessages.helperOfTheMonth = helperOfTheMonth;
-        function importantLinks() {
-            return new discord_js_1.EmbedBuilder({
-                author,
-                color: colors.pink,
-                thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
-                title: "מידע שימושי",
-                description: `**לשרותכם מידע ולינקים חשובים בשרת**
-                ${Config_1.default.config.importantChannels.map(channel => (`<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`)).join('\n')}`,
-                footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
-            });
-        }
-        EmbedMessages.importantLinks = importantLinks;
         async function staffMembers() {
             const managers = await Utils_1.Utils.getUsersWithRoleId(Config_1.default.config.managerRole.id);
             const helpers = await Utils_1.Utils.getUsersWithRoleId(Config_1.default.config.helperRole.id);
@@ -345,18 +297,6 @@ var MessageUtils;
             emoji: '🧑‍💼',
             style: discord_js_1.ButtonStyle.Secondary
         });
-        Actions.user_report_helper = new discord_js_1.ButtonBuilder({
-            customId: "user_report_helper",
-            label: "דווח על תומך",
-            emoji: '🏴',
-            style: discord_js_1.ButtonStyle.Danger
-        });
-        Actions.user_suggest = new discord_js_1.ButtonBuilder({
-            customId: "user_suggest",
-            label: "יש לי הצעת שיפור",
-            emoji: "✅",
-            style: discord_js_1.ButtonStyle.Success
-        });
         Actions.supporterTools = new discord_js_1.ActionRowBuilder().addComponents([
             Actions.tools_close,
             Actions.tools_manager,
@@ -412,43 +352,6 @@ var MessageUtils;
             customId: 'referManager',
             title: "שליחת בקשה למנהל / הפנה מנהל"
         }).addComponents(reportCause);
-        //Report helper modal
-        const reportHelperCause = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
-            customId: 'reportHelperCause',
-            label: 'סיבת הדיווח',
-            style: discord_js_1.TextInputStyle.Paragraph,
-            required: true
-        }));
-        const helperName = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
-            customId: 'helperName',
-            label: 'שם התומך',
-            style: discord_js_1.TextInputStyle.Short,
-            required: true,
-            placeholder: `לדוגמה: D3mocracy#8662`
-        }));
-        Modals.reportHelperModal = new discord_js_1.ModalBuilder({
-            customId: 'reportHelperModal',
-            title: "דיווח על תומך"
-        }).addComponents([helperName, reportHelperCause]);
-        //Suggest idea modal
-        const explaination = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
-            customId: 'suggest_explain',
-            label: 'פירוט',
-            style: discord_js_1.TextInputStyle.Paragraph,
-            required: true,
-            placeholder: "פרט על הרעיון שלך ככל האפשר"
-        }));
-        const comments = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
-            customId: 'suggest_comments',
-            label: 'הערות נוספות',
-            style: discord_js_1.TextInputStyle.Short,
-            required: false,
-            placeholder: `הערות נוספות שתרצה לכתוב (לא חובה)`
-        }));
-        Modals.suggestIdeaModal = new discord_js_1.ModalBuilder({
-            customId: 'suggestIdea',
-            title: "הצעת שיפור / דיווח על באג"
-        }).addComponents([explaination, comments]);
     })(Modals = MessageUtils.Modals || (MessageUtils.Modals = {}));
 })(MessageUtils = exports.MessageUtils || (exports.MessageUtils = {}));
 //# sourceMappingURL=MessageUtils.js.map

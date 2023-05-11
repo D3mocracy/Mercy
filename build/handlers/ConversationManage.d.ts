@@ -16,7 +16,6 @@ declare class ConversationManageHandler {
     revealUser(): Promise<void>;
     resetHelpers(): Promise<void>;
     changeHelpersMessage(): Promise<void>;
-    userReportOnHelper(): Promise<void>;
 }
 export default ConversationManageHandler;
 //# sourceMappingURL=ConversationManage.d.ts.map

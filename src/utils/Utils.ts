@@ -17,12 +17,12 @@ export namespace Utils {
         return (await DataBase.conversationsCollection.find().toArray()).length;
     };
 
-    export async function getChannelById(client: Client, channelId: string): Promise<Channel | null> {
-        return await client.channels.fetch(channelId);
+    export async function getChannelById(client: Client, channelId: string): Promise<Channel | undefined> {
+        return await client.channels.cache.get(channelId);
     }
 
     export async function getRoleById(roleId: string) {
-        return await ConfigHandler.config.guild.roles.fetch(roleId);
+        return await ConfigHandler.config.guild.roles.cache.get(roleId);
     }
 
     export async function getUserByID(client: Client, userId: string): Promise<User> {

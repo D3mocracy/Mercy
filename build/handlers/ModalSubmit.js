@@ -8,6 +8,7 @@ const MessageUtils_1 = require("../utils/MessageUtils");
 const Config_1 = __importDefault(require("./Config"));
 const Utils_1 = require("../utils/Utils");
 const db_1 = __importDefault(require("../utils/db"));
+const ImportantLinks_1 = require("../utils/MessageUtils/ImportantLinks");
 class ModalSubmitHandler {
     interaction;
     constructor(interaction) {
@@ -24,7 +25,7 @@ class ModalSubmitHandler {
     async suggestIdea() {
         await Config_1.default.config.suggestIdeasChannel.send({
             content: `${Config_1.default.config.managerRole}`,
-            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.suggestIdea(this.interaction)]
+            embeds: [ImportantLinks_1.ImportantLinksMessageUtils.EmbedMessages.suggestIdea(this.interaction)]
         });
         await this.interaction.reply({ content: "ההצעה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
     }
@@ -37,7 +38,7 @@ class ModalSubmitHandler {
             : helpers = "לא נמצא צ'אט אחרון / המשתמש לא פתח צ'אט / לא שויך תומך לצ'אט האחרון";
         await Config_1.default.config.requestHelperChannel.send({
             content: `${Config_1.default.config.managerRole}`,
-            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
+            embeds: [await ImportantLinks_1.ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
             components: [MessageUtils_1.MessageUtils.Actions.attachReport(false)]
         });
         await this.interaction.reply({ content: "הדיווח שלך נשלח בהצלחה למנהלים", ephemeral: true });

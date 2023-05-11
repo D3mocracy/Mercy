@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMe
 import { MessageUtils } from "../utils/MessageUtils";
 import { Utils } from "../utils/Utils";
 import ConfigHandler from "./Config";
+import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 
 class CommandHandler {
 
@@ -35,10 +36,10 @@ class CommandHandler {
 
     async importantLinks() {
         await this.interaction.channel?.send({
-            embeds: [MessageUtils.EmbedMessages.importantLinks()],
+            embeds: [ImportantLinksMessageUtils.EmbedMessages.mainMessage()],
             components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
-                MessageUtils.Actions.user_report_helper,
-                MessageUtils.Actions.user_suggest
+                ImportantLinksMessageUtils.Actions.user_report_helper,
+                ImportantLinksMessageUtils.Actions.user_suggest
             ])]
         });
         await this.interaction.reply({ content: "Sent", ephemeral: true })

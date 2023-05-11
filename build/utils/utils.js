@@ -24,11 +24,11 @@ var Utils;
     Utils.getNumberOfConversationFromDB = getNumberOfConversationFromDB;
     ;
     async function getChannelById(client, channelId) {
-        return await client.channels.fetch(channelId);
+        return await client.channels.cache.get(channelId);
     }
     Utils.getChannelById = getChannelById;
     async function getRoleById(roleId) {
-        return await Config_1.default.config.guild.roles.fetch(roleId);
+        return await Config_1.default.config.guild.roles.cache.get(roleId);
     }
     Utils.getRoleById = getRoleById;
     async function getUserByID(client, userId) {

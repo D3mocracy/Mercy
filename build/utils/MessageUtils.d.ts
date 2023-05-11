@@ -16,12 +16,9 @@ export declare namespace MessageUtils {
         function chatClosed(closedBy: string, chatTitle: string): EmbedBuilder;
         function ticketLog(channelTitle: string): Promise<EmbedBuilder>;
         function referManager(interaction: ModalSubmitInteraction): EmbedBuilder;
-        function suggestIdea(interaction: ModalSubmitInteraction): EmbedBuilder;
-        function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string): Promise<EmbedBuilder>;
         const openChat: EmbedBuilder;
         const sureMessageToClose: EmbedBuilder;
         function helperOfTheMonth(helper: GuildMember): EmbedBuilder;
-        function importantLinks(): EmbedBuilder;
         function staffMembers(): Promise<EmbedBuilder>;
     }
     namespace Actions {
@@ -34,8 +31,6 @@ export declare namespace MessageUtils {
         const tools_manager: ButtonBuilder;
         const tools_close: ButtonBuilder;
         const tools_report: ButtonBuilder;
-        const user_report_helper: ButtonBuilder;
-        const user_suggest: ButtonBuilder;
         const supporterTools: ActionRowBuilder<ButtonBuilder>;
         const managerTools: ActionRowBuilder<ButtonBuilder>;
         function changeHelper(helpers: any[]): ActionRowBuilder<StringSelectMenuBuilder>;
@@ -43,8 +38,6 @@ export declare namespace MessageUtils {
     }
     namespace Modals {
         const referManagerModal: ModalBuilder;
-        const reportHelperModal: ModalBuilder;
-        const suggestIdeaModal: ModalBuilder;
     }
 }
 //# sourceMappingURL=MessageUtils.d.ts.map

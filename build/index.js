@@ -20,6 +20,7 @@ const db_1 = __importDefault(require("./utils/db"));
 const Logger_1 = __importDefault(require("./handlers/Logger"));
 const Commands_1 = require("./utils/Commands");
 const ModalSubmit_1 = require("./handlers/ModalSubmit");
+const ImportantLinks_1 = require("./utils/MessageUtils/ImportantLinks");
 const client = new discord_js_1.Client({ intents: 4194303, partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User] });
 db_1.default.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
@@ -57,108 +58,108 @@ client.on('messageCreate', async (message) => {
     }
 });
 client.on('interactionCreate', async (interaction) => {
-    const actionHandler = {
-        openChatButton: async () => {
-            await new StartConversation_1.default(interaction).precondition();
-        },
-        manager_attach_report: async () => {
-            await new ConversationStaffTools_1.default(interaction).managerAttachReport();
-        },
-        tools_attach: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
-            await conversationManage.attachHelper(interaction.user.id);
-            await conversationManage.saveConversation();
-        },
-        tools_close: async () => {
-            try {
+    const actionHandler = new Map([
+        ['openChatButton', async () => {
+                await new StartConversation_1.default(interaction).precondition();
+            }],
+        ['manager_attach_report', async () => {
+                await new ConversationStaffTools_1.default(interaction).managerAttachReport();
+            }],
+        ['tools_attach', async () => {
                 const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
-                await conversationManage.sendSureMessageToClose();
-            }
-            catch (error) {
-                interaction.message.edit({ components: [] });
-                interaction.channel?.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.chatIsNotAvailable] });
-            }
-        },
-        sure_yes: async () => {
-            try {
-                const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
-                await interaction.message.edit({ components: [] });
-                await conversationManage.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
+                await conversationManage.attachHelper(interaction.user.id);
                 await conversationManage.saveConversation();
-            }
-            catch (error) {
+            }],
+        ['tools_close', async () => {
+                try {
+                    const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
+                    await conversationManage.sendSureMessageToClose();
+                }
+                catch (error) {
+                    interaction.message.edit({ components: [] });
+                    interaction.channel?.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.chatIsNotAvailable] });
+                }
+            }],
+        ['sure_yes', async () => {
+                try {
+                    const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
+                    await interaction.message.edit({ components: [] });
+                    await conversationManage.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
+                    await conversationManage.saveConversation();
+                }
+                catch (error) {
+                    interaction.message.edit({ components: [] });
+                    interaction.channel?.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.chatIsNotAvailable] });
+                }
+            }],
+        ['sure_no', async () => {
+                await interaction.channel?.send('הפעולה בוטלה');
                 interaction.message.edit({ components: [] });
-                interaction.channel?.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.chatIsNotAvailable] });
-            }
-        },
-        sure_no: async () => {
-            await interaction.channel?.send('הפעולה בוטלה');
-            interaction.message.edit({ components: [] });
-        },
-        tools_manager: async () => {
-            Utils_1.Utils.isManager(interaction.user.id)
-                ? await interaction.reply({ ephemeral: true, embeds: [MessageUtils_1.MessageUtils.EmbedMessages.ManagerTools], components: [MessageUtils_1.MessageUtils.Actions.managerTools] })
-                : await interaction.reply({ content: "ברכות על הקידום", ephemeral: true });
-        },
-        tools_manager_reveal: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
-            await conversationManage.revealUser();
-        },
-        tools_manager_change_supporter: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
-            await conversationManage.changeHelpersMessage();
-        },
-        tools_reset_helpers: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
-            await conversationManage.resetHelpers();
-            await conversationManage.saveConversation();
-        },
-        tools_refer_manager: async () => {
-            await interaction.showModal(MessageUtils_1.MessageUtils.Modals.referManagerModal);
-        },
-        user_report_helper: async () => {
-            await interaction.showModal(MessageUtils_1.MessageUtils.Modals.reportHelperModal);
-        },
-        user_suggest: async () => {
-            await interaction.showModal(MessageUtils_1.MessageUtils.Modals.suggestIdeaModal);
-        },
-        reportHelperModal: async () => {
-            await new ModalSubmit_1.ModalSubmitHandler(interaction).reportHelper();
-        },
-        referManager: async () => {
-            await new ModalSubmit_1.ModalSubmitHandler(interaction).referManager();
-        },
-        suggestIdea: async () => {
-            await new ModalSubmit_1.ModalSubmitHandler(interaction).suggestIdea();
-        },
-        helpers_list: async () => {
-            await new ChangeHelper_1.default(client, interaction).handle();
-        },
-        openchat: async () => {
-            await new Command_1.default(interaction).openChat();
-        },
-        'תומך החודש': async () => {
-            await new Command_1.default(interaction).makeHelperOfTheMonth();
-        },
-        manage: async () => {
-            await ConversationManage_1.default.sendManageTools(interaction);
-        },
-        importantlinks: async () => {
-            await new Command_1.default(interaction).importantLinks();
-        },
-        sendstaffmessage: async () => {
-            await new Command_1.default(interaction).sendStaffMessage();
-        }
-    };
+            }],
+        ['tools_manager', async () => {
+                Utils_1.Utils.isManager(interaction.user.id)
+                    ? await interaction.reply({ ephemeral: true, embeds: [MessageUtils_1.MessageUtils.EmbedMessages.ManagerTools], components: [MessageUtils_1.MessageUtils.Actions.managerTools] })
+                    : await interaction.reply({ content: "ברכות על הקידום", ephemeral: true });
+            }],
+        ['tools_manager_reveal', async () => {
+                const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
+                await conversationManage.revealUser();
+            }],
+        ['tools_manager_change_supporter', async () => {
+                const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
+                await conversationManage.changeHelpersMessage();
+            }],
+        ['tools_reset_helpers', async () => {
+                const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
+                await conversationManage.resetHelpers();
+                await conversationManage.saveConversation();
+            }],
+        ['tools_refer_manager', async () => {
+                await interaction.showModal(MessageUtils_1.MessageUtils.Modals.referManagerModal);
+            }],
+        ['user_report_helper', async () => {
+                await interaction.showModal(ImportantLinks_1.ImportantLinksMessageUtils.Modals.reportHelperModal);
+            }],
+        ['user_suggest', async () => {
+                await interaction.showModal(ImportantLinks_1.ImportantLinksMessageUtils.Modals.suggestIdeaModal);
+            }],
+        ['reportHelperModal', async () => {
+                await new ModalSubmit_1.ModalSubmitHandler(interaction).reportHelper();
+            }],
+        ['referManager', async () => {
+                await new ModalSubmit_1.ModalSubmitHandler(interaction).referManager();
+            }],
+        ['suggestIdea', async () => {
+                await new ModalSubmit_1.ModalSubmitHandler(interaction).suggestIdea();
+            }],
+        ['helpers_list', async () => {
+                await new ChangeHelper_1.default(client, interaction).handle();
+            }],
+        ['openchat', async () => {
+                await new Command_1.default(interaction).openChat();
+            }],
+        ['תומך החודש', async () => {
+                await new Command_1.default(interaction).makeHelperOfTheMonth();
+            }],
+        ['manage', async () => {
+                await ConversationManage_1.default.sendManageTools(interaction);
+            }],
+        ['importantlinks', async () => {
+                await new Command_1.default(interaction).importantLinks();
+            }],
+        ['sendstaffmessage', async () => {
+                await new Command_1.default(interaction).sendStaffMessage();
+            }]
+    ]);
     try {
         if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu() || interaction.isCommand()) {
-            interaction.isCommand()
-                ? await actionHandler[interaction.commandName]()
-                : await actionHandler[interaction.customId]();
-            if (!(interaction.deferred || interaction.replied)) { //interaction.isChatInputCommand don't have deferUpdate()
-                interaction.isCommand()
-                    ? await interaction.deferReply()
-                    : await interaction.deferUpdate();
+            const action = interaction.isCommand() ? interaction.commandName : interaction.customId;
+            const handler = actionHandler.get(action);
+            if (handler) {
+                await handler();
+                if (!(interaction.deferred || interaction.replied)) {
+                    interaction.isCommand() ? await interaction.deferReply() : await interaction.deferUpdate();
+                }
             }
         }
     }

@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const MessageUtils_1 = require("../utils/MessageUtils");
 const Config_1 = __importDefault(require("./Config"));
+const ImportantLinks_1 = require("../utils/MessageUtils/ImportantLinks");
 class CommandHandler {
     interaction;
     constructor(interaction) {
@@ -37,10 +38,10 @@ class CommandHandler {
     }
     async importantLinks() {
         await this.interaction.channel?.send({
-            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.importantLinks()],
+            embeds: [ImportantLinks_1.ImportantLinksMessageUtils.EmbedMessages.mainMessage()],
             components: [new discord_js_1.ActionRowBuilder().addComponents([
-                    MessageUtils_1.MessageUtils.Actions.user_report_helper,
-                    MessageUtils_1.MessageUtils.Actions.user_suggest
+                    ImportantLinks_1.ImportantLinksMessageUtils.Actions.user_report_helper,
+                    ImportantLinks_1.ImportantLinksMessageUtils.Actions.user_suggest
                 ])]
         });
         await this.interaction.reply({ content: "Sent", ephemeral: true });

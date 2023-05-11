@@ -17,12 +17,12 @@ class StartConversation {
     async precondition() {
         const openConversation = await Utils_1.Utils.getOpenConversation(this.interaction.user.id);
         openConversation
-            ? await this.interaction.reply({
+            ? this.interaction.reply({
                 content: "היי, נראה שכבר יש לך צ'אט פתוח",
                 components: [MessageUtils_1.MessageUtils.Actions.linkButton(`https://discord.com/channels/${Config_1.default.config.guild.id}/${openConversation.channelId}`, "העבר אותי לצ'אט")],
                 ephemeral: true
             })
-            : await this.createConversation();
+            : this.createConversation();
     }
     async createConversation() {
         const numberOfConversation = await Utils_1.Utils.getNumberOfConversationFromDB() + 1;
@@ -48,9 +48,7 @@ class StartConversation {
                 open: true,
                 date: new Date()
             }),
-            convChannel.lockPermissions()
         ]);
-        await this.interaction.deferUpdate();
     }
 }
 exports.default = StartConversation;

@@ -1,9 +1,10 @@
-import { ModalSubmitInteraction, TextChannel } from "discord.js"
+import { ModalSubmitInteraction } from "discord.js"
 import { MessageUtils } from "../utils/MessageUtils";
 import ConfigHandler from "./Config";
 import { Utils } from "../utils/Utils";
 import DataBase from "../utils/db";
 import { Conversation } from "../utils/types";
+import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 
 export class ModalSubmitHandler {
 
@@ -21,7 +22,7 @@ export class ModalSubmitHandler {
     async suggestIdea() {
         await ConfigHandler.config.suggestIdeasChannel.send({
             content: `${ConfigHandler.config.managerRole}`,
-            embeds: [MessageUtils.EmbedMessages.suggestIdea(this.interaction)]
+            embeds: [ImportantLinksMessageUtils.EmbedMessages.suggestIdea(this.interaction)]
         });
         await this.interaction.reply({ content: "ההצעה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
     }
@@ -37,7 +38,7 @@ export class ModalSubmitHandler {
 
         await ConfigHandler.config.requestHelperChannel.send({
             content: `${ConfigHandler.config.managerRole}`,
-            embeds: [await MessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
+            embeds: [await ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
             components: [MessageUtils.Actions.attachReport(false)]
         });
         await this.interaction.reply({ content: "הדיווח שלך נשלח בהצלחה למנהלים", ephemeral: true });

@@ -4,8 +4,8 @@ export declare namespace Utils {
     function hasOpenConversation(userId: string): Promise<boolean>;
     function getOpenConversation(userId: string): Promise<import("mongodb").WithId<import("bson").Document> | undefined>;
     function getNumberOfConversationFromDB(): Promise<number>;
-    function getChannelById(client: Client, channelId: string): Promise<Channel | null>;
-    function getRoleById(roleId: string): Promise<import("discord.js").Role | null>;
+    function getChannelById(client: Client, channelId: string): Promise<Channel | undefined>;
+    function getRoleById(roleId: string): Promise<import("discord.js").Role | undefined>;
     function getUserByID(client: Client, userId: string): Promise<User>;
     function getUsersWithRoleId(roleId: string): Promise<import("@discordjs/collection").Collection<string, import("discord.js").GuildMember>>;
     function updatePermissionToChannel(client: Client, conversation: Conversation): Promise<{

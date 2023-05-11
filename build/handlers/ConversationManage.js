@@ -52,22 +52,23 @@ class ConversationManageHandler {
         await this.interaction.reply({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.sureMessageToClose], components: [MessageUtils_1.MessageUtils.Actions.tools_sure_close_yes_no()] });
     }
     async closeConversation(closedBy) {
+        await this.interaction.deferUpdate();
         const closedMessage = { embeds: [MessageUtils_1.MessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };
         this.conversation.open = false;
         await this.channel.send(closedMessage);
-        await Promise.all([
+        Promise.all([
             Logger_1.default.logTicket(this.channel),
             this.interaction.message.edit({ components: [] }),
             this.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
-            this.interaction.deferUpdate()
-        ]);
-        await this.channel.delete();
+        ]).finally(() => this.channel.delete());
     }
     async attachHelper(staffMemberId) {
         if (!this.conversation.staffMemberId || this.conversation.staffMemberId.length === 0) {
             this.conversation.staffMemberId = [staffMemberId];
-            await Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation);
-            await this.interaction.reply({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] });
+            await Promise.all([
+                Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation),
+                this.interaction.reply({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] })
+            ]);
             return;
         }
         await this.interaction.reply({ ephemeral: true, content: "פסססטט...הצ'אט הזה כבר שויך למישהו" });
@@ -99,14 +100,6 @@ class ConversationManageHandler {
         }
         else {
             await this.interaction.reply({ content: "לא קיים משתמש עם דרגת תומך בשרת", ephemeral: true });
-        }
-    }
-    async userReportOnHelper() {
-        if (!this.conversation.staffMemberId || this.conversation.staffMemberId.length === 0) {
-            await this.interaction.reply("עדיין לא שויך תומך לצ'אט זה");
-        }
-        else {
-            await this.interaction.showModal(MessageUtils_1.MessageUtils.Modals.reportHelperModal);
         }
     }
 }
