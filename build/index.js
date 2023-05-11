@@ -15,13 +15,12 @@ const ConversationStaffTools_1 = __importDefault(require("./handlers/Conversatio
 const CustomEmbedMessages_1 = __importDefault(require("./handlers/CustomEmbedMessages"));
 const LeaveGuild_1 = __importDefault(require("./handlers/LeaveGuild"));
 const StartConversation_1 = __importDefault(require("./handlers/StartConversation"));
-const SubmitReportOnConversation_1 = require("./handlers/SubmitReportOnConversation");
-const SubmitReportOnHelper_1 = require("./handlers/SubmitReportOnHelper");
 const MessageUtils_1 = require("./utils/MessageUtils");
 const Utils_1 = require("./utils/Utils");
 const db_1 = __importDefault(require("./utils/db"));
 const Logger_1 = __importDefault(require("./handlers/Logger"));
 const Commands_1 = require("./utils/Commands");
+const ModalSubmit_1 = require("./handlers/ModalSubmit");
 exports.client = new discord_js_1.Client({ intents: 4194303, partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User] });
 db_1.default.client.connect().then(async () => {
     await exports.client.login(process.env.TOKEN);
@@ -42,6 +41,7 @@ exports.client.on('messageCreate', async (message) => {
             return;
         if (message.content.startsWith('&') && message.member?.permissions.has("Administrator")) {
             await (await CustomEmbedMessages_1.default.createHandler(CustomEmbedMessages_1.default.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
+            message.delete();
         }
         if (await Utils_1.Utils.isGuildMember(message.author.id)) {
             const hasOpenConversation = await Utils_1.Utils.hasOpenConversation(message.author.id);
@@ -114,18 +114,19 @@ exports.client.on('interactionCreate', async (interaction) => {
             await conversationManage.resetHelpers();
             await conversationManage.saveConversation();
         },
-        tools_report: async () => {
-            await interaction.showModal(MessageUtils_1.MessageUtils.Modals.reportChatModal);
+        tools_refer_manager: async () => {
+            await interaction.showModal(MessageUtils_1.MessageUtils.Modals.referManagerModal);
         },
         user_report_helper: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(interaction);
-            await conversationManage.userReportOnHelper();
+            await interaction.showModal(MessageUtils_1.MessageUtils.Modals.reportHelperModal);
         },
         reportHelperModal: async () => {
-            await new SubmitReportOnHelper_1.ReportOnHelperHandler(interaction).handle();
+            // await new ReportOnHelperHandler(interaction as ModalSubmitInteraction).handle();
+            await new ModalSubmit_1.ModalSubmitHandler(interaction).reportHelper();
         },
-        reportModal: async () => {
-            await new SubmitReportOnConversation_1.ReportOnConversationHandler(interaction).handle();
+        referManager: async () => {
+            await new ModalSubmit_1.ModalSubmitHandler(interaction).referManager();
+            // await new ReportOnConversationHandler(interaction as ModalSubmitInteraction).handle();
         },
         helpers_list: async () => {
             await new ChangeHelper_1.default(interaction).handle();

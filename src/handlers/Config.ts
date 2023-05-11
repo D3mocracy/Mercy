@@ -29,7 +29,7 @@ class ConfigHandler {
             client.channels.fetch(configDocument.reportChannelId),
             client.channels.fetch(configDocument.reportHelperChannelId),
             client.channels.fetch(configDocument.staffChannelId),
-            client.channels.fetch(configDocument.errorChannel),
+            client.channels.fetch(configDocument.errorChannelId),
             guild.roles.fetch(configDocument.managerRole),
             guild.roles.fetch(configDocument.helperRole),
             guild.roles.fetch(configDocument.memberRole),

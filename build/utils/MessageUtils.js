@@ -10,7 +10,8 @@ var MessageUtils;
         blue: 0x86b5dd,
         pink: 0xfe929f,
         gold: 0xfcc22d,
-        red: 0xff0000
+        red: 0xff0000,
+        green: 0x33C76E
     };
     let EmbedMessages;
     (function (EmbedMessages) {
@@ -138,27 +139,31 @@ var MessageUtils;
         }
         EmbedMessages.ticketLog = ticketLog;
         ;
-        async function reportConversationMessage(interaction) {
+        async function referManager(interaction) {
             return new discord_js_1.EmbedBuilder({
                 author,
                 color: colors.blue,
-                title: `דיווח על ${interaction.channel.name}`,
-                description: `${interaction.fields.getTextInputValue('reportCause')}`
+                title: `התקבלה בקשה חדשה מתומך`,
+                description: `${interaction.fields.getTextInputValue('referCause')}`
             }).addFields([
-                { name: "איש צוות מדווח", value: `${interaction.user.tag}` },
+                { name: "תומך:", value: `${interaction.user.tag}` },
                 { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
             ]);
         }
-        EmbedMessages.reportConversationMessage = reportConversationMessage;
+        EmbedMessages.referManager = referManager;
         ;
         async function reportHelperMessage(interaction, helpers) {
             return new discord_js_1.EmbedBuilder({
-                author,
+                author: { iconURL: author.iconURL, name: "Mercy - דיווחים" },
                 color: colors.blue,
-                title: `דיווח על ${helpers}`,
-                description: `${interaction.fields.getTextInputValue('reportHelperCause')}`
+                title: `התקבל דיווח על תומך`,
+                description: `**סיבת הדיווח:**
+                ${interaction.fields.getTextInputValue('reportHelperCause')}
+                `,
+                thumbnail: { url: "https://cdn3.iconfinder.com/data/icons/action-states-vol-1-flat/48/Action___States_Vol._1-28-512.png" }
             }).addFields([
-                // { name: "משתמש מדווח", value: `${interaction.user.tag}` },
+                { name: "שם התומך על פי המשתמש", value: `${interaction.fields.getTextInputValue("helperName")}`, inline: true },
+                { name: "תומך אחרון שזוהה לפי המערכת", value: `${helpers}`, inline: true },
                 { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
             ]);
         }
@@ -293,16 +298,16 @@ var MessageUtils;
             style: discord_js_1.ButtonStyle.Danger
         });
         Actions.tools_report = new discord_js_1.ButtonBuilder({
-            customId: "tools_report",
-            label: "דיווח",
-            emoji: '🚩',
+            customId: "tools_refer_manager",
+            label: "הפנה מנהל",
+            emoji: '🧑‍💼',
             style: discord_js_1.ButtonStyle.Secondary
         });
         Actions.user_report_helper = new discord_js_1.ButtonBuilder({
             customId: "user_report_helper",
             label: "דווח על תומך",
-            emoji: '🚩',
-            style: discord_js_1.ButtonStyle.Secondary
+            emoji: '🏴',
+            style: discord_js_1.ButtonStyle.Danger
         });
         Actions.user_suggest = new discord_js_1.ButtonBuilder({
             customId: "user_suggest",
@@ -354,35 +359,54 @@ var MessageUtils;
     ;
     let Modals;
     (function (Modals) {
-        const reportCause = new discord_js_1.TextInputBuilder({
-            customId: 'reportCause',
-            label: 'סיבת הדיווח',
+        //Refer Manager
+        const reportCause = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
+            customId: 'referCause',
+            label: 'בקשה',
             style: discord_js_1.TextInputStyle.Paragraph,
             required: true
-        });
-        const reportCauseActionRow = new discord_js_1.ActionRowBuilder().addComponents(reportCause);
-        Modals.reportChatModal = new discord_js_1.ModalBuilder({
-            customId: 'reportModal',
-            title: "דיווח על צ'אט חריג"
-        }).addComponents(reportCauseActionRow);
-        const reportHelperCause = new discord_js_1.TextInputBuilder({
+        }));
+        Modals.referManagerModal = new discord_js_1.ModalBuilder({
+            customId: 'referManager',
+            title: "שליחת בקשה למנהל / הפנה מנהל"
+        }).addComponents(reportCause);
+        //Report helper modal
+        const reportHelperCause = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
             customId: 'reportHelperCause',
             label: 'סיבת הדיווח',
             style: discord_js_1.TextInputStyle.Paragraph,
             required: true
-        });
-        const helperName = new discord_js_1.TextInputBuilder({
+        }));
+        const helperName = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
             customId: 'helperName',
             label: 'שם התומך',
             style: discord_js_1.TextInputStyle.Short,
             required: true,
             placeholder: `לדוגמה: D3mocracy#8662`
-        });
-        const reportHelperCauseActionRow = new discord_js_1.ActionRowBuilder().addComponents([helperName, reportHelperCause]);
+        }));
         Modals.reportHelperModal = new discord_js_1.ModalBuilder({
             customId: 'reportHelperModal',
             title: "דיווח על תומך"
-        }).addComponents(reportHelperCauseActionRow);
+        }).addComponents([helperName, reportHelperCause]);
+        //Suggest idea modal
+        const explaination = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
+            customId: 'suggest_explain',
+            label: 'פירוט',
+            style: discord_js_1.TextInputStyle.Paragraph,
+            required: true,
+            placeholder: "פרט על הרעיון שלך ככל האפשר"
+        }));
+        const comments = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
+            customId: 'suggest_comments',
+            label: 'הערות נוספות',
+            style: discord_js_1.TextInputStyle.Short,
+            required: false,
+            placeholder: `הערות נוספות שתרצה לכתוב (לא חובה)`
+        }));
+        Modals.suggestIdeaModal = new discord_js_1.ModalBuilder({
+            customId: 'suggestIdea',
+            title: "הצעת שיפור / דיווח על באג"
+        }).addComponents([explaination, comments]);
     })(Modals = MessageUtils.Modals || (MessageUtils.Modals = {}));
 })(MessageUtils = exports.MessageUtils || (exports.MessageUtils = {}));
 //# sourceMappingURL=MessageUtils.js.map

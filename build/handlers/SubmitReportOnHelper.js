@@ -8,6 +8,10 @@ const db_1 = __importDefault(require("../utils/db"));
 const MessageUtils_1 = require("../utils/MessageUtils");
 const Utils_1 = require("../utils/Utils");
 const Config_1 = __importDefault(require("./Config"));
+/**
+ * This is not useable due the button trigger is not in the chat anymore
+ * @deprecated
+ */
 class ReportOnHelperHandler {
     interaction;
     constructor(interaction) {

@@ -20,7 +20,7 @@ export type ConfigDocument = {
     reportHelperChannelId: string,
     staffChannelId: string,
     helperOfTheMonthRoleId: string,
-    errorChannel: string,
+    errorChannelId: string,
 }
 
 export type Config = {

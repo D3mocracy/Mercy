@@ -15,7 +15,7 @@ export declare namespace MessageUtils {
         const helpersReseted: EmbedBuilder;
         function chatClosed(closedBy: string, chatTitle: string): EmbedBuilder;
         function ticketLog(channelTitle: string): Promise<EmbedBuilder>;
-        function reportConversationMessage(interaction: ModalSubmitInteraction): Promise<EmbedBuilder>;
+        function referManager(interaction: ModalSubmitInteraction): Promise<EmbedBuilder>;
         function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string): Promise<EmbedBuilder>;
         const openChat: EmbedBuilder;
         const sureMessageToClose: EmbedBuilder;
@@ -40,8 +40,9 @@ export declare namespace MessageUtils {
         const resetHelpers: ActionRowBuilder<ButtonBuilder>;
     }
     namespace Modals {
-        const reportChatModal: ModalBuilder;
+        const referManagerModal: ModalBuilder;
         const reportHelperModal: ModalBuilder;
+        const suggestIdeaModal: ModalBuilder;
     }
 }
 //# sourceMappingURL=MessageUtils.d.ts.map

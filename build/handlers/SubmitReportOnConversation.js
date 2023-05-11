@@ -21,7 +21,7 @@ class ReportOnConversationHandler {
             return;
         await reportChannel.send({
             content: `<@&${Config_1.default.config.managerRole}>`,
-            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.reportConversationMessage(this.interaction)],
+            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.referManager(this.interaction)],
             components: [MessageUtils_1.MessageUtils.Actions.attachReport(false), MessageUtils_1.MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild.id}/${this.interaction.channelId}`)]
         });
     }

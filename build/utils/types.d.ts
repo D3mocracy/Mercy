@@ -18,7 +18,7 @@ export declare type ConfigDocument = {
     reportHelperChannelId: string;
     staffChannelId: string;
     helperOfTheMonthRoleId: string;
-    errorChannel: string;
+    errorChannelId: string;
 };
 export declare type Config = {
     ticketCatagory: CategoryChannelResolvable;
