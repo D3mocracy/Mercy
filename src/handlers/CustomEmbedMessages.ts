@@ -27,6 +27,7 @@ class CustomEmbedMessages {
 
     async sendMessage() {
         (await Utils.getChannelById(this.channelId) as TextChannel).send({
+            content: "fsds",
             embeds: [
                 new EmbedBuilder({
                     ...this.message,
