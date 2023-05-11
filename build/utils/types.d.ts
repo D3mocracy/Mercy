@@ -8,14 +8,14 @@ export declare type Conversation = {
     date: Date;
 };
 export declare type ConfigDocument = {
-    ticketCatagoryId: string;
-    ticketLogId: string;
+    conversationCatagoryId: string;
+    conversationLogId: string;
     managerRole: string;
     helperRole: string;
     memberRole: string;
     guildId: string;
     reportChannelId: string;
-    reportHelperChannelId: string;
+    requestHelperChannelId: string;
     staffChannelId: string;
     helperOfTheMonthRoleId: string;
     errorChannelId: string;

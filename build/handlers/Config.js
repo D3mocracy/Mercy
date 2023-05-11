@@ -23,10 +23,10 @@ class ConfigHandler {
         const configDocument = (await db_1.default.configCollection.find({}).toArray())[0];
         const guild = await __1.client.guilds.fetch(process.env.GuildID);
         const fetchPromises = [
-            __1.client.channels.fetch(configDocument.ticketCatagoryId),
-            __1.client.channels.fetch(configDocument.ticketLogId),
+            __1.client.channels.fetch(configDocument.conversationCatagoryId),
+            __1.client.channels.fetch(configDocument.conversationLogId),
             __1.client.channels.fetch(configDocument.reportChannelId),
-            __1.client.channels.fetch(configDocument.reportHelperChannelId),
+            __1.client.channels.fetch(configDocument.requestHelperChannelId),
             __1.client.channels.fetch(configDocument.staffChannelId),
             __1.client.channels.fetch(configDocument.errorChannelId),
             guild.roles.fetch(configDocument.managerRole),
