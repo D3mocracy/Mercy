@@ -1,4 +1,8 @@
 import { ModalSubmitInteraction } from "discord.js";
+/**
+ * Not in use anymore
+ * @deprecated
+ */
 export declare class ReportOnConversationHandler {
     private interaction;
     constructor(interaction: ModalSubmitInteraction);

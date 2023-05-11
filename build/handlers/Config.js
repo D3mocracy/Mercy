@@ -17,7 +17,8 @@ class ConfigHandler {
         helperRole: {},
         memberRole: {},
         helperOfTheMonthRole: {},
-        guild: {}
+        guild: {},
+        importantChannels: [{ "": "" }],
     };
     async loadConfig() {
         const configDocument = (await db_1.default.configCollection.find({}).toArray())[0];
@@ -47,6 +48,7 @@ class ConfigHandler {
             memberRole: memberRole,
             helperOfTheMonthRole: helperOfTheMonthRole,
             guild: guild,
+            importantChannels: configDocument.importantChannels,
         };
     }
 }

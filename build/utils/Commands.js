@@ -15,10 +15,14 @@ var Command;
     const manageChat = new discord_js_1.SlashCommandBuilder()
         .setName("manage")
         .setDescription("כלי הניהול של צ'אט זה");
+    const sendStaffMessage = new discord_js_1.SlashCommandBuilder()
+        .setName("sendstaffmessage")
+        .setDescription("שולח הודעה עם רשימה של הצוות")
+        .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator);
     const setHelperOfTheMonth = new discord_js_1.ContextMenuCommandBuilder()
         .setName('תומך החודש')
         .setType(discord_js_1.ApplicationCommandType.User)
         .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator);
-    Command.commands = [openChat, setHelperOfTheMonth, manageChat, importantLinks];
+    Command.commands = [openChat, setHelperOfTheMonth, manageChat, importantLinks, sendStaffMessage];
 })(Command = exports.Command || (exports.Command = {}));
 //# sourceMappingURL=Commands.js.map

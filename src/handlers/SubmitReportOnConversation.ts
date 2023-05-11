@@ -3,6 +3,10 @@ import { MessageUtils } from "../utils/MessageUtils";
 import { Utils } from "../utils/Utils";
 import ConfigHandler from "./Config";
 
+/**
+ * Not in use anymore
+ * @deprecated
+ */
 export class ReportOnConversationHandler {
     constructor(private interaction: ModalSubmitInteraction) {
         this.interaction = interaction;

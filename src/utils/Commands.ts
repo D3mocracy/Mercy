@@ -15,10 +15,16 @@ export namespace Command {
         .setName("manage")
         .setDescription("כלי הניהול של צ'אט זה")
 
+    const sendStaffMessage = new SlashCommandBuilder()
+        .setName("sendstaffmessage")
+        .setDescription("שולח הודעה עם רשימה של הצוות")
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
+
     const setHelperOfTheMonth = new ContextMenuCommandBuilder()
         .setName('תומך החודש')
         .setType(ApplicationCommandType.User)
         .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
 
-    export const commands = [openChat, setHelperOfTheMonth, manageChat, importantLinks]
+
+    export const commands = [openChat, setHelperOfTheMonth, manageChat, importantLinks, sendStaffMessage]
 }

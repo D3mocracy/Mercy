@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 const MessageUtils_1 = require("../utils/MessageUtils");
-const Utils_1 = require("../utils/Utils");
 const Config_1 = __importDefault(require("./Config"));
 class CommandHandler {
     interaction;
@@ -16,6 +15,12 @@ class CommandHandler {
         this.interaction.channel?.send({
             embeds: [MessageUtils_1.MessageUtils.EmbedMessages.openChat],
             components: [MessageUtils_1.MessageUtils.Actions.openChatButton]
+        });
+        await this.interaction.reply({ content: 'Sent!', ephemeral: true });
+    }
+    async sendStaffMessage() {
+        this.interaction.channel?.send({
+            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.staffMembers()]
         });
         await this.interaction.reply({ content: 'Sent!', ephemeral: true });
     }
@@ -32,7 +37,7 @@ class CommandHandler {
     }
     async importantLinks() {
         await this.interaction.channel?.send({
-            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.importantLinks([await Utils_1.Utils.getChannelById("1035880270064259084")])],
+            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.importantLinks()],
             components: [new discord_js_1.ActionRowBuilder().addComponents([
                     MessageUtils_1.MessageUtils.Actions.user_report_helper,
                     MessageUtils_1.MessageUtils.Actions.user_suggest

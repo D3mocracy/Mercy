@@ -142,6 +142,9 @@ exports.client.on('interactionCreate', async (interaction) => {
         },
         importantlinks: async () => {
             await new Command_1.default(interaction).importantLinks();
+        },
+        sendstaffmessage: async () => {
+            await new Command_1.default(interaction).sendStaffMessage();
         }
     };
     try {

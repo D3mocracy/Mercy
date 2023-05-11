@@ -143,6 +143,9 @@ client.on('interactionCreate', async interaction => {
         },
         importantlinks: async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).importantLinks();
+        },
+        sendstaffmessage: async () => {
+            await new CommandHandler(interaction as ChatInputCommandInteraction).sendStaffMessage();
         }
     }
     try {

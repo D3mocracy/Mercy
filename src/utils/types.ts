@@ -21,6 +21,7 @@ export type ConfigDocument = {
     staffChannelId: string,
     helperOfTheMonthRoleId: string,
     errorChannelId: string,
+    importantChannels: { [key: string]: string }[],
 }
 
 export type Config = {
@@ -35,6 +36,7 @@ export type Config = {
     memberRole: Role,
     helperOfTheMonthRole: Role,
     guild: Guild,
+    importantChannels: { [key: string]: string }[],
 }
 
 export type CustomMessage = {

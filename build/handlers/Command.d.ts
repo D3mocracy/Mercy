@@ -3,6 +3,7 @@ declare class CommandHandler {
     private interaction;
     constructor(interaction: ChatInputCommandInteraction | UserContextMenuCommandInteraction);
     openChat(): Promise<void>;
+    sendStaffMessage(): Promise<void>;
     makeHelperOfTheMonth(): Promise<void>;
     importantLinks(): Promise<void>;
 }

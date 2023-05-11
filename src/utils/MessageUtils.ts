@@ -1,5 +1,6 @@
 import { GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { Utils } from "./Utils";
+import ConfigHandler from "../handlers/Config";
 
 export namespace MessageUtils {
     const author = { iconURL: 'https://i.imgur.com/ATfQQi7.png', name: 'Mercy - אנונימי' };
@@ -219,14 +220,37 @@ export namespace MessageUtils {
             })
         }
 
-        export function importantLinks(channels: TextChannel[]) {
+        export function importantLinks() {
             return new EmbedBuilder({
                 author,
-                color: colors.blue,
+                color: colors.pink,
+                thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
                 title: "מידע שימושי",
-                description: `משתמשים יקרים, לשרותכם מידע ולינקים חשובים בשרת \n
-                ${channels.map(channel => `${channel}`)}
-                `
+                description: `**לשרותכם מידע ולינקים חשובים בשרת**
+                ${ConfigHandler.config.importantChannels.map(channel => (
+                    `<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`
+                )).join('\n')}`,
+
+                footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
+            })
+        }
+
+        export async function staffMembers() {
+            const managers = await Utils.getUsersWithRoleId(ConfigHandler.config.managerRole.id);
+            const helpers = await Utils.getUsersWithRoleId(ConfigHandler.config.helperRole.id);
+            return new EmbedBuilder({
+                author,
+                color: colors.pink,
+                thumbnail: { url: "https://cdn-icons-png.flaticon.com/512/2332/2332039.png" },
+                title: "צוות השרת",
+                description: `**מנהלים:**
+                ${managers.map(manager => `${manager.user}`)}
+
+                **תומכים:**
+                ${helpers.map(helper => `${helper.user}`).join('\n')}
+                `,
+
+                footer: { iconURL: author.iconURL, text: "תמיד כאן בשבילכם! - הנהלת הקהילה" }
             })
         }
 

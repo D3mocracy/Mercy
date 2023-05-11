@@ -1,4 +1,4 @@
-import { GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ModalBuilder, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ModalBuilder, ModalSubmitInteraction } from "discord.js";
 export declare namespace MessageUtils {
     namespace EmbedMessages {
         const StartConversationAsk: EmbedBuilder;
@@ -20,7 +20,8 @@ export declare namespace MessageUtils {
         const openChat: EmbedBuilder;
         const sureMessageToClose: EmbedBuilder;
         function helperOfTheMonth(helper: GuildMember): EmbedBuilder;
-        function importantLinks(channels: TextChannel[]): EmbedBuilder;
+        function importantLinks(): EmbedBuilder;
+        function staffMembers(): Promise<EmbedBuilder>;
     }
     namespace Actions {
         const openChatButton: ActionRowBuilder<ButtonBuilder>;

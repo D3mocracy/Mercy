@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageUtils = void 0;
 const discord_js_1 = require("discord.js");
 const Utils_1 = require("./Utils");
+const Config_1 = __importDefault(require("../handlers/Config"));
 var MessageUtils;
 (function (MessageUtils) {
     const author = { iconURL: 'https://i.imgur.com/ATfQQi7.png', name: 'Mercy - אנונימי' };
@@ -215,17 +219,36 @@ var MessageUtils;
             });
         }
         EmbedMessages.helperOfTheMonth = helperOfTheMonth;
-        function importantLinks(channels) {
+        function importantLinks() {
             return new discord_js_1.EmbedBuilder({
                 author,
-                color: colors.blue,
+                color: colors.pink,
+                thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
                 title: "מידע שימושי",
-                description: `משתמשים יקרים, לשרותכם מידע ולינקים חשובים בשרת \n
-                ${channels.map(channel => `${channel}`)}
-                `
+                description: `**לשרותכם מידע ולינקים חשובים בשרת**
+                ${Config_1.default.config.importantChannels.map(channel => (`<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`)).join('\n')}`,
+                footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
             });
         }
         EmbedMessages.importantLinks = importantLinks;
+        async function staffMembers() {
+            const managers = await Utils_1.Utils.getUsersWithRoleId(Config_1.default.config.managerRole.id);
+            const helpers = await Utils_1.Utils.getUsersWithRoleId(Config_1.default.config.helperRole.id);
+            return new discord_js_1.EmbedBuilder({
+                author,
+                color: colors.pink,
+                thumbnail: { url: "https://cdn-icons-png.flaticon.com/512/2332/2332039.png" },
+                title: "צוות השרת",
+                description: `**מנהלים:**
+                ${managers.map(manager => `${manager.user}`)}
+
+                **תומכים:**
+                ${helpers.map(helper => `${helper.user}`).join('\n')}
+                `,
+                footer: { iconURL: author.iconURL, text: "תמיד כאן בשבילכם! - הנהלת הקהילה" }
+            });
+        }
+        EmbedMessages.staffMembers = staffMembers;
     })(EmbedMessages = MessageUtils.EmbedMessages || (MessageUtils.EmbedMessages = {}));
     let Actions;
     (function (Actions) {

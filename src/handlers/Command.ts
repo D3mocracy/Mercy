@@ -15,6 +15,13 @@ class CommandHandler {
         await this.interaction.reply({ content: 'Sent!', ephemeral: true })
     }
 
+    async sendStaffMessage() {
+        this.interaction.channel?.send({
+            embeds: [await MessageUtils.EmbedMessages.staffMembers()]
+        })
+        await this.interaction.reply({ content: 'Sent!', ephemeral: true });
+    }
+
     async makeHelperOfTheMonth() {
         const helper = (this.interaction as UserContextMenuCommandInteraction).targetMember as GuildMember;
         const helperOfTheMonth = ConfigHandler.config.helperOfTheMonthRole;
@@ -28,7 +35,7 @@ class CommandHandler {
 
     async importantLinks() {
         await this.interaction.channel?.send({
-            embeds: [MessageUtils.EmbedMessages.importantLinks([await Utils.getChannelById("1035880270064259084") as TextChannel])],
+            embeds: [MessageUtils.EmbedMessages.importantLinks()],
             components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
                 MessageUtils.Actions.user_report_helper,
                 MessageUtils.Actions.user_suggest

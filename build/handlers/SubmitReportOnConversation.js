@@ -6,6 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportOnConversationHandler = void 0;
 const MessageUtils_1 = require("../utils/MessageUtils");
 const Config_1 = __importDefault(require("./Config"));
+/**
+ * Not in use anymore
+ * @deprecated
+ */
 class ReportOnConversationHandler {
     interaction;
     constructor(interaction) {

@@ -16,7 +16,8 @@ class ConfigHandler {
         helperRole: {} as Role,
         memberRole: {} as Role,
         helperOfTheMonthRole: {} as Role,
-        guild: {} as Guild
+        guild: {} as Guild,
+        importantChannels: [{ "": "" }],
     };
 
     async loadConfig(): Promise<Config> {
@@ -61,6 +62,7 @@ class ConfigHandler {
             memberRole: memberRole as Role,
             helperOfTheMonthRole: helperOfTheMonthRole as Role,
             guild: guild as Guild,
+            importantChannels: configDocument.importantChannels,
         };
     }
 }
