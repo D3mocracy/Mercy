@@ -1,3 +1,2 @@
-import { Client } from "discord.js";
-export declare const client: Client;
+export {};
 //# sourceMappingURL=index.d.ts.map

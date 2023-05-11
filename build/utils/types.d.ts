@@ -22,14 +22,16 @@ export declare type ConfigDocument = {
     importantChannels: {
         [key: string]: string;
     }[];
+    suggestIdeasChannelId: string;
 };
 export declare type Config = {
-    ticketCatagory: CategoryChannelResolvable;
-    ticketLog: TextChannel;
+    conversationCatagory: CategoryChannelResolvable;
+    conversationLog: TextChannel;
     reportChannel: TextChannel;
-    reportHelperChannel: TextChannel;
+    requestHelperChannel: TextChannel;
     staffChannel: TextChannel;
     errorChannel: TextChannel;
+    suggestIdeasChannel: TextChannel;
     managerRole: Role;
     helperRole: Role;
     memberRole: Role;

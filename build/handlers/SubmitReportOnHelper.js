@@ -26,7 +26,7 @@ class ReportOnHelperHandler {
         if (!conversation.staffMemberId)
             return;
         const helpers = Utils_1.Utils.getMembersById(...conversation.staffMemberId).map(member => member?.displayName).join(', ');
-        const reportChannel = Config_1.default.config.reportHelperChannel;
+        const reportChannel = Config_1.default.config.requestHelperChannel;
         if (!reportChannel)
             return;
         await reportChannel.send({

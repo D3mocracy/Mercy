@@ -1,13 +1,12 @@
 import DataBase from "../utils/db";
 import { Conversation } from "../utils/types";
-import { ChannelType, Message, TextChannel } from "discord.js"
+import { ChannelType, Message, TextChannel, Client } from "discord.js"
 import { Utils } from "../utils/Utils";
 import { CantLoadConversationFromDB } from "../utils/Errors";
-import { client } from "..";
 
 class CommunicateConversationHandler {
     private conversation: Conversation = {} as any;
-    constructor(private message: Message, private type: ChannelType) { }
+    constructor(private client: Client, private message: Message, private type: ChannelType) { }
 
     async handle() {
         await this.loadConversation();
@@ -28,14 +27,14 @@ class CommunicateConversationHandler {
         console.log(this.type);
 
         if (this.type === ChannelType.DM) {
-            await ((await Utils.getChannelById(this.conversation.channelId)) as TextChannel).send(this.message.content);
+            await ((await Utils.getChannelById(this.client, this.conversation.channelId)) as TextChannel).send(this.message.content);
 
         } else if (this.type === ChannelType.GuildText) {
             console.log('check');
 
             if (this.message.content.startsWith('!')) return;
 
-            (await client.users.fetch(this.conversation.userId)).send(this.message.content);
+            (await this.client.users.fetch(this.conversation.userId)).send(this.message.content);
         }
 
     }

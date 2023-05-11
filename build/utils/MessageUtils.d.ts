@@ -1,4 +1,4 @@
-import { GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ModalBuilder, ModalSubmitInteraction } from "discord.js";
+import { Client, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ModalBuilder, ModalSubmitInteraction } from "discord.js";
 export declare namespace MessageUtils {
     namespace EmbedMessages {
         const StartConversationAsk: EmbedBuilder;
@@ -8,14 +8,15 @@ export declare namespace MessageUtils {
         function newChatUser(numberOfConversation: number): EmbedBuilder;
         function staffMemberAttached(staffMemberUsername: string): EmbedBuilder;
         const ManagerTools: EmbedBuilder;
-        function revealUserMessage(userId: string): Promise<EmbedBuilder>;
+        function revealUserMessage(client: Client, userId: string): Promise<EmbedBuilder>;
         const changeHelper: EmbedBuilder;
         const answerOpenConversationTimeEnd: EmbedBuilder;
         const userChooseNo: EmbedBuilder;
         const helpersReseted: EmbedBuilder;
         function chatClosed(closedBy: string, chatTitle: string): EmbedBuilder;
         function ticketLog(channelTitle: string): Promise<EmbedBuilder>;
-        function referManager(interaction: ModalSubmitInteraction): Promise<EmbedBuilder>;
+        function referManager(interaction: ModalSubmitInteraction): EmbedBuilder;
+        function suggestIdea(interaction: ModalSubmitInteraction): EmbedBuilder;
         function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string): Promise<EmbedBuilder>;
         const openChat: EmbedBuilder;
         const sureMessageToClose: EmbedBuilder;

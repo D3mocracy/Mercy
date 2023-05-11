@@ -29,7 +29,7 @@ class StartConversation {
         const convChannel = await Config_1.default.config.guild.channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: discord_js_1.ChannelType.GuildText,
-            parent: Config_1.default.config.ticketCatagory
+            parent: Config_1.default.config.conversationCatagory
         });
         await Promise.all([
             this.interaction.user.send({

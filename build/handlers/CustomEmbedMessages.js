@@ -7,10 +7,12 @@ const discord_js_1 = require("discord.js");
 const db_1 = __importDefault(require("../utils/db"));
 const Utils_1 = require("../utils/Utils");
 class CustomEmbedMessages {
+    client;
     key;
     channelId;
     message = {};
-    constructor(key, channelId) {
+    constructor(client, key, channelId) {
+        this.client = client;
         this.key = key;
         this.channelId = channelId;
         this.key = key;
@@ -22,8 +24,8 @@ class CustomEmbedMessages {
     static getKeyFromMessage(message) {
         return message.split('&')[1];
     }
-    static async createHandler(key, channelId) {
-        const handler = new CustomEmbedMessages(key, channelId);
+    static async createHandler(client, key, channelId) {
+        const handler = new CustomEmbedMessages(client, key, channelId);
         const message = await handler.load();
         if (message) {
             return handler;
@@ -33,7 +35,7 @@ class CustomEmbedMessages {
         }
     }
     async sendMessage() {
-        (await Utils_1.Utils.getChannelById(this.channelId)).send({
+        (await Utils_1.Utils.getChannelById(this.client, this.channelId)).send({
             embeds: [
                 new discord_js_1.EmbedBuilder({
                     ...this.message,

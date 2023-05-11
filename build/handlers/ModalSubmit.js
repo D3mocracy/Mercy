@@ -14,15 +14,19 @@ class ModalSubmitHandler {
         this.interaction = interaction;
     }
     async referManager() {
-        const reportChannel = Config_1.default.config.reportChannel;
-        if (!reportChannel)
-            return;
-        await reportChannel.send({
+        await Config_1.default.config.suggestIdeasChannel.send({
             content: `${Config_1.default.config.managerRole}`,
-            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.referManager(this.interaction)],
+            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.referManager(this.interaction)],
             components: [MessageUtils_1.MessageUtils.Actions.attachReport(false), MessageUtils_1.MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild.id}/${this.interaction.channelId}`)]
         });
         await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
+    }
+    async suggestIdea() {
+        await Config_1.default.config.suggestIdeasChannel.send({
+            content: `${Config_1.default.config.managerRole}`,
+            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.suggestIdea(this.interaction)]
+        });
+        await this.interaction.reply({ content: "ההצעה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
     }
     async reportHelper() {
         let helpers = "";
@@ -31,12 +35,12 @@ class ModalSubmitHandler {
         (lastConversation && lastConversation.staffMemberId)
             ? helpers = Utils_1.Utils.getMembersById(...lastConversation.staffMemberId).map(member => member?.displayName).join(', ')
             : helpers = "לא נמצא צ'אט אחרון / המשתמש לא פתח צ'אט / לא שויך תומך לצ'אט האחרון";
-        await Config_1.default.config.reportHelperChannel.send({
+        await Config_1.default.config.requestHelperChannel.send({
             content: `${Config_1.default.config.managerRole}`,
             embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
             components: [MessageUtils_1.MessageUtils.Actions.attachReport(false)]
         });
-        await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
+        await this.interaction.reply({ content: "הדיווח שלך נשלח בהצלחה למנהלים", ephemeral: true });
     }
 }
 exports.ModalSubmitHandler = ModalSubmitHandler;

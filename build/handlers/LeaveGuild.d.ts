@@ -1,7 +1,9 @@
+import { Client } from "discord.js";
 declare class LeaveGuildHandler {
+    private client;
     private userId;
     private conversation;
-    constructor(userId: string);
+    constructor(client: Client, userId: string);
     loadConversation(): Promise<void>;
     saveConversation(): Promise<void>;
     closeConversation(): Promise<void>;

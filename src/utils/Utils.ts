@@ -1,9 +1,7 @@
-import { Channel, User, TextChannel, ChannelType, Client, Partials } from "discord.js";
+import { Channel, User, TextChannel, ChannelType, Client } from "discord.js";
 import DataBase from "./db";
 import { Conversation } from "./types";
-import { Command } from "./Commands";
 import ConfigHandler from "../handlers/Config";
-import { client } from "..";
 export namespace Utils {
 
     export async function hasOpenConversation(userId: string) {
@@ -19,7 +17,7 @@ export namespace Utils {
         return (await DataBase.conversationsCollection.find().toArray()).length;
     };
 
-    export async function getChannelById(channelId: string): Promise<Channel | null> {
+    export async function getChannelById(client: Client, channelId: string): Promise<Channel | null> {
         return await client.channels.fetch(channelId);
     }
 
@@ -27,7 +25,7 @@ export namespace Utils {
         return await ConfigHandler.config.guild.roles.fetch(roleId);
     }
 
-    export async function getUserByID(userId: string): Promise<User> {
+    export async function getUserByID(client: Client, userId: string): Promise<User> {
         return await client.users.fetch(userId);
     }
 
@@ -36,8 +34,8 @@ export namespace Utils {
         return ConfigHandler.config.guild.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
     }
 
-    export async function updatePermissionToChannel(conversation: Conversation) {
-        const channel: TextChannel = await getChannelById(conversation.channelId) as TextChannel;
+    export async function updatePermissionToChannel(client: Client, conversation: Conversation) {
+        const channel: TextChannel = await Utils.getChannelById(client, conversation.channelId) as TextChannel;
         await channel.lockPermissions();
 
         if (!conversation.staffMemberId || conversation.staffMemberId.length === 0 || channel === null) return;
@@ -46,13 +44,13 @@ export namespace Utils {
             await channel.permissionOverwrites.create(memberId, { SendMessages: true })
         })
 
-        const usernames = await Promise.all(conversation.staffMemberId.map(memberId => getUserByID(memberId)));
+        const usernames = await Promise.all(conversation.staffMemberId.map(memberId => Utils.getUserByID(client, memberId)));
         return { usernames, conversation, channel };
     }
 
     export async function isTicketChannel(channel: Channel) {
         // const config: Config = await new ConfigHandler().getConfig();
-        return channel.type === ChannelType.GuildText && (channel as TextChannel).parent === ConfigHandler.config.ticketCatagory;
+        return channel.type === ChannelType.GuildText && (channel as TextChannel).parent === ConfigHandler.config.conversationCatagory;
     }
 
     export async function isGuildMember(userId: string) {

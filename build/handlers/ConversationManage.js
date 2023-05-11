@@ -9,16 +9,17 @@ const Utils_1 = require("../utils/Utils");
 const Logger_1 = __importDefault(require("./Logger"));
 const Errors_1 = require("../utils/Errors");
 const Config_1 = __importDefault(require("./Config"));
-const __1 = require("..");
 class ConversationManageHandler {
+    client;
     interaction;
     channel = {};
     conversation = {};
-    constructor(interaction) {
+    constructor(client, interaction) {
+        this.client = client;
         this.interaction = interaction;
     }
-    static async createHandler(interaction) {
-        const handler = new ConversationManageHandler(interaction);
+    static async createHandler(client, interaction) {
+        const handler = new ConversationManageHandler(client, interaction);
         await handler.loadConversation();
         return handler;
     }
@@ -27,7 +28,7 @@ class ConversationManageHandler {
             ? this.conversation = await db_1.default.conversationsCollection.findOne({ userId: this.interaction.user.id, open: true })
             : this.conversation = await db_1.default.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true });
         if (this.conversation) {
-            this.channel = await Utils_1.Utils.getChannelById(this.conversation.channelId);
+            this.channel = await Utils_1.Utils.getChannelById(this.client, this.conversation.channelId);
         }
         else {
             throw new Errors_1.CantLoadConversationFromDB();
@@ -57,7 +58,7 @@ class ConversationManageHandler {
         await Promise.all([
             Logger_1.default.logTicket(this.channel),
             this.interaction.message.edit({ components: [] }),
-            __1.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
+            this.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
             this.interaction.deferUpdate()
         ]);
         await this.channel.delete();
@@ -65,7 +66,7 @@ class ConversationManageHandler {
     async attachHelper(staffMemberId) {
         if (!this.conversation.staffMemberId || this.conversation.staffMemberId.length === 0) {
             this.conversation.staffMemberId = [staffMemberId];
-            await Utils_1.Utils.updatePermissionToChannel(this.conversation);
+            await Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation);
             await this.interaction.reply({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] });
             return;
         }
@@ -78,12 +79,12 @@ class ConversationManageHandler {
         }
         await this.interaction.reply({
             ephemeral: true,
-            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.revealUserMessage(this.conversation.userId)]
+            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.revealUserMessage(this.client, this.conversation.userId)]
         });
     }
     async resetHelpers() {
         this.conversation.staffMemberId = [];
-        await Utils_1.Utils.updatePermissionToChannel(this.conversation);
+        await Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation);
         await this.interaction.channel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.helpersReseted] });
     }
     async changeHelpersMessage() {

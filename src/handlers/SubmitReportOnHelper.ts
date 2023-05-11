@@ -21,7 +21,7 @@ export class ReportOnHelperHandler {
             await DataBase.conversationsCollection.find({ userId: this.interaction.user.id, open: false }).sort({ _id: -1 }).limit(1).next() as any;
         if (!conversation.staffMemberId) return;
         const helpers = Utils.getMembersById(...conversation.staffMemberId).map(member => member?.displayName).join(', ');
-        const reportChannel: TextChannel = ConfigHandler.config.reportHelperChannel;
+        const reportChannel: TextChannel = ConfigHandler.config.requestHelperChannel;
         if (!reportChannel) return;
         await reportChannel.send({
             content: `<@&${ConfigHandler.config.managerRole}>`,

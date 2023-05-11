@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, PermissionFlagsBits } from "discord.js";
+import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials } from "discord.js";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
 import CommandHandler from "./handlers/Command";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
@@ -9,8 +9,6 @@ import ConversationStaffToolsHandler from "./handlers/ConversationStaffTools";
 import CustomEmbedMessages from "./handlers/CustomEmbedMessages";
 import LeaveGuildHandler from "./handlers/LeaveGuild";
 import StartConversation from "./handlers/StartConversation";
-import { ReportOnConversationHandler } from "./handlers/SubmitReportOnConversation";
-import { ReportOnHelperHandler } from "./handlers/SubmitReportOnHelper";
 import { MessageUtils } from "./utils/MessageUtils";
 import { Utils } from "./utils/Utils";
 import DataBase from "./utils/db";
@@ -18,17 +16,17 @@ import Logger from "./handlers/Logger";
 import { Command } from "./utils/Commands";
 import { ModalSubmitHandler } from "./handlers/ModalSubmit";
 
-export const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
+const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
 
 DataBase.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
     await client.application?.commands.set(Command.commands);
-    await new ConfigHandler().loadConfig();
+    await new ConfigHandler(client).loadConfig()
 }).catch((error) => {
     Logger.logError(error)
 });
 
-client.once('ready', () => {
+client.once('ready', async () => {
     console.log(`Logged in as ${client!.user?.tag}!`);
 });
 
@@ -40,7 +38,7 @@ client.on('messageCreate', async message => {
             || !message.channel.isTextBased()) return;
 
         if (message.content.startsWith('&') && message.member?.permissions.has("Administrator")) {
-            await (await CustomEmbedMessages.createHandler(CustomEmbedMessages.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
+            await (await CustomEmbedMessages.createHandler(client, CustomEmbedMessages.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
             message.delete();
         }
 
@@ -48,7 +46,7 @@ client.on('messageCreate', async message => {
             const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
 
             if ((message.channel.isDMBased() && hasOpenConversation) || await Utils.isTicketChannel(message.channel)) {
-                await new CommunicateConversationHandler(message, message.channel.type).handle();
+                await new CommunicateConversationHandler(client, message, message.channel.type).handle();
             }
         } else {
             await message.reply("היי, לא נראה שאתה חלק מהשרת האנונימי");
@@ -68,13 +66,13 @@ client.on('interactionCreate', async interaction => {
             await new ConversationStaffToolsHandler(interaction as ButtonInteraction).managerAttachReport();
         },
         tools_attach: async () => {
-            const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
+            const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
             await conversationManage.attachHelper(interaction.user.id);
             await conversationManage.saveConversation();
         },
         tools_close: async () => {
             try {
-                const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
+                const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
                 await conversationManage.sendSureMessageToClose();
             } catch (error) {
                 (interaction as ButtonInteraction).message.edit({ components: [] });
@@ -83,7 +81,7 @@ client.on('interactionCreate', async interaction => {
         },
         sure_yes: async () => {
             try {
-                const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
+                const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
                 await (interaction as ButtonInteraction).message.edit({ components: [] });
                 await conversationManage.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
                 await conversationManage.saveConversation();
@@ -102,16 +100,16 @@ client.on('interactionCreate', async interaction => {
                 : await (interaction as ButtonInteraction).reply({ content: "ברכות על הקידום", ephemeral: true });
         },
         tools_manager_reveal: async () => {
-            const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
+            const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
             await conversationManage.revealUser();
         },
         tools_manager_change_supporter: async () => {
-            const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
+            const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
             await conversationManage.changeHelpersMessage();
 
         },
         tools_reset_helpers: async () => {
-            const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
+            const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
             await conversationManage.resetHelpers();
             await conversationManage.saveConversation();
         },
@@ -121,14 +119,20 @@ client.on('interactionCreate', async interaction => {
         user_report_helper: async () => {
             await (interaction as ButtonInteraction).showModal(MessageUtils.Modals.reportHelperModal);
         },
+        user_suggest: async () => {
+            await (interaction as ButtonInteraction).showModal(MessageUtils.Modals.suggestIdeaModal);
+        },
         reportHelperModal: async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).reportHelper();
         },
         referManager: async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).referManager();
         },
+        suggestIdea: async () => {
+            await new ModalSubmitHandler(interaction as ModalSubmitInteraction).suggestIdea();
+        },
         helpers_list: async () => {
-            await new ChangeHelperHandler(interaction as StringSelectMenuInteraction).handle();
+            await new ChangeHelperHandler(client, interaction as StringSelectMenuInteraction).handle();
         },
         openchat: async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).openChat();
@@ -167,7 +171,7 @@ client.on('interactionCreate', async interaction => {
 client.on('guildMemberRemove', async member => {
     try {
         if (!await Utils.hasOpenConversation(member.id)) return;
-        const leaveGuildHandler = new LeaveGuildHandler(member.user.id);
+        const leaveGuildHandler = new LeaveGuildHandler(client, member.user.id);
         await leaveGuildHandler.loadConversation();
         await leaveGuildHandler.closeConversation();
     } catch (error: any) {

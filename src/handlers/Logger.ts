@@ -8,7 +8,7 @@ import ConfigHandler from "./Config";
 namespace Logger {
 
     export async function logTicket(ticketChannel: TextChannel) {
-        const logChannel: TextChannel = ConfigHandler.config.ticketLog;
+        const logChannel: TextChannel = ConfigHandler.config.conversationLog;
         const attachment = await createTranscript(ticketChannel, {
             limit: -1,
             returnType: ExportReturnType.Attachment,
@@ -19,8 +19,13 @@ namespace Logger {
 
     export async function logError(error: Error) {
         console.error(error);
-        const errorChannel = ConfigHandler.config.errorChannel;
-        await errorChannel.send({ embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
+        // try {
+        //     const errorChannel = ConfigHandler.config.errorChannel;
+        //     console.log(errorChannel)
+        //     await errorChannel.send({ embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
+        // } catch (error) {
+        //     console.error(error);
+        // }
     }
 
 }

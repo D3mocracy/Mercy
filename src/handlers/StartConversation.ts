@@ -26,7 +26,7 @@ class StartConversation {
         const convChannel = await ConfigHandler.config.guild.channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: ChannelType.GuildText,
-            parent: ConfigHandler.config.ticketCatagory
+            parent: ConfigHandler.config.conversationCatagory
         });
 
         await Promise.all([

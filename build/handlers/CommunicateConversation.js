@@ -7,12 +7,13 @@ const db_1 = __importDefault(require("../utils/db"));
 const discord_js_1 = require("discord.js");
 const Utils_1 = require("../utils/Utils");
 const Errors_1 = require("../utils/Errors");
-const __1 = require("..");
 class CommunicateConversationHandler {
+    client;
     message;
     type;
     conversation = {};
-    constructor(message, type) {
+    constructor(client, message, type) {
+        this.client = client;
         this.message = message;
         this.type = type;
     }
@@ -34,13 +35,13 @@ class CommunicateConversationHandler {
     async sendMessage() {
         console.log(this.type);
         if (this.type === discord_js_1.ChannelType.DM) {
-            await (await Utils_1.Utils.getChannelById(this.conversation.channelId)).send(this.message.content);
+            await (await Utils_1.Utils.getChannelById(this.client, this.conversation.channelId)).send(this.message.content);
         }
         else if (this.type === discord_js_1.ChannelType.GuildText) {
             console.log('check');
             if (this.message.content.startsWith('!'))
                 return;
-            (await __1.client.users.fetch(this.conversation.userId)).send(this.message.content);
+            (await this.client.users.fetch(this.conversation.userId)).send(this.message.content);
         }
     }
 }

@@ -1,11 +1,12 @@
-import { ButtonInteraction, TextChannel, ChatInputCommandInteraction } from "discord.js";
+import { ButtonInteraction, Client, TextChannel, ChatInputCommandInteraction } from "discord.js";
 import { Conversation } from "../utils/types";
 declare class ConversationManageHandler {
+    private client;
     private interaction;
     channel: TextChannel;
     conversation: Conversation;
     private constructor();
-    static createHandler(interaction: ButtonInteraction): Promise<ConversationManageHandler>;
+    static createHandler(client: Client, interaction: ButtonInteraction): Promise<ConversationManageHandler>;
     loadConversation(): Promise<void>;
     saveConversation(): Promise<void>;
     static sendManageTools(interaction: ChatInputCommandInteraction): Promise<void>;

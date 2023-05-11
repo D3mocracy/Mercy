@@ -6,17 +6,16 @@ import { Utils } from "../utils/Utils";
 import Logger from "./Logger";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import ConfigHandler from "./Config";
-import { client } from "..";
 
 
 class ConversationManageHandler {
     channel: TextChannel = {} as any;
     conversation: Conversation = {} as any;
 
-    private constructor(private interaction: ButtonInteraction) { }
+    private constructor(private client: Client, private interaction: ButtonInteraction) { }
 
-    static async createHandler(interaction: ButtonInteraction) {
-        const handler = new ConversationManageHandler(interaction);
+    static async createHandler(client: Client, interaction: ButtonInteraction) {
+        const handler = new ConversationManageHandler(client, interaction);
         await handler.loadConversation();
         return handler;
     }
@@ -26,7 +25,7 @@ class ConversationManageHandler {
             ? this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.interaction.user.id, open: true }) as any
             : this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any;
         if (this.conversation) {
-            this.channel = await Utils.getChannelById(this.conversation.channelId) as TextChannel;
+            this.channel = await Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel;
         } else {
             throw new CantLoadConversationFromDB();
         }
@@ -59,7 +58,7 @@ class ConversationManageHandler {
         await Promise.all([
             Logger.logTicket(this.channel),
             this.interaction.message.edit({ components: [] }),
-            client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
+            this.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
             this.interaction.deferUpdate()
         ]);
         await this.channel.delete();
@@ -68,7 +67,7 @@ class ConversationManageHandler {
     async attachHelper(staffMemberId: string): Promise<void> {
         if (!this.conversation.staffMemberId || this.conversation.staffMemberId.length === 0) {
             this.conversation.staffMemberId = [staffMemberId];
-            await Utils.updatePermissionToChannel(this.conversation);
+            await Utils.updatePermissionToChannel(this.client, this.conversation);
             await this.interaction.reply({ embeds: [MessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] })
             return;
         }
@@ -82,13 +81,13 @@ class ConversationManageHandler {
         }
         await this.interaction.reply({
             ephemeral: true,
-            embeds: [await MessageUtils.EmbedMessages.revealUserMessage(this.conversation.userId)]
+            embeds: [await MessageUtils.EmbedMessages.revealUserMessage(this.client, this.conversation.userId)]
         });
     }
 
     async resetHelpers() {
         this.conversation.staffMemberId = [];
-        await Utils.updatePermissionToChannel(this.conversation);
+        await Utils.updatePermissionToChannel(this.client, this.conversation);
         await (this.interaction.channel as TextChannel).send({ embeds: [MessageUtils.EmbedMessages.helpersReseted] });
     }
 

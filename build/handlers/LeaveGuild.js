@@ -8,9 +8,11 @@ const MessageUtils_1 = require("../utils/MessageUtils");
 const Utils_1 = require("../utils/Utils");
 const Logger_1 = __importDefault(require("./Logger"));
 class LeaveGuildHandler {
+    client;
     userId;
     conversation = {};
-    constructor(userId) {
+    constructor(client, userId) {
+        this.client = client;
         this.userId = userId;
     }
     async loadConversation() {
@@ -22,7 +24,7 @@ class LeaveGuildHandler {
     async closeConversation() {
         if (!this.conversation.userId)
             return;
-        const channel = await Utils_1.Utils.getChannelById(this.conversation.channelId);
+        const channel = await Utils_1.Utils.getChannelById(this.client, this.conversation.channelId);
         const closedMessage = { embeds: [MessageUtils_1.MessageUtils.EmbedMessages.chatClosed("משתמש שיצא", channel.name)] };
         this.conversation.open = false;
         await Promise.all([

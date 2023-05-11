@@ -1,14 +1,13 @@
-import { TextChannel } from "discord.js";
+import { TextChannel, Client } from "discord.js";
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
-import ConversationManageHandler from "./ConversationManage";
 import Logger from "./Logger";
 
 class LeaveGuildHandler {
     private conversation: Conversation = {} as any;
-    constructor(private userId: string) { }
+    constructor(private client: Client, private userId: string) { }
 
     async loadConversation(): Promise<void> {
         this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.userId, open: true }) as any;
@@ -20,7 +19,7 @@ class LeaveGuildHandler {
 
     async closeConversation() {
         if (!this.conversation.userId) return;
-        const channel: TextChannel = await Utils.getChannelById(this.conversation.channelId) as any;
+        const channel: TextChannel = await Utils.getChannelById(this.client, this.conversation.channelId) as any;
         const closedMessage = { embeds: [MessageUtils.EmbedMessages.chatClosed("משתמש שיצא", channel.name)] };
         this.conversation.open = false;
         await Promise.all([

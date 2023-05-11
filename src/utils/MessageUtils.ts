@@ -1,4 +1,4 @@
-import { GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, TextChannel } from "discord.js";
+import { Client, GuildMember, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { Utils } from "./Utils";
 import ConfigHandler from "../handlers/Config";
 
@@ -74,8 +74,8 @@ export namespace MessageUtils {
             description: "מנהלים יקרים, שימו לב שהפרת אנונימיות של משתמש היא נושא רגיש מאוד. אם אין לכם חשד כי מדובר בעבירה על אחד מחוקי המדינה ו/או פגיעה עצמית ו/או פגיעה בסובבים את האינדיבידואל, השתדל שלא להפר מדיניות זו."
         });
 
-        export async function revealUserMessage(userId: string) {
-            const user = await Utils.getUserByID(userId);
+        export async function revealUserMessage(client: Client, userId: string) {
+            const user = await Utils.getUserByID(client, userId);
             return new EmbedBuilder({
                 author,
                 color: colors.blue,
@@ -143,7 +143,7 @@ export namespace MessageUtils {
             });
         };
 
-        export async function referManager(interaction: ModalSubmitInteraction) {
+        export function referManager(interaction: ModalSubmitInteraction) {
             return new EmbedBuilder({
                 author,
                 color: colors.blue,
@@ -154,6 +154,25 @@ export namespace MessageUtils {
                 { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
             ])
         };
+
+        export function suggestIdea(interaction: ModalSubmitInteraction) {
+            return new EmbedBuilder({
+                author: { iconURL: author.iconURL, name: "Mercy - כללי" },
+                title: "התקבלה הצעת ייעול / דיווח על באג",
+                description: `**תיאור ההצעה**
+                ${interaction.fields.getTextInputValue("suggest_explain")}
+                **הערות נוספות**
+                ${interaction.fields.getTextInputValue("suggest_comments")}`,
+                fields: [
+                    {
+                        name: "משתמש מציע:",
+                        value: `${interaction.member}`
+                    }
+                ],
+                timestamp: new Date(),
+                color: colors.green
+            })
+        }
 
         export async function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string) {
             return new EmbedBuilder({

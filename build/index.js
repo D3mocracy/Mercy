@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.client = void 0;
 require("dotenv").config();
 const discord_js_1 = require("discord.js");
 const ChangeHelper_1 = __importDefault(require("./handlers/ChangeHelper"));
@@ -21,18 +20,18 @@ const db_1 = __importDefault(require("./utils/db"));
 const Logger_1 = __importDefault(require("./handlers/Logger"));
 const Commands_1 = require("./utils/Commands");
 const ModalSubmit_1 = require("./handlers/ModalSubmit");
-exports.client = new discord_js_1.Client({ intents: 4194303, partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User] });
+const client = new discord_js_1.Client({ intents: 4194303, partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User] });
 db_1.default.client.connect().then(async () => {
-    await exports.client.login(process.env.TOKEN);
-    await exports.client.application?.commands.set(Commands_1.Command.commands);
-    await new Config_1.default().loadConfig();
+    await client.login(process.env.TOKEN);
+    await client.application?.commands.set(Commands_1.Command.commands);
+    await new Config_1.default(client).loadConfig();
 }).catch((error) => {
     Logger_1.default.logError(error);
 });
-exports.client.once('ready', () => {
-    console.log(`Logged in as ${exports.client.user?.tag}!`);
+client.once('ready', async () => {
+    console.log(`Logged in as ${client.user?.tag}!`);
 });
-exports.client.on('messageCreate', async (message) => {
+client.on('messageCreate', async (message) => {
     try {
         if (message.author.bot
             || message.attachments.size > 0
@@ -40,13 +39,13 @@ exports.client.on('messageCreate', async (message) => {
             || !message.channel.isTextBased())
             return;
         if (message.content.startsWith('&') && message.member?.permissions.has("Administrator")) {
-            await (await CustomEmbedMessages_1.default.createHandler(CustomEmbedMessages_1.default.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
+            await (await CustomEmbedMessages_1.default.createHandler(client, CustomEmbedMessages_1.default.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
             message.delete();
         }
         if (await Utils_1.Utils.isGuildMember(message.author.id)) {
             const hasOpenConversation = await Utils_1.Utils.hasOpenConversation(message.author.id);
             if ((message.channel.isDMBased() && hasOpenConversation) || await Utils_1.Utils.isTicketChannel(message.channel)) {
-                await new CommunicateConversation_1.default(message, message.channel.type).handle();
+                await new CommunicateConversation_1.default(client, message, message.channel.type).handle();
             }
         }
         else {
@@ -57,7 +56,7 @@ exports.client.on('messageCreate', async (message) => {
         Logger_1.default.logError(error);
     }
 });
-exports.client.on('interactionCreate', async (interaction) => {
+client.on('interactionCreate', async (interaction) => {
     const actionHandler = {
         openChatButton: async () => {
             await new StartConversation_1.default(interaction).precondition();
@@ -66,13 +65,13 @@ exports.client.on('interactionCreate', async (interaction) => {
             await new ConversationStaffTools_1.default(interaction).managerAttachReport();
         },
         tools_attach: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(interaction);
+            const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
             await conversationManage.attachHelper(interaction.user.id);
             await conversationManage.saveConversation();
         },
         tools_close: async () => {
             try {
-                const conversationManage = await ConversationManage_1.default.createHandler(interaction);
+                const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
                 await conversationManage.sendSureMessageToClose();
             }
             catch (error) {
@@ -82,7 +81,7 @@ exports.client.on('interactionCreate', async (interaction) => {
         },
         sure_yes: async () => {
             try {
-                const conversationManage = await ConversationManage_1.default.createHandler(interaction);
+                const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
                 await interaction.message.edit({ components: [] });
                 await conversationManage.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
                 await conversationManage.saveConversation();
@@ -102,15 +101,15 @@ exports.client.on('interactionCreate', async (interaction) => {
                 : await interaction.reply({ content: "ברכות על הקידום", ephemeral: true });
         },
         tools_manager_reveal: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(interaction);
+            const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
             await conversationManage.revealUser();
         },
         tools_manager_change_supporter: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(interaction);
+            const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
             await conversationManage.changeHelpersMessage();
         },
         tools_reset_helpers: async () => {
-            const conversationManage = await ConversationManage_1.default.createHandler(interaction);
+            const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
             await conversationManage.resetHelpers();
             await conversationManage.saveConversation();
         },
@@ -120,14 +119,20 @@ exports.client.on('interactionCreate', async (interaction) => {
         user_report_helper: async () => {
             await interaction.showModal(MessageUtils_1.MessageUtils.Modals.reportHelperModal);
         },
+        user_suggest: async () => {
+            await interaction.showModal(MessageUtils_1.MessageUtils.Modals.suggestIdeaModal);
+        },
         reportHelperModal: async () => {
             await new ModalSubmit_1.ModalSubmitHandler(interaction).reportHelper();
         },
         referManager: async () => {
             await new ModalSubmit_1.ModalSubmitHandler(interaction).referManager();
         },
+        suggestIdea: async () => {
+            await new ModalSubmit_1.ModalSubmitHandler(interaction).suggestIdea();
+        },
         helpers_list: async () => {
-            await new ChangeHelper_1.default(interaction).handle();
+            await new ChangeHelper_1.default(client, interaction).handle();
         },
         openchat: async () => {
             await new Command_1.default(interaction).openChat();
@@ -161,11 +166,11 @@ exports.client.on('interactionCreate', async (interaction) => {
         Logger_1.default.logError(error);
     }
 });
-exports.client.on('guildMemberRemove', async (member) => {
+client.on('guildMemberRemove', async (member) => {
     try {
         if (!await Utils_1.Utils.hasOpenConversation(member.id))
             return;
-        const leaveGuildHandler = new LeaveGuild_1.default(member.user.id);
+        const leaveGuildHandler = new LeaveGuild_1.default(client, member.user.id);
         await leaveGuildHandler.loadConversation();
         await leaveGuildHandler.closeConversation();
     }
@@ -173,7 +178,7 @@ exports.client.on('guildMemberRemove', async (member) => {
         Logger_1.default.logError(error);
     }
 });
-exports.client.on('guildMemberAdd', async (member) => {
+client.on('guildMemberAdd', async (member) => {
     try {
         const memberRole = Config_1.default.config.memberRole;
         memberRole && member.roles.add(memberRole);
@@ -182,7 +187,7 @@ exports.client.on('guildMemberAdd', async (member) => {
         Logger_1.default.logError(error);
     }
 });
-exports.client.on('channelDelete', async (channel) => {
+client.on('channelDelete', async (channel) => {
     try {
         await db_1.default.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
     }

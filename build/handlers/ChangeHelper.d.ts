@@ -1,8 +1,9 @@
-import { StringSelectMenuInteraction } from "discord.js";
+import { StringSelectMenuInteraction, Client } from "discord.js";
 declare class ChangeHelperHandler {
+    private client;
     private interaction;
     private conversation;
-    constructor(interaction: StringSelectMenuInteraction);
+    constructor(client: Client, interaction: StringSelectMenuInteraction);
     loadConversation(): Promise<void>;
     saveConversation(): Promise<void>;
     handle(): Promise<void>;

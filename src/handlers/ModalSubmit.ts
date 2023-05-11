@@ -10,14 +10,20 @@ export class ModalSubmitHandler {
     constructor(protected interaction: ModalSubmitInteraction) { }
 
     async referManager() {
-        const reportChannel: TextChannel = ConfigHandler.config.reportChannel;
-        if (!reportChannel) return;
-        await reportChannel.send({
+        await ConfigHandler.config.suggestIdeasChannel.send({
             content: `${ConfigHandler.config.managerRole}`,
-            embeds: [await MessageUtils.EmbedMessages.referManager(this.interaction)],
+            embeds: [MessageUtils.EmbedMessages.referManager(this.interaction)],
             components: [MessageUtils.Actions.attachReport(false), MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild.id}/${this.interaction.channelId}`)]
         });
         await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
+    }
+
+    async suggestIdea() {
+        await ConfigHandler.config.suggestIdeasChannel.send({
+            content: `${ConfigHandler.config.managerRole}`,
+            embeds: [MessageUtils.EmbedMessages.suggestIdea(this.interaction)]
+        });
+        await this.interaction.reply({ content: "ההצעה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
     }
 
     async reportHelper() {
@@ -29,12 +35,12 @@ export class ModalSubmitHandler {
             ? helpers = Utils.getMembersById(...lastConversation.staffMemberId).map(member => member?.displayName).join(', ')
             : helpers = "לא נמצא צ'אט אחרון / המשתמש לא פתח צ'אט / לא שויך תומך לצ'אט האחרון"
 
-        await ConfigHandler.config.reportHelperChannel.send({
+        await ConfigHandler.config.requestHelperChannel.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [await MessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
             components: [MessageUtils.Actions.attachReport(false)]
         });
-        await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
+        await this.interaction.reply({ content: "הדיווח שלך נשלח בהצלחה למנהלים", ephemeral: true });
     }
 
 }

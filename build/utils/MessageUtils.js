@@ -77,8 +77,8 @@ var MessageUtils;
             title: "הגדרות ניהול",
             description: "מנהלים יקרים, שימו לב שהפרת אנונימיות של משתמש היא נושא רגיש מאוד. אם אין לכם חשד כי מדובר בעבירה על אחד מחוקי המדינה ו/או פגיעה עצמית ו/או פגיעה בסובבים את האינדיבידואל, השתדל שלא להפר מדיניות זו."
         });
-        async function revealUserMessage(userId) {
-            const user = await Utils_1.Utils.getUserByID(userId);
+        async function revealUserMessage(client, userId) {
+            const user = await Utils_1.Utils.getUserByID(client, userId);
             return new discord_js_1.EmbedBuilder({
                 author,
                 color: colors.blue,
@@ -143,7 +143,7 @@ var MessageUtils;
         }
         EmbedMessages.ticketLog = ticketLog;
         ;
-        async function referManager(interaction) {
+        function referManager(interaction) {
             return new discord_js_1.EmbedBuilder({
                 author,
                 color: colors.blue,
@@ -156,6 +156,25 @@ var MessageUtils;
         }
         EmbedMessages.referManager = referManager;
         ;
+        function suggestIdea(interaction) {
+            return new discord_js_1.EmbedBuilder({
+                author: { iconURL: author.iconURL, name: "Mercy - כללי" },
+                title: "התקבלה הצעת ייעול / דיווח על באג",
+                description: `**תיאור ההצעה**
+                ${interaction.fields.getTextInputValue("suggest_explain")}
+                **הערות נוספות**
+                ${interaction.fields.getTextInputValue("suggest_comments")}`,
+                fields: [
+                    {
+                        name: "משתמש מציע:",
+                        value: `${interaction.member}`
+                    }
+                ],
+                timestamp: new Date(),
+                color: colors.green
+            });
+        }
+        EmbedMessages.suggestIdea = suggestIdea;
         async function reportHelperMessage(interaction, helpers) {
             return new discord_js_1.EmbedBuilder({
                 author: { iconURL: author.iconURL, name: "Mercy - דיווחים" },
