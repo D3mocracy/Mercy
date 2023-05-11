@@ -13,7 +13,7 @@ export namespace Utils {
     }
 
     export function getGuild() {
-        return Utils.client.guilds.cache.get("1035880269460295720")!;
+        return Utils.client.guilds.cache.get(process.env.GuildID as string)!;
     }
 
     export async function hasOpenConversation(userId: string) {

@@ -1,5 +1,5 @@
 import { CategoryChannelResolvable, TextChannel, Role, Guild } from "discord.js";
-export type Conversation = {
+export declare type Conversation = {
     userId: string;
     staffMemberId?: string[];
     guildId: string;
@@ -7,7 +7,7 @@ export type Conversation = {
     open: boolean;
     date: Date;
 };
-export type ConfigDocument = {
+export declare type ConfigDocument = {
     ticketCatagoryId: string;
     ticketLogId: string;
     managerRole: string;
@@ -20,7 +20,7 @@ export type ConfigDocument = {
     helperOfTheMonthRoleId: string;
     errorChannel: string;
 };
-export type Config = {
+export declare type Config = {
     ticketCatagory: CategoryChannelResolvable;
     ticketLog: TextChannel;
     reportChannel: TextChannel;
@@ -33,7 +33,7 @@ export type Config = {
     helperOfTheMonthRole: Role;
     guild: Guild;
 };
-export type CustomMessage = {
+export declare type CustomMessage = {
     key: string;
     title: string;
     description: string;
@@ -44,7 +44,7 @@ export type CustomMessage = {
     };
     fields: embedField[];
 };
-type embedField = {
+declare type embedField = {
     name: string;
     value: string;
     inline: boolean;

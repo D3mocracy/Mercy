@@ -24,7 +24,7 @@ db_1.default.client.connect().then(async () => {
     await Utils_1.Utils.turnOnBot();
     await new Config_1.default().loadConfig();
 }).catch((error) => {
-    console.log(error);
+    console.error(error);
     Logger_1.default.logError(error);
 });
 client.once('ready', () => {
@@ -51,7 +51,7 @@ client.on('messageCreate', async (message) => {
         }
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         Logger_1.default.logError(error);
     }
 });
@@ -154,7 +154,7 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         Logger_1.default.logError(error);
     }
 });
@@ -176,7 +176,7 @@ client.on('guildMemberAdd', async (member) => {
         memberRole && member.roles.add(memberRole);
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         Logger_1.default.logError(error);
     }
 });
@@ -185,7 +185,7 @@ client.on('channelDelete', async (channel) => {
         await db_1.default.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
     }
     catch (error) {
-        console.log(error);
+        console.error(error);
         Logger_1.default.logError(error);
     }
 });
