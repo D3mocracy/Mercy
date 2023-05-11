@@ -1,12 +1,10 @@
 import { Channel, User, TextChannel, Client } from "discord.js";
 import { Conversation } from "./types";
-import { WithId } from "mongodb";
 export declare namespace Utils {
-    const client: Client;
+    const client: Client<boolean>;
     function turnOnBot(): Promise<void>;
-    function getGuild(): import("discord.js").Guild;
     function hasOpenConversation(userId: string): Promise<boolean>;
-    function getOpenConversation(userId: string): Promise<WithId<import("bson").Document> | undefined>;
+    function getOpenConversation(userId: string): Promise<import("mongodb").WithId<import("bson").Document> | undefined>;
     function getNumberOfConversationFromDB(): Promise<number>;
     function getChannelById(channelId: string): Promise<Channel | null>;
     function getRoleById(roleId: string): Promise<import("discord.js").Role | null>;

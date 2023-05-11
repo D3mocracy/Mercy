@@ -1,3 +1,4 @@
+import { client } from "..";
 import { Utils } from "../utils/Utils";
 import DataBase from "../utils/db";
 import { Config, ConfigDocument } from "../utils/types";
@@ -20,19 +21,19 @@ class ConfigHandler {
 
     async loadConfig(): Promise<Config> {
         const configDocument: ConfigDocument = (await DataBase.configCollection.find({}).toArray())[0] as any;
+        const guild: Guild = await client.guilds.fetch(process.env.GuildID as string);
 
         const fetchPromises = [
-            Utils.getGuild().channels.fetch(configDocument.ticketCatagoryId),
-            Utils.getChannelById(configDocument.ticketLogId),
-            Utils.getChannelById(configDocument.reportChannelId),
-            Utils.getChannelById(configDocument.reportHelperChannelId),
-            Utils.getChannelById(configDocument.staffChannelId),
-            Utils.getChannelById(configDocument.errorChannel),
-            Utils.getRoleById(configDocument.managerRole),
-            Utils.getRoleById(configDocument.helperRole),
-            Utils.getRoleById(configDocument.memberRole),
-            Utils.getRoleById(configDocument.helperOfTheMonthRoleId),
-            Utils.getGuild(),
+            client.channels.fetch(configDocument.ticketCatagoryId),
+            client.channels.fetch(configDocument.ticketLogId),
+            client.channels.fetch(configDocument.reportChannelId),
+            client.channels.fetch(configDocument.reportHelperChannelId),
+            client.channels.fetch(configDocument.staffChannelId),
+            client.channels.fetch(configDocument.errorChannel),
+            guild.roles.fetch(configDocument.managerRole),
+            guild.roles.fetch(configDocument.helperRole),
+            guild.roles.fetch(configDocument.memberRole),
+            guild.roles.fetch(configDocument.helperOfTheMonthRoleId),
         ];
 
         const [
@@ -46,7 +47,6 @@ class ConfigHandler {
             helperRole,
             memberRole,
             helperOfTheMonthRole,
-            guild,
         ] = await Promise.all(fetchPromises);
 
         return ConfigHandler.config = {

@@ -3,17 +3,13 @@ import DataBase from "./db";
 import { Conversation } from "./types";
 import { Command } from "./Commands";
 import ConfigHandler from "../handlers/Config";
-import { WithId } from "mongodb";
+import { client as c } from "..";
 export namespace Utils {
-    export const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
+    export const client = c;
 
     export async function turnOnBot() {
         await client.login(process.env.TOKEN);
         await client.application?.commands.set(Command.commands);
-    }
-
-    export function getGuild() {
-        return Utils.client.guilds.cache.get(process.env.GuildID as string)!;
     }
 
     export async function hasOpenConversation(userId: string) {
@@ -30,15 +26,15 @@ export namespace Utils {
     };
 
     export async function getChannelById(channelId: string): Promise<Channel | null> {
-        return await Utils.client.channels.fetch(channelId);
+        return await client.channels.fetch(channelId);
     }
 
     export async function getRoleById(roleId: string) {
-        return await Utils.getGuild().roles.fetch(roleId);
+        return await ConfigHandler.config.guild.roles.fetch(roleId);
     }
 
     export async function getUserByID(userId: string): Promise<User> {
-        return await Utils.client.users.fetch(userId);
+        return await client.users.fetch(userId);
     }
 
     export async function getUsersWithRoleId(roleId: string) {
@@ -71,12 +67,12 @@ export namespace Utils {
     }
 
     export function getMembersById(...userId: string[]) {
-        return userId.map(userId => Utils.getGuild().members.cache.get(userId));
+        return userId.map(userId => ConfigHandler.config.guild.members.cache.get(userId));
         // return Utils.getGuild().members.cache.map(member => member.user.id === )
     }
 
     export function isManager(userId: string) {
-        return Utils.getGuild().members.cache.get(userId)?.roles.cache.find((r) => r.id === ConfigHandler.config.managerRole.id);
+        return ConfigHandler.config.guild.members.cache.get(userId)?.roles.cache.find((r) => r.id === ConfigHandler.config.managerRole.id);
     }
 
 }

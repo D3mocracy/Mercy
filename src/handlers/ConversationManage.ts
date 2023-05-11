@@ -5,6 +5,7 @@ import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
 import Logger from "./Logger";
 import { CantLoadConversationFromDB } from "../utils/Errors";
+import ConfigHandler from "./Config";
 
 
 class ConversationManageHandler {
@@ -75,7 +76,7 @@ class ConversationManageHandler {
     }
 
     async revealUser() {
-        if (!(await Utils.getGuild().members.fetch(this.interaction.user.id)).permissions.has("Administrator")) {
+        if (!(await ConfigHandler.config.guild.members.fetch(this.interaction.user.id)).permissions.has("Administrator")) {
             await this.interaction.reply({ content: "אין לך מספיק הרשאות כדי לבצע פעולה זו", ephemeral: true });
             return;
         }

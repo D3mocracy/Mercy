@@ -26,7 +26,7 @@ class StartConversation {
     }
     async createConversation() {
         const numberOfConversation = await Utils_1.Utils.getNumberOfConversationFromDB() + 1;
-        const convChannel = await Utils_1.Utils.getGuild().channels.create({
+        const convChannel = await Config_1.default.config.guild.channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: discord_js_1.ChannelType.GuildText,
             parent: Config_1.default.config.ticketCatagory
@@ -43,7 +43,7 @@ class StartConversation {
             }).then(message => message.edit({ content: null })),
             db_1.default.conversationsCollection.insertOne({
                 userId: this.interaction.user.id,
-                guildId: Utils_1.Utils.getGuild().id,
+                guildId: Config_1.default.config.guild.id,
                 channelId: convChannel.id,
                 open: true,
                 date: new Date()

@@ -8,18 +8,15 @@ const discord_js_1 = require("discord.js");
 const db_1 = __importDefault(require("./db"));
 const Commands_1 = require("./Commands");
 const Config_1 = __importDefault(require("../handlers/Config"));
+const __1 = require("..");
 var Utils;
 (function (Utils) {
-    Utils.client = new discord_js_1.Client({ intents: 4194303, partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User] });
+    Utils.client = __1.client;
     async function turnOnBot() {
         await Utils.client.login(process.env.TOKEN);
         await Utils.client.application?.commands.set(Commands_1.Command.commands);
     }
     Utils.turnOnBot = turnOnBot;
-    function getGuild() {
-        return Utils.client.guilds.cache.get(process.env.GuildID);
-    }
-    Utils.getGuild = getGuild;
     async function hasOpenConversation(userId) {
         return !!(await db_1.default.conversationsCollection.findOne({ userId, open: true }));
     }
@@ -39,7 +36,7 @@ var Utils;
     }
     Utils.getChannelById = getChannelById;
     async function getRoleById(roleId) {
-        return await Utils.getGuild().roles.fetch(roleId);
+        return await Config_1.default.config.guild.roles.fetch(roleId);
     }
     Utils.getRoleById = getRoleById;
     async function getUserByID(userId) {
@@ -74,12 +71,12 @@ var Utils;
     }
     Utils.isGuildMember = isGuildMember;
     function getMembersById(...userId) {
-        return userId.map(userId => Utils.getGuild().members.cache.get(userId));
+        return userId.map(userId => Config_1.default.config.guild.members.cache.get(userId));
         // return Utils.getGuild().members.cache.map(member => member.user.id === )
     }
     Utils.getMembersById = getMembersById;
     function isManager(userId) {
-        return Utils.getGuild().members.cache.get(userId)?.roles.cache.find((r) => r.id === Config_1.default.config.managerRole.id);
+        return Config_1.default.config.guild.members.cache.get(userId)?.roles.cache.find((r) => r.id === Config_1.default.config.managerRole.id);
     }
     Utils.isManager = isManager;
 })(Utils = exports.Utils || (exports.Utils = {}));

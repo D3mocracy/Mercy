@@ -8,6 +8,7 @@ const MessageUtils_1 = require("../utils/MessageUtils");
 const Utils_1 = require("../utils/Utils");
 const Logger_1 = __importDefault(require("./Logger"));
 const Errors_1 = require("../utils/Errors");
+const Config_1 = __importDefault(require("./Config"));
 class ConversationManageHandler {
     interaction;
     bot = Utils_1.Utils.client;
@@ -71,7 +72,7 @@ class ConversationManageHandler {
         await this.interaction.reply({ ephemeral: true, content: "פסססטט...הצ'אט הזה כבר שויך למישהו" });
     }
     async revealUser() {
-        if (!(await Utils_1.Utils.getGuild().members.fetch(this.interaction.user.id)).permissions.has("Administrator")) {
+        if (!(await Config_1.default.config.guild.members.fetch(this.interaction.user.id)).permissions.has("Administrator")) {
             await this.interaction.reply({ content: "אין לך מספיק הרשאות כדי לבצע פעולה זו", ephemeral: true });
             return;
         }

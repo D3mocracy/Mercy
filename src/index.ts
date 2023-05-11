@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction } from "discord.js";
+import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials } from "discord.js";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
 import CommandHandler from "./handlers/Command";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
@@ -15,14 +15,15 @@ import { MessageUtils } from "./utils/MessageUtils";
 import { Utils } from "./utils/Utils";
 import DataBase from "./utils/db";
 import Logger from "./handlers/Logger";
+import { Command } from "./utils/Commands";
 
-const client = Utils.client;
+export const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
 
 DataBase.client.connect().then(async () => {
-    await Utils.turnOnBot();
+    await client.login(process.env.TOKEN);
+    await client.application?.commands.set(Command.commands);
     await new ConfigHandler().loadConfig();
 }).catch((error) => {
-    console.error(error);
     Logger.logError(error)
 });
 
@@ -51,7 +52,6 @@ client.on('messageCreate', async message => {
             await message.reply("היי, לא נראה שאתה חלק מהשרת האנונימי");
         }
     } catch (error: any) {
-        console.error(error);
         Logger.logError(error);
     }
 });
@@ -155,7 +155,6 @@ client.on('interactionCreate', async interaction => {
             }
         }
     } catch (error: any) {
-        console.error(error);
         Logger.logError(error);
     }
 
@@ -177,7 +176,6 @@ client.on('guildMemberAdd', async member => {
         const memberRole = ConfigHandler.config.memberRole;
         memberRole && member.roles.add(memberRole);
     } catch (error: any) {
-        console.error(error);
         Logger.logError(error);
     }
 });
@@ -186,7 +184,6 @@ client.on('channelDelete', async channel => {
     try {
         await DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
     } catch (error: any) {
-        console.error(error);
         Logger.logError(error);
     }
 })

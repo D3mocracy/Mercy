@@ -23,7 +23,7 @@ class StartConversation {
 
     private async createConversation() {
         const numberOfConversation = await Utils.getNumberOfConversationFromDB() + 1;
-        const convChannel = await Utils.getGuild().channels.create({
+        const convChannel = await ConfigHandler.config.guild.channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: ChannelType.GuildText,
             parent: ConfigHandler.config.ticketCatagory
@@ -43,7 +43,7 @@ class StartConversation {
 
             DataBase.conversationsCollection.insertOne({
                 userId: this.interaction.user.id,
-                guildId: Utils.getGuild().id,
+                guildId: ConfigHandler.config.guild.id,
                 channelId: convChannel.id,
                 open: true,
                 date: new Date()

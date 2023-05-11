@@ -3,7 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.client = void 0;
 require("dotenv").config();
+const discord_js_1 = require("discord.js");
 const ChangeHelper_1 = __importDefault(require("./handlers/ChangeHelper"));
 const Command_1 = __importDefault(require("./handlers/Command"));
 const CommunicateConversation_1 = __importDefault(require("./handlers/CommunicateConversation"));
@@ -19,18 +21,19 @@ const MessageUtils_1 = require("./utils/MessageUtils");
 const Utils_1 = require("./utils/Utils");
 const db_1 = __importDefault(require("./utils/db"));
 const Logger_1 = __importDefault(require("./handlers/Logger"));
-const client = Utils_1.Utils.client;
+const Commands_1 = require("./utils/Commands");
+exports.client = new discord_js_1.Client({ intents: 4194303, partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User] });
 db_1.default.client.connect().then(async () => {
-    await Utils_1.Utils.turnOnBot();
+    await exports.client.login(process.env.TOKEN);
+    await exports.client.application?.commands.set(Commands_1.Command.commands);
     await new Config_1.default().loadConfig();
 }).catch((error) => {
-    console.error(error);
     Logger_1.default.logError(error);
 });
-client.once('ready', () => {
-    console.log(`Logged in as ${client.user?.tag}!`);
+exports.client.once('ready', () => {
+    console.log(`Logged in as ${exports.client.user?.tag}!`);
 });
-client.on('messageCreate', async (message) => {
+exports.client.on('messageCreate', async (message) => {
     try {
         if (message.author.bot
             || message.attachments.size > 0
@@ -51,11 +54,10 @@ client.on('messageCreate', async (message) => {
         }
     }
     catch (error) {
-        console.error(error);
         Logger_1.default.logError(error);
     }
 });
-client.on('interactionCreate', async (interaction) => {
+exports.client.on('interactionCreate', async (interaction) => {
     const actionHandler = {
         openChatButton: async () => {
             await new StartConversation_1.default(interaction).precondition();
@@ -154,11 +156,10 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     catch (error) {
-        console.error(error);
         Logger_1.default.logError(error);
     }
 });
-client.on('guildMemberRemove', async (member) => {
+exports.client.on('guildMemberRemove', async (member) => {
     try {
         if (!await Utils_1.Utils.hasOpenConversation(member.id))
             return;
@@ -170,22 +171,20 @@ client.on('guildMemberRemove', async (member) => {
         Logger_1.default.logError(error);
     }
 });
-client.on('guildMemberAdd', async (member) => {
+exports.client.on('guildMemberAdd', async (member) => {
     try {
         const memberRole = Config_1.default.config.memberRole;
         memberRole && member.roles.add(memberRole);
     }
     catch (error) {
-        console.error(error);
         Logger_1.default.logError(error);
     }
 });
-client.on('channelDelete', async (channel) => {
+exports.client.on('channelDelete', async (channel) => {
     try {
         await db_1.default.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
     }
     catch (error) {
-        console.error(error);
         Logger_1.default.logError(error);
     }
 });

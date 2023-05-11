@@ -25,7 +25,7 @@ class CommandHandler {
         const staffChannel = Config_1.default.config.staffChannel;
         if (!helper || !helperOfTheMonth || !staffChannel || !staffChannel.isTextBased())
             return;
-        Utils_1.Utils.getGuild().members.cache.filter(member => member.roles.cache.has(helperOfTheMonth.id)).forEach(async (helper) => await helper.roles.remove(helperOfTheMonth));
+        Config_1.default.config.guild.members.cache.filter(member => member.roles.cache.has(helperOfTheMonth.id)).forEach(async (helper) => await helper.roles.remove(helperOfTheMonth));
         helper.roles.add(helperOfTheMonth);
         staffChannel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.helperOfTheMonth(helper)] });
         await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! התומך קיבל את הדרגה ונשלחה הכרזה", ephemeral: true });
