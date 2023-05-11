@@ -15,10 +15,10 @@ class ModalSubmitHandler {
         this.interaction = interaction;
     }
     async referManager() {
-        await Config_1.default.config.suggestIdeasChannel.send({
+        await Config_1.default.config.requestHelperChannel.send({
             content: `${Config_1.default.config.managerRole}`,
             embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.referManager(this.interaction)],
-            components: [ConversationManage_1.ConversationManageMessageUtils.Actions.attachReport(false), ConversationManage_1.ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild.id}/${this.interaction.channelId}`)]
+            components: [ConversationManage_1.ConversationManageMessageUtils.Actions.markAsDone(false), ConversationManage_1.ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild.id}/${this.interaction.channelId}`)]
         });
         await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
     }
@@ -36,7 +36,7 @@ class ModalSubmitHandler {
         (lastConversation && lastConversation.staffMemberId)
             ? helpers = Utils_1.Utils.getMembersById(...lastConversation.staffMemberId).map(member => member?.displayName).join(', ')
             : helpers = "לא נמצא צ'אט אחרון / המשתמש לא פתח צ'אט / לא שויך תומך לצ'אט האחרון";
-        await Config_1.default.config.requestHelperChannel.send({
+        await Config_1.default.config.reportChannel.send({
             content: `${Config_1.default.config.managerRole}`,
             embeds: [await ImportantLinks_1.ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
             components: [ConversationManage_1.ConversationManageMessageUtils.Actions.attachReport(false)]

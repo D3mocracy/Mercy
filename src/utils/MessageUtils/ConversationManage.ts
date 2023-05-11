@@ -16,12 +16,12 @@ export namespace ConversationManageMessageUtils {
         export function referManager(interaction: ModalSubmitInteraction) {
             return new EmbedBuilder({
                 author,
-                color: colors.blue,
+                color: colors.pink,
                 title: `התקבלה בקשה חדשה מתומך`,
                 description: `${interaction.fields.getTextInputValue('referCause')}`
             }).addFields([
                 { name: "תומך:", value: `${interaction.user.tag}` },
-                { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
+                { name: "סטטוס טיפול", value: `לא טופל` },
             ])
         };
 
@@ -106,8 +106,20 @@ export namespace ConversationManageMessageUtils {
                     style: ButtonStyle.Success
                 })
             );
-
         }
+
+        export function markAsDone(isAttached: boolean) {
+            return new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder({
+                    customId: 'manager_mark_as_done',
+                    label: 'סמן כבוצע',
+                    disabled: isAttached,
+                    emoji: "✔️",
+                    style: ButtonStyle.Success
+                })
+            );
+        }
+
         export function tools_report_link(url: string) {
             return new ActionRowBuilder<ButtonBuilder>().addComponents([
                 new ButtonBuilder({

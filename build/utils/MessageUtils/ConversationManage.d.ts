@@ -12,6 +12,7 @@ export declare namespace ConversationManageMessageUtils {
     }
     namespace Actions {
         function attachReport(isAttached: boolean): ActionRowBuilder<ButtonBuilder>;
+        function markAsDone(isAttached: boolean): ActionRowBuilder<ButtonBuilder>;
         function tools_report_link(url: string): ActionRowBuilder<ButtonBuilder>;
         function tools_sure_close_yes_no(): ActionRowBuilder<ButtonBuilder>;
         const tools_attach: ButtonBuilder;

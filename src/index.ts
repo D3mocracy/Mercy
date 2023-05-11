@@ -67,6 +67,9 @@ client.on('interactionCreate', async interaction => {
         ['manager_attach_report', async () => {
             await new ConversationStaffToolsHandler(interaction as ButtonInteraction).managerAttachReport();
         }],
+        ['manager_mark_as_done', async () => {
+            await new ConversationStaffToolsHandler(interaction as ButtonInteraction).managerMarkRequestAsDone();
+        }],
         ['tools_attach', async () => {
             const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
             await conversationManage.attachHelper(interaction.user.id);

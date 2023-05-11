@@ -1,5 +1,4 @@
 import { ModalSubmitInteraction } from "discord.js"
-import { MessageUtils } from "../utils/MessageUtils";
 import ConfigHandler from "./Config";
 import { Utils } from "../utils/Utils";
 import DataBase from "../utils/db";
@@ -12,10 +11,10 @@ export class ModalSubmitHandler {
     constructor(protected interaction: ModalSubmitInteraction) { }
 
     async referManager() {
-        await ConfigHandler.config.suggestIdeasChannel.send({
+        await ConfigHandler.config.requestHelperChannel.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [ConversationManageMessageUtils.EmbedMessages.referManager(this.interaction)],
-            components: [ConversationManageMessageUtils.Actions.attachReport(false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild.id}/${this.interaction.channelId}`)]
+            components: [ConversationManageMessageUtils.Actions.markAsDone(false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild.id}/${this.interaction.channelId}`)]
         });
         await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
     }
@@ -37,7 +36,7 @@ export class ModalSubmitHandler {
             ? helpers = Utils.getMembersById(...lastConversation.staffMemberId).map(member => member?.displayName).join(', ')
             : helpers = "לא נמצא צ'אט אחרון / המשתמש לא פתח צ'אט / לא שויך תומך לצ'אט האחרון"
 
-        await ConfigHandler.config.requestHelperChannel.send({
+        await ConfigHandler.config.reportChannel.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [await ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
             components: [ConversationManageMessageUtils.Actions.attachReport(false)]

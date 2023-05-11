@@ -33,12 +33,10 @@ class CommunicateConversationHandler {
         }
     }
     async sendMessage() {
-        console.log(this.type);
         if (this.type === discord_js_1.ChannelType.DM) {
             await (await Utils_1.Utils.getChannelById(this.client, this.conversation.channelId)).send(this.message.content);
         }
         else if (this.type === discord_js_1.ChannelType.GuildText) {
-            console.log('check');
             if (this.message.content.startsWith('!'))
                 return;
             (await this.client.users.fetch(this.conversation.userId)).send(this.message.content);

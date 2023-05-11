@@ -18,12 +18,12 @@ var ConversationManageMessageUtils;
         function referManager(interaction) {
             return new discord_js_1.EmbedBuilder({
                 author,
-                color: colors.blue,
+                color: colors.pink,
                 title: `התקבלה בקשה חדשה מתומך`,
                 description: `${interaction.fields.getTextInputValue('referCause')}`
             }).addFields([
                 { name: "תומך:", value: `${interaction.user.tag}` },
-                { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
+                { name: "סטטוס טיפול", value: `לא טופל` },
             ]);
         }
         EmbedMessages.referManager = referManager;
@@ -107,6 +107,16 @@ var ConversationManageMessageUtils;
             }));
         }
         Actions.attachReport = attachReport;
+        function markAsDone(isAttached) {
+            return new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder({
+                customId: 'manager_mark_as_done',
+                label: 'סמן כבוצע',
+                disabled: isAttached,
+                emoji: "✔️",
+                style: discord_js_1.ButtonStyle.Success
+            }));
+        }
+        Actions.markAsDone = markAsDone;
         function tools_report_link(url) {
             return new discord_js_1.ActionRowBuilder().addComponents([
                 new discord_js_1.ButtonBuilder({

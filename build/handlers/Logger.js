@@ -22,7 +22,6 @@ var Logger;
     async function logError(error) {
         try {
             const errorChannel = Config_1.default.config.errorChannel;
-            console.log(errorChannel);
             await errorChannel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)] });
         }
         catch (error) {
