@@ -122,12 +122,10 @@ client.on('interactionCreate', async interaction => {
             await (interaction as ButtonInteraction).showModal(MessageUtils.Modals.reportHelperModal);
         },
         reportHelperModal: async () => {
-            // await new ReportOnHelperHandler(interaction as ModalSubmitInteraction).handle();
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).reportHelper();
         },
         referManager: async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).referManager();
-            // await new ReportOnConversationHandler(interaction as ModalSubmitInteraction).handle();
         },
         helpers_list: async () => {
             await new ChangeHelperHandler(interaction as StringSelectMenuInteraction).handle();

@@ -1,5 +1,5 @@
 import { Utils } from "../utils/Utils";
-import { ChannelType, CategoryChannel, ActionRowBuilder, ButtonInteraction, ButtonBuilder } from "discord.js"
+import { ChannelType, GuildMember, ActionRowBuilder, ButtonInteraction, ButtonBuilder } from "discord.js"
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import ConfigHandler from "./Config";
