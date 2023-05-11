@@ -133,6 +133,9 @@ client.on('interactionCreate', async interaction => {
         },
         manage: async () => {
             await ConversationManageHandler.sendManageTools(interaction as ChatInputCommandInteraction)
+        },
+        importantlinks: async () => {
+            await new CommandHandler(interaction as ChatInputCommandInteraction).importantLinks();
         }
     }
     try {

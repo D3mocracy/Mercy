@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember } from "discord.js"
+import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember, ActionRowBuilder, ButtonBuilder, TextChannel } from "discord.js"
 import { MessageUtils } from "../utils/MessageUtils";
 import { Utils } from "../utils/Utils";
 import ConfigHandler from "./Config";
@@ -24,6 +24,17 @@ class CommandHandler {
         helper.roles.add(helperOfTheMonth);
         staffChannel.send({ embeds: [MessageUtils.EmbedMessages.helperOfTheMonth(helper)] });
         await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! התומך קיבל את הדרגה ונשלחה הכרזה", ephemeral: true });
+    }
+
+    async importantLinks() {
+        await this.interaction.channel?.send({
+            embeds: [MessageUtils.EmbedMessages.importantLinks([await Utils.getChannelById("1035880270064259084") as TextChannel])],
+            components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
+                MessageUtils.Actions.user_report_helper,
+                MessageUtils.Actions.user_suggest
+            ])]
+        });
+        await this.interaction.reply({ content: "Sent", ephemeral: true })
     }
 
 }

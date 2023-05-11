@@ -170,7 +170,7 @@ export namespace MessageUtils {
             color: colors.blue,
             title: `אתם לא לבד - דברו איתנו!`,
             description: `
-            על מנת לפתוח צ'אט ולשוחח עם אחד התומכים באופן אנונימי יש ללחוץ על הכפתור מטה, והצ'אט יפתח באופן אוטומטי. לאחר פתיחתו תקבלו הודעה פרטית מהבוט האנונימי שלנו כי הצ'אט אכן נפתח. \n
+            על מנת לפתוח צ'אט ולשוחח עם אחד התומכים באופן אנונימי יש ללחוץ על הכפתור מטה, ו**הצ'אט יפתח באופן אוטומטי**. לאחר פתיחתו תקבלו הודעה פרטית מהבוט האנונימי שלנו כי הצ'אט אכן נפתח. \n
             באמצעות ההודעה הפרטית אתם מוזמנים לכתוב לנו ולפרוק בחופשיות את כל מה שעל ליבכם, ונשמח להעניק לכם אוזן קשבת ומענה חם ואוהב בחזרה. \n
             **שימו ❤️, לחיצה על הכפתור מהווה את אישורכם לתנאי השימוש.**
             `,
@@ -211,6 +211,17 @@ export namespace MessageUtils {
                 **כל הכבוד המשך כך!**`,
                 thumbnail: { url: "https://cdn-icons-png.flaticon.com/512/6941/6941697.png" },
                 footer: { text: "בברכה, מנהלי הקהילה", iconURL: author.iconURL }
+            })
+        }
+
+        export function importantLinks(channels: TextChannel[]) {
+            return new EmbedBuilder({
+                author,
+                color: colors.blue,
+                title: "מידע שימושי",
+                description: `משתמשים יקרים, לשרותכם מידע ולינקים חשובים בשרת \n
+                ${channels.map(channel => `${channel}`)}
+                `
             })
         }
 
@@ -302,16 +313,19 @@ export namespace MessageUtils {
             style: ButtonStyle.Secondary
         });
 
-        /**
-        * This feature is deprecated.
-        * @deprecated
-        */
         export const user_report_helper = new ButtonBuilder({
             customId: "user_report_helper",
             label: "דווח על תומך",
             emoji: '🚩',
             style: ButtonStyle.Secondary
         });
+
+        export const user_suggest = new ButtonBuilder({
+            customId: "user_suggest",
+            label: "יש לי הצעת שיפור",
+            emoji: "✅",
+            style: ButtonStyle.Success
+        })
 
         export const supporterTools = new ActionRowBuilder<ButtonBuilder>().addComponents([
             tools_close,
@@ -377,11 +391,19 @@ export namespace MessageUtils {
 
         const reportHelperCause = new TextInputBuilder({
             customId: 'reportHelperCause',
-            label: 'דיווח',
+            label: 'סיבת הדיווח',
             style: TextInputStyle.Paragraph,
             required: true
         });
-        const reportHelperCauseActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reportHelperCause) as any;
+
+        const helperName = new TextInputBuilder({
+            customId: 'helperName',
+            label: 'שם התומך',
+            style: TextInputStyle.Short,
+            required: true,
+            placeholder: `לדוגמה: D3mocracy#8662`
+        });
+        const reportHelperCauseActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents([helperName, reportHelperCause]) as any;
         export const reportHelperModal = new ModalBuilder({
             customId: 'reportHelperModal',
             title: "דיווח על תומך"

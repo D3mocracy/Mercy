@@ -45,7 +45,8 @@ class StartConversation {
                 userId: this.interaction.user.id,
                 guildId: Utils.getGuild().id,
                 channelId: convChannel.id,
-                open: true
+                open: true,
+                date: new Date()
             }),
 
             convChannel.lockPermissions()

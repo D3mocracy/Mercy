@@ -5,7 +5,8 @@ export type Conversation = {
     staffMemberId?: string[],
     guildId: string,
     channelId: string,
-    open: boolean
+    open: boolean,
+    date: Date,
 }
 
 export type ConfigDocument = {
@@ -41,4 +42,15 @@ export type CustomMessage = {
     title: string,
     description: string,
     color: string,
+    footer: {
+        text: string,
+        iconURL: string
+    },
+    fields: embedField[]
+}
+
+type embedField = {
+    name: string,
+    value: string,
+    inline: boolean
 }
