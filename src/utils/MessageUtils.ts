@@ -7,7 +7,8 @@ export namespace MessageUtils {
         blue: 0x86b5dd,
         pink: 0xfe929f,
         gold: 0xfcc22d,
-        red: 0xff0000
+        red: 0xff0000,
+        green: 0x33C76E
     }
 
     export namespace EmbedMessages {
@@ -141,26 +142,30 @@ export namespace MessageUtils {
             });
         };
 
-        export async function reportConversationMessage(interaction: ModalSubmitInteraction) {
+        export async function referManager(interaction: ModalSubmitInteraction) {
             return new EmbedBuilder({
                 author,
                 color: colors.blue,
-                title: `דיווח על ${(interaction.channel as TextChannel).name}`,
-                description: `${interaction.fields.getTextInputValue('reportCause')}`
+                title: `התקבלה בקשה חדשה מתומך`,
+                description: `${interaction.fields.getTextInputValue('referCause')}`
             }).addFields([
-                { name: "איש צוות מדווח", value: `${interaction.user.tag}` },
+                { name: "תומך:", value: `${interaction.user.tag}` },
                 { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
             ])
         };
 
         export async function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string) {
             return new EmbedBuilder({
-                author,
+                author: { iconURL: author.iconURL, name: "Mercy - דיווחים" },
                 color: colors.blue,
-                title: `דיווח על ${helpers}`,
-                description: `${interaction.fields.getTextInputValue('reportHelperCause')}`
+                title: `התקבל דיווח על תומך`,
+                description: `**סיבת הדיווח:**
+                ${interaction.fields.getTextInputValue('reportHelperCause')}
+                `,
+                thumbnail: { url: "https://cdn3.iconfinder.com/data/icons/action-states-vol-1-flat/48/Action___States_Vol._1-28-512.png" }
             }).addFields([
-                // { name: "משתמש מדווח", value: `${interaction.user.tag}` },
+                { name: "שם התומך על פי המשתמש", value: `${interaction.fields.getTextInputValue("helperName")}`, inline: true },
+                { name: "תומך אחרון שזוהה לפי המערכת", value: `${helpers}`, inline: true },
                 { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
             ])
         };
@@ -307,17 +312,17 @@ export namespace MessageUtils {
         })
 
         export const tools_report = new ButtonBuilder({
-            customId: "tools_report",
-            label: "דיווח",
-            emoji: '🚩',
+            customId: "tools_refer_manager",
+            label: "הפנה מנהל",
+            emoji: '🧑‍💼',
             style: ButtonStyle.Secondary
         });
 
         export const user_report_helper = new ButtonBuilder({
             customId: "user_report_helper",
             label: "דווח על תומך",
-            emoji: '🚩',
-            style: ButtonStyle.Secondary
+            emoji: '🏴',
+            style: ButtonStyle.Danger
         });
 
         export const user_suggest = new ButtonBuilder({
@@ -375,39 +380,62 @@ export namespace MessageUtils {
 
     export namespace Modals {
 
-        const reportCause = new TextInputBuilder({
-            customId: 'reportCause',
-            label: 'סיבת הדיווח',
+        //Refer Manager
+        const reportCause = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
+            customId: 'referCause',
+            label: 'בקשה',
             style: TextInputStyle.Paragraph,
             required: true
-        });
+        }));
 
-        const reportCauseActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents(reportCause);
-        export const reportChatModal = new ModalBuilder({
-            customId: 'reportModal',
-            title: "דיווח על צ'אט חריג"
-        }).addComponents(reportCauseActionRow);
+        export const referManagerModal = new ModalBuilder({
+            customId: 'referManager',
+            title: "שליחת בקשה למנהל / הפנה מנהל"
+        }).addComponents(reportCause);
 
-
-        const reportHelperCause = new TextInputBuilder({
+        //Report helper modal
+        const reportHelperCause = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
             customId: 'reportHelperCause',
             label: 'סיבת הדיווח',
             style: TextInputStyle.Paragraph,
             required: true
-        });
+        }));
 
-        const helperName = new TextInputBuilder({
+        const helperName = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
             customId: 'helperName',
             label: 'שם התומך',
             style: TextInputStyle.Short,
             required: true,
             placeholder: `לדוגמה: D3mocracy#8662`
-        });
-        const reportHelperCauseActionRow = new ActionRowBuilder<TextInputBuilder>().addComponents([helperName, reportHelperCause]) as any;
+        }));
+
         export const reportHelperModal = new ModalBuilder({
             customId: 'reportHelperModal',
             title: "דיווח על תומך"
-        }).addComponents(reportHelperCauseActionRow);
+        }).addComponents([helperName, reportHelperCause]);
+
+
+        //Suggest idea modal
+        const explaination = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
+            customId: 'suggest_explain',
+            label: 'פירוט',
+            style: TextInputStyle.Paragraph,
+            required: true,
+            placeholder: "פרט על הרעיון שלך ככל האפשר"
+        }));
+
+        const comments = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
+            customId: 'suggest_comments',
+            label: 'הערות נוספות',
+            style: TextInputStyle.Short,
+            required: false,
+            placeholder: `הערות נוספות שתרצה לכתוב (לא חובה)`
+        }));
+
+        export const suggestIdeaModal = new ModalBuilder({
+            customId: 'suggestIdea',
+            title: "הצעת שיפור / דיווח על באג"
+        }).addComponents([explaination, comments]);
     }
 
 } 

@@ -5,6 +5,10 @@ import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
 import ConfigHandler from "./Config";
 
+/**
+ * This is not useable due the button trigger is not in the chat anymore
+ * @deprecated
+ */
 export class ReportOnHelperHandler {
     constructor(private interaction: ModalSubmitInteraction) { }
 

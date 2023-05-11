@@ -16,6 +16,7 @@ import { Utils } from "./utils/Utils";
 import DataBase from "./utils/db";
 import Logger from "./handlers/Logger";
 import { Command } from "./utils/Commands";
+import { ModalSubmitHandler } from "./handlers/ModalSubmit";
 
 export const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
 
@@ -40,6 +41,7 @@ client.on('messageCreate', async message => {
 
         if (message.content.startsWith('&') && message.member?.permissions.has("Administrator")) {
             await (await CustomEmbedMessages.createHandler(CustomEmbedMessages.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
+            message.delete();
         }
 
         if (await Utils.isGuildMember(message.author.id)) {
@@ -113,18 +115,19 @@ client.on('interactionCreate', async interaction => {
             await conversationManage.resetHelpers();
             await conversationManage.saveConversation();
         },
-        tools_report: async () => {
-            await (interaction as ButtonInteraction).showModal(MessageUtils.Modals.reportChatModal);
+        tools_refer_manager: async () => {
+            await (interaction as ButtonInteraction).showModal(MessageUtils.Modals.referManagerModal);
         },
         user_report_helper: async () => {
-            const conversationManage = await ConversationManageHandler.createHandler(interaction as ButtonInteraction);
-            await conversationManage.userReportOnHelper();
+            await (interaction as ButtonInteraction).showModal(MessageUtils.Modals.reportHelperModal);
         },
         reportHelperModal: async () => {
-            await new ReportOnHelperHandler(interaction as ModalSubmitInteraction).handle();
+            // await new ReportOnHelperHandler(interaction as ModalSubmitInteraction).handle();
+            await new ModalSubmitHandler(interaction as ModalSubmitInteraction).reportHelper();
         },
-        reportModal: async () => {
-            await new ReportOnConversationHandler(interaction as ModalSubmitInteraction).handle();
+        referManager: async () => {
+            await new ModalSubmitHandler(interaction as ModalSubmitInteraction).referManager();
+            // await new ReportOnConversationHandler(interaction as ModalSubmitInteraction).handle();
         },
         helpers_list: async () => {
             await new ChangeHelperHandler(interaction as StringSelectMenuInteraction).handle();
