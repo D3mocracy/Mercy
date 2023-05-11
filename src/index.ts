@@ -16,6 +16,7 @@ import Logger from "./handlers/Logger";
 import { Command } from "./utils/Commands";
 import { ModalSubmitHandler } from "./handlers/ModalSubmit";
 import { ImportantLinksMessageUtils } from "./utils/MessageUtils/ImportantLinks";
+import { ConversationManageMessageUtils } from "./utils/MessageUtils/ConversationManage";
 
 const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
 
@@ -97,7 +98,10 @@ client.on('interactionCreate', async interaction => {
         }],
         ['tools_manager', async () => {
             Utils.isManager(interaction.user.id)
-                ? await (interaction as ButtonInteraction).reply({ ephemeral: true, embeds: [MessageUtils.EmbedMessages.ManagerTools], components: [MessageUtils.Actions.managerTools] })
+                ? await (interaction as ButtonInteraction).reply({
+                    ephemeral: true, embeds: [ConversationManageMessageUtils.EmbedMessages.ManagerTools],
+                    components: [ConversationManageMessageUtils.Actions.managerTools]
+                })
                 : await (interaction as ButtonInteraction).reply({ content: "ברכות על הקידום", ephemeral: true });
         }],
         ['tools_manager_reveal', async () => {

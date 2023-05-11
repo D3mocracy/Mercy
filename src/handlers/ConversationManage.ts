@@ -7,6 +7,7 @@ import Logger from "./Logger";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import ConfigHandler from "./Config";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
+import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 
 class ConversationManageHandler {
@@ -39,8 +40,8 @@ class ConversationManageHandler {
     static async sendManageTools(interaction: ChatInputCommandInteraction) {
         if (await Utils.isTicketChannel(interaction.channel as TextChannel)) {
             await interaction.reply({
-                embeds: [MessageUtils.EmbedMessages.newChatStaff()],
-                components: [MessageUtils.Actions.supporterTools]
+                embeds: [ConversationManageMessageUtils.EmbedMessages.newChatStaff()],
+                components: [ConversationManageMessageUtils.Actions.supporterTools]
             });
         } else {
             await interaction.reply({ content: "ניתן לבצע את הפקודה הזו רק בצ'אטים", ephemeral: true });
@@ -49,12 +50,12 @@ class ConversationManageHandler {
     }
 
     async sendSureMessageToClose() {
-        await this.interaction.reply({ embeds: [MessageUtils.EmbedMessages.sureMessageToClose], components: [MessageUtils.Actions.tools_sure_close_yes_no()] });
+        await this.interaction.reply({ embeds: [MessageUtils.EmbedMessages.sureMessageToClose], components: [ConversationManageMessageUtils.Actions.tools_sure_close_yes_no()] });
     }
 
     async closeConversation(closedBy: string) {
         await this.interaction.deferUpdate()
-        const closedMessage = { embeds: [MessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };
+        const closedMessage = { embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };
         this.conversation.open = false;
         await this.channel.send(closedMessage);
         Promise.all([
@@ -69,7 +70,7 @@ class ConversationManageHandler {
             this.conversation.staffMemberId = [staffMemberId];
             await Promise.all([
                 Utils.updatePermissionToChannel(this.client, this.conversation),
-                this.interaction.reply({ embeds: [MessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] })
+                this.interaction.reply({ embeds: [ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] })
             ])
             return;
         }
@@ -83,14 +84,14 @@ class ConversationManageHandler {
         }
         await this.interaction.reply({
             ephemeral: true,
-            embeds: [await MessageUtils.EmbedMessages.revealUserMessage(this.client, this.conversation.userId)]
+            embeds: [await ConversationManageMessageUtils.EmbedMessages.revealUserMessage(this.client, this.conversation.userId)]
         });
     }
 
     async resetHelpers() {
         this.conversation.staffMemberId = [];
         await Utils.updatePermissionToChannel(this.client, this.conversation);
-        await (this.interaction.channel as TextChannel).send({ embeds: [MessageUtils.EmbedMessages.helpersReseted] });
+        await (this.interaction.channel as TextChannel).send({ embeds: [ConversationManageMessageUtils.EmbedMessages.helpersReseted] });
     }
 
     async changeHelpersMessage() {
@@ -99,9 +100,9 @@ class ConversationManageHandler {
         if (helpersList.length) {
             await this.interaction.reply({
                 ephemeral: true,
-                embeds: [MessageUtils.EmbedMessages.changeHelper],
-                components: [MessageUtils.Actions.changeHelper(helpersList),
-                MessageUtils.Actions.resetHelpers]
+                embeds: [ConversationManageMessageUtils.EmbedMessages.changeHelper],
+                components: [ConversationManageMessageUtils.Actions.changeHelper(helpersList),
+                ConversationManageMessageUtils.Actions.resetHelpers]
             });
         } else {
             await this.interaction.reply({ content: "לא קיים משתמש עם דרגת תומך בשרת", ephemeral: true });

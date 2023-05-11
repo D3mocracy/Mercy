@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModalSubmitHandler = void 0;
-const MessageUtils_1 = require("../utils/MessageUtils");
 const Config_1 = __importDefault(require("./Config"));
 const Utils_1 = require("../utils/Utils");
 const db_1 = __importDefault(require("../utils/db"));
 const ImportantLinks_1 = require("../utils/MessageUtils/ImportantLinks");
+const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
 class ModalSubmitHandler {
     interaction;
     constructor(interaction) {
@@ -17,8 +17,8 @@ class ModalSubmitHandler {
     async referManager() {
         await Config_1.default.config.suggestIdeasChannel.send({
             content: `${Config_1.default.config.managerRole}`,
-            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.referManager(this.interaction)],
-            components: [MessageUtils_1.MessageUtils.Actions.attachReport(false), MessageUtils_1.MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild.id}/${this.interaction.channelId}`)]
+            embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.referManager(this.interaction)],
+            components: [ConversationManage_1.ConversationManageMessageUtils.Actions.attachReport(false), ConversationManage_1.ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild.id}/${this.interaction.channelId}`)]
         });
         await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
     }
@@ -39,7 +39,7 @@ class ModalSubmitHandler {
         await Config_1.default.config.requestHelperChannel.send({
             content: `${Config_1.default.config.managerRole}`,
             embeds: [await ImportantLinks_1.ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
-            components: [MessageUtils_1.MessageUtils.Actions.attachReport(false)]
+            components: [ConversationManage_1.ConversationManageMessageUtils.Actions.attachReport(false)]
         });
         await this.interaction.reply({ content: "הדיווח שלך נשלח בהצלחה למנהלים", ephemeral: true });
     }

@@ -8,6 +8,7 @@ const discord_js_1 = require("discord.js");
 const db_1 = __importDefault(require("../utils/db"));
 const MessageUtils_1 = require("../utils/MessageUtils");
 const Config_1 = __importDefault(require("./Config"));
+const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
 class StartConversation {
     interaction;
     constructor(interaction) {
@@ -34,12 +35,12 @@ class StartConversation {
         await Promise.all([
             this.interaction.user.send({
                 embeds: [MessageUtils_1.MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
-                components: [new discord_js_1.ActionRowBuilder().addComponents(MessageUtils_1.MessageUtils.Actions.tools_close)]
+                components: [new discord_js_1.ActionRowBuilder().addComponents(ConversationManage_1.ConversationManageMessageUtils.Actions.tools_close)]
             }),
             convChannel.send({
                 content: `<@&${Config_1.default.config.helperRole}>`,
-                embeds: [MessageUtils_1.MessageUtils.EmbedMessages.newChatStaff()],
-                components: [MessageUtils_1.MessageUtils.Actions.supporterTools]
+                embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.newChatStaff()],
+                components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supporterTools]
             }).then(message => message.edit({ content: null })),
             db_1.default.conversationsCollection.insertOne({
                 userId: this.interaction.user.id,

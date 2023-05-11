@@ -9,6 +9,7 @@ const Utils_1 = require("../utils/Utils");
 const Logger_1 = __importDefault(require("./Logger"));
 const Errors_1 = require("../utils/Errors");
 const Config_1 = __importDefault(require("./Config"));
+const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
 class ConversationManageHandler {
     client;
     interaction;
@@ -40,8 +41,8 @@ class ConversationManageHandler {
     static async sendManageTools(interaction) {
         if (await Utils_1.Utils.isTicketChannel(interaction.channel)) {
             await interaction.reply({
-                embeds: [MessageUtils_1.MessageUtils.EmbedMessages.newChatStaff()],
-                components: [MessageUtils_1.MessageUtils.Actions.supporterTools]
+                embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.newChatStaff()],
+                components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supporterTools]
             });
         }
         else {
@@ -49,11 +50,11 @@ class ConversationManageHandler {
         }
     }
     async sendSureMessageToClose() {
-        await this.interaction.reply({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.sureMessageToClose], components: [MessageUtils_1.MessageUtils.Actions.tools_sure_close_yes_no()] });
+        await this.interaction.reply({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.sureMessageToClose], components: [ConversationManage_1.ConversationManageMessageUtils.Actions.tools_sure_close_yes_no()] });
     }
     async closeConversation(closedBy) {
         await this.interaction.deferUpdate();
-        const closedMessage = { embeds: [MessageUtils_1.MessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };
+        const closedMessage = { embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };
         this.conversation.open = false;
         await this.channel.send(closedMessage);
         Promise.all([
@@ -67,7 +68,7 @@ class ConversationManageHandler {
             this.conversation.staffMemberId = [staffMemberId];
             await Promise.all([
                 Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation),
-                this.interaction.reply({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] })
+                this.interaction.reply({ embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] })
             ]);
             return;
         }
@@ -80,22 +81,22 @@ class ConversationManageHandler {
         }
         await this.interaction.reply({
             ephemeral: true,
-            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.revealUserMessage(this.client, this.conversation.userId)]
+            embeds: [await ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.revealUserMessage(this.client, this.conversation.userId)]
         });
     }
     async resetHelpers() {
         this.conversation.staffMemberId = [];
         await Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation);
-        await this.interaction.channel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.helpersReseted] });
+        await this.interaction.channel.send({ embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.helpersReseted] });
     }
     async changeHelpersMessage() {
         const helpersList = (await Utils_1.Utils.getUsersWithRoleId('1036014794806939648')).map(m => m);
         if (helpersList.length) {
             await this.interaction.reply({
                 ephemeral: true,
-                embeds: [MessageUtils_1.MessageUtils.EmbedMessages.changeHelper],
-                components: [MessageUtils_1.MessageUtils.Actions.changeHelper(helpersList),
-                    MessageUtils_1.MessageUtils.Actions.resetHelpers]
+                embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.changeHelper],
+                components: [ConversationManage_1.ConversationManageMessageUtils.Actions.changeHelper(helpersList),
+                    ConversationManage_1.ConversationManageMessageUtils.Actions.resetHelpers]
             });
         }
         else {

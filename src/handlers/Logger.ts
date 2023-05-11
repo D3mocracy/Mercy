@@ -18,14 +18,13 @@ namespace Logger {
     }
 
     export async function logError(error: Error) {
-        console.error(error);
-        // try {
-        //     const errorChannel = ConfigHandler.config.errorChannel;
-        //     console.log(errorChannel)
-        //     await errorChannel.send({ embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
-        // } catch (error) {
-        //     console.error(error);
-        // }
+        try {
+            const errorChannel = ConfigHandler.config.errorChannel;
+            console.log(errorChannel)
+            await errorChannel.send({ embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
+        } catch (error) {
+            console.error(error);
+        }
     }
 
 }

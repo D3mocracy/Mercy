@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = __importDefault(require("../utils/db"));
-const MessageUtils_1 = require("../utils/MessageUtils");
 const Utils_1 = require("../utils/Utils");
+const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
 class ChangeHelperHandler {
     client;
     interaction;
@@ -29,7 +29,7 @@ class ChangeHelperHandler {
         const newPermission = await Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation); //Can't import messageUtils from Utils
         if (!newPermission)
             return;
-        await newPermission.channel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.staffMemberAttached(newPermission.usernames.join(', '))] });
+        await newPermission.channel.send({ embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(newPermission.usernames.join(', '))] });
         await this.interaction.deferUpdate();
     }
 }

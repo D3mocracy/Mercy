@@ -3,6 +3,7 @@ import { ChannelType, GuildMember, ActionRowBuilder, ButtonInteraction, ButtonBu
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import ConfigHandler from "./Config";
+import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class StartConversation {
 
@@ -32,13 +33,13 @@ class StartConversation {
         await Promise.all([
             this.interaction.user.send({
                 embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
-                components: [new ActionRowBuilder<ButtonBuilder>().addComponents(MessageUtils.Actions.tools_close)]
+                components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
             }),
 
             convChannel.send({
                 content: `<@&${ConfigHandler.config.helperRole}>`,
-                embeds: [MessageUtils.EmbedMessages.newChatStaff()],
-                components: [MessageUtils.Actions.supporterTools]
+                embeds: [ConversationManageMessageUtils.EmbedMessages.newChatStaff()],
+                components: [ConversationManageMessageUtils.Actions.supporterTools]
             }).then(message => message.edit({ content: null })),
 
             DataBase.conversationsCollection.insertOne({

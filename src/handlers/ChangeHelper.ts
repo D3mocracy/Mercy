@@ -3,6 +3,7 @@ import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
+import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class ChangeHelperHandler {
     private conversation: Conversation = {} as any;
@@ -24,7 +25,7 @@ class ChangeHelperHandler {
         await this.saveConversation();
         const newPermission = await Utils.updatePermissionToChannel(this.client, this.conversation); //Can't import messageUtils from Utils
         if (!newPermission) return;
-        await newPermission.channel.send({ embeds: [MessageUtils.EmbedMessages.staffMemberAttached(newPermission.usernames.join(', '))] });
+        await newPermission.channel.send({ embeds: [ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(newPermission.usernames.join(', '))] });
         await this.interaction.deferUpdate();
     }
 }

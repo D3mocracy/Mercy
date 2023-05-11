@@ -5,6 +5,7 @@ import { Utils } from "../utils/Utils";
 import DataBase from "../utils/db";
 import { Conversation } from "../utils/types";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
+import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 export class ModalSubmitHandler {
 
@@ -13,8 +14,8 @@ export class ModalSubmitHandler {
     async referManager() {
         await ConfigHandler.config.suggestIdeasChannel.send({
             content: `${ConfigHandler.config.managerRole}`,
-            embeds: [MessageUtils.EmbedMessages.referManager(this.interaction)],
-            components: [MessageUtils.Actions.attachReport(false), MessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild.id}/${this.interaction.channelId}`)]
+            embeds: [ConversationManageMessageUtils.EmbedMessages.referManager(this.interaction)],
+            components: [ConversationManageMessageUtils.Actions.attachReport(false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild.id}/${this.interaction.channelId}`)]
         });
         await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
     }
@@ -39,7 +40,7 @@ export class ModalSubmitHandler {
         await ConfigHandler.config.requestHelperChannel.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [await ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
-            components: [MessageUtils.Actions.attachReport(false)]
+            components: [ConversationManageMessageUtils.Actions.attachReport(false)]
         });
         await this.interaction.reply({ content: "הדיווח שלך נשלח בהצלחה למנהלים", ephemeral: true });
     }

@@ -18,11 +18,11 @@ export namespace Utils {
     };
 
     export async function getChannelById(client: Client, channelId: string): Promise<Channel | undefined> {
-        return await client.channels.cache.get(channelId);
+        return client.channels.cache.get(channelId);
     }
 
     export async function getRoleById(roleId: string) {
-        return await ConfigHandler.config.guild.roles.cache.get(roleId);
+        return ConfigHandler.config.guild.roles.cache.get(roleId);
     }
 
     export async function getUserByID(client: Client, userId: string): Promise<User> {

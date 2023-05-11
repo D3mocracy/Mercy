@@ -4,6 +4,7 @@ import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
 import Logger from "./Logger";
+import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class LeaveGuildHandler {
     private conversation: Conversation = {} as any;
@@ -20,7 +21,7 @@ class LeaveGuildHandler {
     async closeConversation() {
         if (!this.conversation.userId) return;
         const channel: TextChannel = await Utils.getChannelById(this.client, this.conversation.channelId) as any;
-        const closedMessage = { embeds: [MessageUtils.EmbedMessages.chatClosed("משתמש שיצא", channel.name)] };
+        const closedMessage = { embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed("משתמש שיצא", channel.name)] };
         this.conversation.open = false;
         await Promise.all([
             channel.send(closedMessage),

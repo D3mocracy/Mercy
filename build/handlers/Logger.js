@@ -20,14 +20,14 @@ var Logger;
     }
     Logger.logTicket = logTicket;
     async function logError(error) {
-        console.error(error);
-        // try {
-        //     const errorChannel = ConfigHandler.config.errorChannel;
-        //     console.log(errorChannel)
-        //     await errorChannel.send({ embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
-        // } catch (error) {
-        //     console.error(error);
-        // }
+        try {
+            const errorChannel = Config_1.default.config.errorChannel;
+            console.log(errorChannel);
+            await errorChannel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)] });
+        }
+        catch (error) {
+            console.error(error);
+        }
     }
     Logger.logError = logError;
 })(Logger || (Logger = {}));

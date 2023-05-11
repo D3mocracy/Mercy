@@ -21,6 +21,7 @@ const Logger_1 = __importDefault(require("./handlers/Logger"));
 const Commands_1 = require("./utils/Commands");
 const ModalSubmit_1 = require("./handlers/ModalSubmit");
 const ImportantLinks_1 = require("./utils/MessageUtils/ImportantLinks");
+const ConversationManage_2 = require("./utils/MessageUtils/ConversationManage");
 const client = new discord_js_1.Client({ intents: 4194303, partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User] });
 db_1.default.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
@@ -98,7 +99,10 @@ client.on('interactionCreate', async (interaction) => {
             }],
         ['tools_manager', async () => {
                 Utils_1.Utils.isManager(interaction.user.id)
-                    ? await interaction.reply({ ephemeral: true, embeds: [MessageUtils_1.MessageUtils.EmbedMessages.ManagerTools], components: [MessageUtils_1.MessageUtils.Actions.managerTools] })
+                    ? await interaction.reply({
+                        ephemeral: true, embeds: [ConversationManage_2.ConversationManageMessageUtils.EmbedMessages.ManagerTools],
+                        components: [ConversationManage_2.ConversationManageMessageUtils.Actions.managerTools]
+                    })
                     : await interaction.reply({ content: "ברכות על הקידום", ephemeral: true });
             }],
         ['tools_manager_reveal', async () => {
