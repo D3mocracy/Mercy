@@ -40,8 +40,8 @@ exports.client.on('messageCreate', async (message) => {
             || message.stickers.size > 0
             || !message.channel.isTextBased())
             return;
-        if (message.content.startsWith('&')) {
-            await (await CustomEmbedMessages_1.default.createHandler(CustomEmbedMessages_1.default.getKeyFromMessage(message.content), message.channelId)).sendMessage();
+        if (message.content.startsWith('&') && message.member?.permissions.has("Administrator")) {
+            await (await CustomEmbedMessages_1.default.createHandler(CustomEmbedMessages_1.default.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
         }
         if (await Utils_1.Utils.isGuildMember(message.author.id)) {
             const hasOpenConversation = await Utils_1.Utils.hasOpenConversation(message.author.id);

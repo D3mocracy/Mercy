@@ -12,7 +12,7 @@ class CustomEmbedMessages {
     }
 
     async load() {
-        this.message = await DataBase.embedMessagesCollection.findOne({ key: this.key }) as any;
+        return this.message = await DataBase.embedMessagesCollection.findOne({ key: this.key }) as any;
     }
 
     static getKeyFromMessage(message: string) {
@@ -21,13 +21,14 @@ class CustomEmbedMessages {
 
     static async createHandler(key: string, channelId: string) {
         const handler = new CustomEmbedMessages(key, channelId);
-        await handler.load();
-        return handler;
+        const message = await handler.load();
+        if (message) {
+            return handler;
+        } else { return; }
     }
 
     async sendMessage() {
         (await Utils.getChannelById(this.channelId) as TextChannel).send({
-            content: "fsds",
             embeds: [
                 new EmbedBuilder({
                     ...this.message,

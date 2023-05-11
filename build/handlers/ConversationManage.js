@@ -9,9 +9,9 @@ const Utils_1 = require("../utils/Utils");
 const Logger_1 = __importDefault(require("./Logger"));
 const Errors_1 = require("../utils/Errors");
 const Config_1 = __importDefault(require("./Config"));
+const __1 = require("..");
 class ConversationManageHandler {
     interaction;
-    bot = Utils_1.Utils.client;
     channel = {};
     conversation = {};
     constructor(interaction) {
@@ -57,7 +57,7 @@ class ConversationManageHandler {
         await Promise.all([
             Logger_1.default.logTicket(this.channel),
             this.interaction.message.edit({ components: [] }),
-            Utils_1.Utils.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
+            __1.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
             this.interaction.deferUpdate()
         ]);
         await this.channel.delete();

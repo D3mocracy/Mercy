@@ -1,8 +1,6 @@
-import { Channel, User, TextChannel, Client } from "discord.js";
+import { Channel, User, TextChannel } from "discord.js";
 import { Conversation } from "./types";
 export declare namespace Utils {
-    const client: Client<boolean>;
-    function turnOnBot(): Promise<void>;
     function hasOpenConversation(userId: string): Promise<boolean>;
     function getOpenConversation(userId: string): Promise<import("mongodb").WithId<import("bson").Document> | undefined>;
     function getNumberOfConversationFromDB(): Promise<number>;

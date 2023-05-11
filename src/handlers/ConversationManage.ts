@@ -6,10 +6,10 @@ import { Utils } from "../utils/Utils";
 import Logger from "./Logger";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import ConfigHandler from "./Config";
+import { client } from "..";
 
 
 class ConversationManageHandler {
-    bot: Client = Utils.client;
     channel: TextChannel = {} as any;
     conversation: Conversation = {} as any;
 
@@ -59,7 +59,7 @@ class ConversationManageHandler {
         await Promise.all([
             Logger.logTicket(this.channel),
             this.interaction.message.edit({ components: [] }),
-            Utils.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
+            client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
             this.interaction.deferUpdate()
         ]);
         await this.channel.delete();

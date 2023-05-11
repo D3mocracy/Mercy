@@ -7,6 +7,7 @@ const db_1 = __importDefault(require("../utils/db"));
 const discord_js_1 = require("discord.js");
 const Utils_1 = require("../utils/Utils");
 const Errors_1 = require("../utils/Errors");
+const __1 = require("..");
 class CommunicateConversationHandler {
     message;
     type;
@@ -39,7 +40,7 @@ class CommunicateConversationHandler {
             console.log('check');
             if (this.message.content.startsWith('!'))
                 return;
-            (await Utils_1.Utils.client.users.fetch(this.conversation.userId)).send(this.message.content);
+            (await __1.client.users.fetch(this.conversation.userId)).send(this.message.content);
         }
     }
 }

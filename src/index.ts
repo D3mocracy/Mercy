@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials } from "discord.js";
+import { ButtonInteraction, ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, PermissionFlagsBits } from "discord.js";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
 import CommandHandler from "./handlers/Command";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
@@ -38,8 +38,8 @@ client.on('messageCreate', async message => {
             || message.stickers.size > 0
             || !message.channel.isTextBased()) return;
 
-        if (message.content.startsWith('&')) {
-            await (await CustomEmbedMessages.createHandler(CustomEmbedMessages.getKeyFromMessage(message.content), message.channelId)).sendMessage();
+        if (message.content.startsWith('&') && message.member?.permissions.has("Administrator")) {
+            await (await CustomEmbedMessages.createHandler(CustomEmbedMessages.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
         }
 
         if (await Utils.isGuildMember(message.author.id)) {

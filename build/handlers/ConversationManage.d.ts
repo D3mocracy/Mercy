@@ -1,8 +1,7 @@
-import { ButtonInteraction, Client, TextChannel, ChatInputCommandInteraction } from "discord.js";
+import { ButtonInteraction, TextChannel, ChatInputCommandInteraction } from "discord.js";
 import { Conversation } from "../utils/types";
 declare class ConversationManageHandler {
     private interaction;
-    bot: Client;
     channel: TextChannel;
     conversation: Conversation;
     private constructor();

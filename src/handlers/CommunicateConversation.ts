@@ -3,6 +3,7 @@ import { Conversation } from "../utils/types";
 import { ChannelType, Message, TextChannel } from "discord.js"
 import { Utils } from "../utils/Utils";
 import { CantLoadConversationFromDB } from "../utils/Errors";
+import { client } from "..";
 
 class CommunicateConversationHandler {
     private conversation: Conversation = {} as any;
@@ -34,7 +35,7 @@ class CommunicateConversationHandler {
 
             if (this.message.content.startsWith('!')) return;
 
-            (await Utils.client.users.fetch(this.conversation.userId)).send(this.message.content);
+            (await client.users.fetch(this.conversation.userId)).send(this.message.content);
         }
 
     }

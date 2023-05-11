@@ -6,17 +6,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Utils = void 0;
 const discord_js_1 = require("discord.js");
 const db_1 = __importDefault(require("./db"));
-const Commands_1 = require("./Commands");
 const Config_1 = __importDefault(require("../handlers/Config"));
 const __1 = require("..");
 var Utils;
 (function (Utils) {
-    Utils.client = __1.client;
-    async function turnOnBot() {
-        await Utils.client.login(process.env.TOKEN);
-        await Utils.client.application?.commands.set(Commands_1.Command.commands);
-    }
-    Utils.turnOnBot = turnOnBot;
     async function hasOpenConversation(userId) {
         return !!(await db_1.default.conversationsCollection.findOne({ userId, open: true }));
     }
@@ -32,7 +25,7 @@ var Utils;
     Utils.getNumberOfConversationFromDB = getNumberOfConversationFromDB;
     ;
     async function getChannelById(channelId) {
-        return await Utils.client.channels.fetch(channelId);
+        return await __1.client.channels.fetch(channelId);
     }
     Utils.getChannelById = getChannelById;
     async function getRoleById(roleId) {
@@ -40,7 +33,7 @@ var Utils;
     }
     Utils.getRoleById = getRoleById;
     async function getUserByID(userId) {
-        return await Utils.client.users.fetch(userId);
+        return await __1.client.users.fetch(userId);
     }
     Utils.getUserByID = getUserByID;
     async function getUsersWithRoleId(roleId) {

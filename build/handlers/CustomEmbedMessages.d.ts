@@ -4,9 +4,9 @@ declare class CustomEmbedMessages {
     private channelId;
     message: EmbedData;
     private constructor();
-    load(): Promise<void>;
+    load(): Promise<any>;
     static getKeyFromMessage(message: string): string;
-    static createHandler(key: string, channelId: string): Promise<CustomEmbedMessages>;
+    static createHandler(key: string, channelId: string): Promise<CustomEmbedMessages | undefined>;
     sendMessage(): Promise<void>;
 }
 export default CustomEmbedMessages;

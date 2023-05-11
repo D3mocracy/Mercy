@@ -17,15 +17,20 @@ class CustomEmbedMessages {
         this.channelId = channelId;
     }
     async load() {
-        this.message = await db_1.default.embedMessagesCollection.findOne({ key: this.key });
+        return this.message = await db_1.default.embedMessagesCollection.findOne({ key: this.key });
     }
     static getKeyFromMessage(message) {
         return message.split('&')[1];
     }
     static async createHandler(key, channelId) {
         const handler = new CustomEmbedMessages(key, channelId);
-        await handler.load();
-        return handler;
+        const message = await handler.load();
+        if (message) {
+            return handler;
+        }
+        else {
+            return;
+        }
     }
     async sendMessage() {
         (await Utils_1.Utils.getChannelById(this.channelId)).send({

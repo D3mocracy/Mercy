@@ -18,6 +18,7 @@ namespace Logger {
     }
 
     export async function logError(error: Error) {
+        console.error(error);
         const errorChannel = ConfigHandler.config.errorChannel;
         await errorChannel.send({ embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
     }

@@ -3,14 +3,8 @@ import DataBase from "./db";
 import { Conversation } from "./types";
 import { Command } from "./Commands";
 import ConfigHandler from "../handlers/Config";
-import { client as c } from "..";
+import { client } from "..";
 export namespace Utils {
-    export const client = c;
-
-    export async function turnOnBot() {
-        await client.login(process.env.TOKEN);
-        await client.application?.commands.set(Command.commands);
-    }
 
     export async function hasOpenConversation(userId: string) {
         return !!(await DataBase.conversationsCollection.findOne({ userId, open: true }));

@@ -20,6 +20,7 @@ var Logger;
     }
     Logger.logTicket = logTicket;
     async function logError(error) {
+        console.error(error);
         const errorChannel = Config_1.default.config.errorChannel;
         await errorChannel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)] });
     }
