@@ -32,7 +32,7 @@ const client: Client = new Client({
 
 DataBase.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
-    client.user?.setActivity({ type: ActivityType.Listening, name: "to your ❤️" })
+    client.user?.setActivity({ type: ActivityType.Listening, name: "your ❤️" })
     await client.application?.commands.set(Command.commands);
 }).catch((error) => {
     Logger.logError(error)
