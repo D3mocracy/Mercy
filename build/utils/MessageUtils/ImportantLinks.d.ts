@@ -1,7 +1,7 @@
 import { ButtonBuilder, EmbedBuilder, GuildMember, ModalBuilder, ModalSubmitInteraction } from "discord.js";
 export declare namespace ImportantLinksMessageUtils {
     namespace EmbedMessages {
-        const mainMessage: EmbedBuilder;
+        function mainMessage(): EmbedBuilder;
         function suggestIdea(expain: string, comments: string, member: GuildMember): EmbedBuilder;
         function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string): Promise<EmbedBuilder>;
     }

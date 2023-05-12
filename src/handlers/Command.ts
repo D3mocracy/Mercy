@@ -36,7 +36,7 @@ class CommandHandler {
 
     async importantLinks() {
         await this.interaction.channel?.send({
-            embeds: [ImportantLinksMessageUtils.EmbedMessages.mainMessage],
+            embeds: [ImportantLinksMessageUtils.EmbedMessages.mainMessage()],
             components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
                 ImportantLinksMessageUtils.Actions.user_report_helper,
                 ImportantLinksMessageUtils.Actions.user_suggest

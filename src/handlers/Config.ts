@@ -24,6 +24,9 @@ class ConfigHandler {
         const configDocument: ConfigDocument = (await DataBase.configCollection.find({}).toArray())[0] as any;
         const guild: Guild = client.guilds.cache.get(process.env.GuildID as string) as Guild;
 
+        console.log(configDocument);
+
+
         return ConfigHandler.config = {
             get guild() {
                 return guild;
@@ -61,9 +64,7 @@ class ConfigHandler {
             get helperOfTheMonthRole() {
                 return guild.roles.cache.get(configDocument.helperOfTheMonthRoleId);
             },
-            get importantChannels() {
-                return configDocument.importantChannels;
-            },
+            importantChannels: configDocument.importantChannels
         }
     }
 }

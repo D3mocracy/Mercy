@@ -12,18 +12,21 @@ export namespace ImportantLinksMessageUtils {
             red: 0xff0000,
             green: 0x33C76E
         }
-        export const mainMessage = new EmbedBuilder({
-            author,
-            color: colors.pink,
-            thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
-            title: "מידע שימושי",
-            description: `**לשרותכם מידע ולינקים חשובים בשרת**
-                ${ConfigHandler.config.importantChannels?.map(channel => (
-                `<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`
-            )).join('\n')}`,
+        export function mainMessage() {
+            return new EmbedBuilder({
+                author,
+                color: colors.pink,
+                thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
+                title: "מידע שימושי",
+                description: `**לשרותכם מידע ולינקים חשובים בשרת**
+                    ${ConfigHandler.config.importantChannels?.map(channel => (
+                    `<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`
+                )).join('\n')}`,
 
-            footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
-        })
+                footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
+            })
+        }
+
 
 
         export function suggestIdea(expain: string, comments: string, member: GuildMember) {

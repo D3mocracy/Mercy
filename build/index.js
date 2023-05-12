@@ -35,7 +35,7 @@ const client = new discord_js_1.Client({
 });
 db_1.default.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
-    client.user?.setActivity({ type: discord_js_1.ActivityType.Listening, name: "to your ❤️" });
+    client.user?.setActivity({ type: discord_js_1.ActivityType.Listening, name: "your ❤️" });
     await client.application?.commands.set(Commands_1.Command.commands);
 }).catch((error) => {
     Logger_1.default.logError(error);

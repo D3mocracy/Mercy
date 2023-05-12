@@ -38,7 +38,7 @@ class CommandHandler {
     }
     async importantLinks() {
         await this.interaction.channel?.send({
-            embeds: [ImportantLinks_1.ImportantLinksMessageUtils.EmbedMessages.mainMessage],
+            embeds: [ImportantLinks_1.ImportantLinksMessageUtils.EmbedMessages.mainMessage()],
             components: [new discord_js_1.ActionRowBuilder().addComponents([
                     ImportantLinks_1.ImportantLinksMessageUtils.Actions.user_report_helper,
                     ImportantLinks_1.ImportantLinksMessageUtils.Actions.user_suggest

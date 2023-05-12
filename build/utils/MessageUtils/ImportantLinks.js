@@ -18,15 +18,18 @@ var ImportantLinksMessageUtils;
             red: 0xff0000,
             green: 0x33C76E
         };
-        EmbedMessages.mainMessage = new discord_js_1.EmbedBuilder({
-            author,
-            color: colors.pink,
-            thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
-            title: "מידע שימושי",
-            description: `**לשרותכם מידע ולינקים חשובים בשרת**
-                ${Config_1.default.config.importantChannels?.map(channel => (`<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`)).join('\n')}`,
-            footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
-        });
+        function mainMessage() {
+            return new discord_js_1.EmbedBuilder({
+                author,
+                color: colors.pink,
+                thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
+                title: "מידע שימושי",
+                description: `**לשרותכם מידע ולינקים חשובים בשרת**
+                    ${Config_1.default.config.importantChannels?.map(channel => (`<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`)).join('\n')}`,
+                footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
+            });
+        }
+        EmbedMessages.mainMessage = mainMessage;
         function suggestIdea(expain, comments, member) {
             return new discord_js_1.EmbedBuilder({
                 author: { iconURL: author.iconURL, name: "Mercy - כללי" },
