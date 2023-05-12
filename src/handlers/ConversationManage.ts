@@ -27,7 +27,7 @@ class ConversationManageHandler {
             ? this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.interaction.user.id, open: true }) as any
             : this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any;
         if (this.conversation) {
-            this.channel = await Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel;
+            this.channel = Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel;
         } else {
             throw new CantLoadConversationFromDB();
         }
@@ -78,7 +78,7 @@ class ConversationManageHandler {
     }
 
     async revealUser() {
-        if (!(await ConfigHandler.config.guild.members.fetch(this.interaction.user.id)).permissions.has("Administrator")) {
+        if (!(await ConfigHandler.config.guild?.members.fetch(this.interaction.user.id))?.permissions.has("Administrator")) {
             await this.interaction.reply({ content: "אין לך מספיק הרשאות כדי לבצע פעולה זו", ephemeral: true });
             return;
         }
@@ -95,9 +95,10 @@ class ConversationManageHandler {
     }
 
     async changeHelpersMessage() {
-        const helpersList = (await Utils.getUsersWithRoleId('1036014794806939648')).map(m => m);
+        // await ConfigHandler.config.guild?.members.fetch();
+        const helpersList = ConfigHandler.config.helperRole?.members.map(m => m);
 
-        if (helpersList.length) {
+        if (helpersList?.length) {
             await this.interaction.reply({
                 ephemeral: true,
                 embeds: [ConversationManageMessageUtils.EmbedMessages.changeHelper],

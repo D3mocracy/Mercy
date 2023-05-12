@@ -19,27 +19,52 @@ class ConfigHandler {
         importantChannels: [{ "": "" }],
     };
 
-    constructor(private bot: Client) { }
 
-    async loadConfig(): Promise<Config> {
+    async loadConfig(client: Client): Promise<Config> {
         const configDocument: ConfigDocument = (await DataBase.configCollection.find({}).toArray())[0] as any;
-        const guild: Guild = this.bot.guilds.cache.get(process.env.GuildID as string) as Guild;
+        const guild: Guild = client.guilds.cache.get(process.env.GuildID as string) as Guild;
 
         return ConfigHandler.config = {
-            conversationCatagory: this.bot.channels.cache.get(configDocument.conversationCatagoryId) as CategoryChannel,
-            conversationLog: this.bot.channels.cache.get(configDocument.conversationLogId) as TextChannel,
-            reportChannel: this.bot.channels.cache.get(configDocument.reportChannelId) as TextChannel,
-            requestHelperChannel: this.bot.channels.cache.get(configDocument.requestHelperChannelId) as TextChannel,
-            staffChannel: this.bot.channels.cache.get(configDocument.staffChannelId) as TextChannel,
-            errorChannel: this.bot.channels.cache.get(configDocument.errorChannelId) as TextChannel,
-            suggestIdeasChannel: this.bot.channels.cache.get(configDocument.suggestIdeasChannelId) as TextChannel,
-            managerRole: guild.roles.cache.get(configDocument.managerRole) as Role,
-            helperRole: guild.roles.cache.get(configDocument.helperRole) as Role,
-            memberRole: guild.roles.cache.get(configDocument.memberRole) as Role,
-            helperOfTheMonthRole: guild.roles.cache.get(configDocument.helperOfTheMonthRoleId) as Role,
-            guild: guild as Guild,
-            importantChannels: configDocument.importantChannels,
-        };
+            get guild() {
+                return guild;
+            },
+            get conversationCatagory() {
+                return client.channels.cache.get(configDocument.conversationCatagoryId) as CategoryChannel;
+            },
+            get conversationLog() {
+                return client.channels.cache.get(configDocument.conversationLogId) as TextChannel;
+            },
+            get reportChannel() {
+                return client.channels.cache.get(configDocument.reportChannelId) as TextChannel;
+            },
+            get requestHelperChannel() {
+                return client.channels.cache.get(configDocument.requestHelperChannelId) as TextChannel;
+            },
+            get staffChannel() {
+                return client.channels.cache.get(configDocument.staffChannelId) as TextChannel;
+            },
+            get errorChannel() {
+                return client.channels.cache.get(configDocument.errorChannelId) as TextChannel;
+            },
+            get suggestIdeasChannel() {
+                return client.channels.cache.get(configDocument.suggestIdeasChannelId) as TextChannel;
+            },
+            get managerRole() {
+                return guild.roles.cache.get(configDocument.managerRole);
+            },
+            get helperRole() {
+                return guild.roles.cache.get(configDocument.helperRole);
+            },
+            get memberRole() {
+                return guild.roles.cache.get(configDocument.memberRole);
+            },
+            get helperOfTheMonthRole() {
+                return guild.roles.cache.get(configDocument.helperOfTheMonthRoleId);
+            },
+            get importantChannels() {
+                return configDocument.importantChannels;
+            },
+        }
     }
 }
 

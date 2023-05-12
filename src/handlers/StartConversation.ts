@@ -16,7 +16,7 @@ class StartConversation {
         openConversation
             ? this.interaction.reply({
                 content: "היי, נראה שכבר יש לך צ'אט פתוח",
-                components: [MessageUtils.Actions.linkButton(`https://discord.com/channels/${ConfigHandler.config.guild.id}/${openConversation.channelId}`, "העבר אותי לצ'אט")],
+                components: [MessageUtils.Actions.linkButton(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${openConversation.channelId}`, "העבר אותי לצ'אט")],
                 ephemeral: true
             })
             : this.createConversation();
@@ -24,12 +24,12 @@ class StartConversation {
 
     private async createConversation() {
         const numberOfConversation = await Utils.getNumberOfConversationFromDB() + 1;
-        const convChannel = await ConfigHandler.config.guild.channels.create({
+        const convChannel = await ConfigHandler.config.guild?.channels.create({
             name: `צ'אט מספר ${numberOfConversation}`,
             type: ChannelType.GuildText,
             parent: ConfigHandler.config.conversationCatagory
         });
-
+        if (!convChannel) return;
         await Promise.all([
             this.interaction.user.send({
                 embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
@@ -44,7 +44,7 @@ class StartConversation {
 
             DataBase.conversationsCollection.insertOne({
                 userId: this.interaction.user.id,
-                guildId: ConfigHandler.config.guild.id,
+                guildId: ConfigHandler.config.guild?.id,
                 channelId: convChannel.id,
                 open: true,
                 date: new Date()

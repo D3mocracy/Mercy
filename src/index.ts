@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, ButtonInteraction } from "discord.js";
+import { ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, ButtonInteraction, IntentsBitField, ActivityFlags, ActivityType } from "discord.js";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
 import CommandHandler from "./handlers/Command";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
@@ -18,17 +18,29 @@ import { ModalSubmitHandler } from "./handlers/ModalSubmit";
 import { ImportantLinksMessageUtils } from "./utils/MessageUtils/ImportantLinks";
 import { ConversationManageMessageUtils } from "./utils/MessageUtils/ConversationManage";
 
-const client: Client = new Client({ intents: 4194303, partials: [Partials.Channel, Partials.Message, Partials.User] });
+//4194303
+const client: Client = new Client({
+    intents: [
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMembers,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.GuildMessageReactions,
+        IntentsBitField.Flags.MessageContent,
+        IntentsBitField.Flags.DirectMessages,
+    ], partials: [Partials.Channel, Partials.Message, Partials.User, Partials.GuildMember]
+});
 
 DataBase.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
+    client.user?.setActivity({ type: ActivityType.Listening, name: "to your ❤️" })
     await client.application?.commands.set(Command.commands);
-    await new ConfigHandler(client).loadConfig();
 }).catch((error) => {
     Logger.logError(error)
 });
 
 client.once('ready', async () => {
+    const config = await new ConfigHandler().loadConfig(client);
+    await config.guild?.members.fetch();
     console.log(`Logged in as ${client!.user?.tag}!`);
 });
 
@@ -44,15 +56,12 @@ client.on('messageCreate', async message => {
             message.delete();
         }
 
-        if (await Utils.isGuildMember(message.author.id)) {
-            const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
 
-            if ((message.channel.isDMBased() && hasOpenConversation) || await Utils.isTicketChannel(message.channel)) {
-                await new CommunicateConversationHandler(client, message, message.channel.type).handle();
-            }
-        } else {
-            await message.reply("היי, לא נראה שאתה חלק מהשרת האנונימי");
+        const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
+        if ((message.channel.isDMBased() && hasOpenConversation) || Utils.isTicketChannel(message.channel)) {
+            await new CommunicateConversationHandler(client, message, message.channel.type).handle();
         }
+
     } catch (error: any) {
         Logger.logError(error);
     }

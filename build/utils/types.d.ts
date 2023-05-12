@@ -24,7 +24,7 @@ export type ConfigDocument = {
     }[];
     suggestIdeasChannelId: string;
 };
-export type Config = {
+export type Config = Partial<{
     conversationCatagory: CategoryChannelResolvable;
     conversationLog: TextChannel;
     reportChannel: TextChannel;
@@ -40,7 +40,7 @@ export type Config = {
     importantChannels: {
         [key: string]: string;
     }[];
-};
+}>;
 export type CustomMessage = {
     key: string;
     title: string;

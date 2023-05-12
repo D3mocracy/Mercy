@@ -5,7 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageUtils = void 0;
 const discord_js_1 = require("discord.js");
-const Utils_1 = require("./Utils");
 const Config_1 = __importDefault(require("../handlers/Config"));
 var MessageUtils;
 (function (MessageUtils) {
@@ -110,18 +109,19 @@ var MessageUtils;
         }
         EmbedMessages.helperOfTheMonth = helperOfTheMonth;
         async function staffMembers() {
-            const managers = await Utils_1.Utils.getUsersWithRoleId(Config_1.default.config.managerRole.id);
-            const helpers = await Utils_1.Utils.getUsersWithRoleId(Config_1.default.config.helperRole.id);
+            // await ConfigHandler.config.guild?.members.fetch();
+            const managerRole = Config_1.default.config.managerRole?.members;
+            const helperRole = Config_1.default.config.helperRole?.members;
             return new discord_js_1.EmbedBuilder({
                 author,
                 color: colors.pink,
                 thumbnail: { url: "https://cdn-icons-png.flaticon.com/512/2332/2332039.png" },
                 title: "צוות השרת",
                 description: `**מנהלים:**
-                ${managers.map(manager => `${manager.user}`)}
+                ${managerRole?.map((manager) => `${manager.user}`)}
 
                 **תומכים:**
-                ${helpers.map(helper => `${helper.user}`).join('\n')}
+                ${helperRole?.map((helper) => `${helper.user}`).join('\n')}
                 `,
                 footer: { iconURL: author.iconURL, text: "תמיד כאן בשבילכם! - הנהלת הקהילה" }
             });

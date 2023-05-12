@@ -34,7 +34,7 @@ class CommunicateConversationHandler {
     }
     async sendMessage() {
         if (this.type === discord_js_1.ChannelType.DM) {
-            await (await Utils_1.Utils.getChannelById(this.client, this.conversation.channelId)).send(this.message.content);
+            await Utils_1.Utils.getChannelById(this.client, this.conversation.channelId).send(this.message.content);
         }
         else if (this.type === discord_js_1.ChannelType.GuildText) {
             if (this.message.content.startsWith('!'))

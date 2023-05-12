@@ -151,7 +151,7 @@ var ConversationManageMessageUtils;
         Actions.tools_manager = new discord_js_1.ButtonBuilder({
             customId: "tools_manager",
             label: "הגדרות ניהול",
-            emoji: '🧑‍💼',
+            emoji: '⚙️',
             style: discord_js_1.ButtonStyle.Primary
         });
         Actions.tools_close = new discord_js_1.ButtonBuilder({

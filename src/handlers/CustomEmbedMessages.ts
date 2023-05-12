@@ -28,7 +28,7 @@ class CustomEmbedMessages {
     }
 
     async sendMessage() {
-        (await Utils.getChannelById(this.client, this.channelId) as TextChannel).send({
+        (Utils.getChannelById(this.client, this.channelId) as TextChannel).send({
             embeds: [
                 new EmbedBuilder({
                     ...this.message,

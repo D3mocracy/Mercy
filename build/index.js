@@ -22,15 +22,27 @@ const Commands_1 = require("./utils/Commands");
 const ModalSubmit_1 = require("./handlers/ModalSubmit");
 const ImportantLinks_1 = require("./utils/MessageUtils/ImportantLinks");
 const ConversationManage_2 = require("./utils/MessageUtils/ConversationManage");
-const client = new discord_js_1.Client({ intents: 4194303, partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User] });
+//4194303
+const client = new discord_js_1.Client({
+    intents: [
+        discord_js_1.IntentsBitField.Flags.Guilds,
+        discord_js_1.IntentsBitField.Flags.GuildMembers,
+        discord_js_1.IntentsBitField.Flags.GuildMessages,
+        discord_js_1.IntentsBitField.Flags.GuildMessageReactions,
+        discord_js_1.IntentsBitField.Flags.MessageContent,
+        discord_js_1.IntentsBitField.Flags.DirectMessages,
+    ], partials: [discord_js_1.Partials.Channel, discord_js_1.Partials.Message, discord_js_1.Partials.User, discord_js_1.Partials.GuildMember]
+});
 db_1.default.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
+    client.user?.setActivity({ type: discord_js_1.ActivityType.Listening, name: "to your ❤️" });
     await client.application?.commands.set(Commands_1.Command.commands);
-    await new Config_1.default(client).loadConfig();
 }).catch((error) => {
     Logger_1.default.logError(error);
 });
 client.once('ready', async () => {
+    const config = await new Config_1.default().loadConfig(client);
+    await config.guild?.members.fetch();
     console.log(`Logged in as ${client.user?.tag}!`);
 });
 client.on('messageCreate', async (message) => {
@@ -44,14 +56,9 @@ client.on('messageCreate', async (message) => {
             await (await CustomEmbedMessages_1.default.createHandler(client, CustomEmbedMessages_1.default.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
             message.delete();
         }
-        if (await Utils_1.Utils.isGuildMember(message.author.id)) {
-            const hasOpenConversation = await Utils_1.Utils.hasOpenConversation(message.author.id);
-            if ((message.channel.isDMBased() && hasOpenConversation) || await Utils_1.Utils.isTicketChannel(message.channel)) {
-                await new CommunicateConversation_1.default(client, message, message.channel.type).handle();
-            }
-        }
-        else {
-            await message.reply("היי, לא נראה שאתה חלק מהשרת האנונימי");
+        const hasOpenConversation = await Utils_1.Utils.hasOpenConversation(message.author.id);
+        if ((message.channel.isDMBased() && hasOpenConversation) || Utils_1.Utils.isTicketChannel(message.channel)) {
+            await new CommunicateConversation_1.default(client, message, message.channel.type).handle();
         }
     }
     catch (error) {

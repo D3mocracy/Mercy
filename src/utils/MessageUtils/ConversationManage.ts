@@ -155,7 +155,7 @@ export namespace ConversationManageMessageUtils {
         export const tools_manager = new ButtonBuilder({
             customId: "tools_manager",
             label: "הגדרות ניהול",
-            emoji: '🧑‍💼',
+            emoji: '⚙️',
             style: ButtonStyle.Primary
         });
 

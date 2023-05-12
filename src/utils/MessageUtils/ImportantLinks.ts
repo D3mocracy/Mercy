@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, GuildMember, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import ConfigHandler from "../../handlers/Config";
 
 export namespace ImportantLinksMessageUtils {
@@ -12,33 +12,33 @@ export namespace ImportantLinksMessageUtils {
             red: 0xff0000,
             green: 0x33C76E
         }
-        export function mainMessage() {
-            return new EmbedBuilder({
-                author,
-                color: colors.pink,
-                thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
-                title: "מידע שימושי",
-                description: `**לשרותכם מידע ולינקים חשובים בשרת**
-                ${ConfigHandler.config.importantChannels.map(channel => (
-                    `<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`
-                )).join('\n')}`,
+        export const mainMessage = new EmbedBuilder({
+            author,
+            color: colors.pink,
+            thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
+            title: "מידע שימושי",
+            description: `**לשרותכם מידע ולינקים חשובים בשרת**
+                ${ConfigHandler.config.importantChannels?.map(channel => (
+                `<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`
+            )).join('\n')}`,
 
-                footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
-            })
-        }
+            footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
+        })
 
-        export function suggestIdea(interaction: ModalSubmitInteraction) {
+
+        export function suggestIdea(expain: string, comments: string, member: GuildMember) {
             return new EmbedBuilder({
                 author: { iconURL: author.iconURL, name: "Mercy - כללי" },
                 title: "התקבלה הצעת ייעול / דיווח על באג",
                 description: `**תיאור ההצעה**
-                ${interaction.fields.getTextInputValue("suggest_explain")}
+                ${expain}
+
                 **הערות נוספות**
-                ${interaction.fields.getTextInputValue("suggest_comments")}`,
+                ${comments}`,
                 fields: [
                     {
                         name: "משתמש מציע:",
-                        value: `${interaction.member}`
+                        value: `${member}`
                     }
                 ],
                 timestamp: new Date(),
@@ -112,10 +112,11 @@ export namespace ImportantLinksMessageUtils {
 
         const helperName = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
             customId: 'helperName',
-            label: 'שם התומך',
+            label: "שם התומך / מספר הצ'אט",
             style: TextInputStyle.Short,
+            minLength: 4,
             required: true,
-            placeholder: `לדוגמה: D3mocracy#8662`
+            placeholder: `לדוגמה: D3mocracy#8662 / צ'אט 43`
         }));
 
         export const reportHelperModal = new ModalBuilder({

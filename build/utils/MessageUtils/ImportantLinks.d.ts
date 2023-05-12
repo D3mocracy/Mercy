@@ -1,8 +1,8 @@
-import { ButtonBuilder, EmbedBuilder, ModalBuilder, ModalSubmitInteraction } from "discord.js";
+import { ButtonBuilder, EmbedBuilder, GuildMember, ModalBuilder, ModalSubmitInteraction } from "discord.js";
 export declare namespace ImportantLinksMessageUtils {
     namespace EmbedMessages {
-        function mainMessage(): EmbedBuilder;
-        function suggestIdea(interaction: ModalSubmitInteraction): EmbedBuilder;
+        const mainMessage: EmbedBuilder;
+        function suggestIdea(expain: string, comments: string, member: GuildMember): EmbedBuilder;
         function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string): Promise<EmbedBuilder>;
     }
     namespace Actions {

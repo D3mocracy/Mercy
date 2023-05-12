@@ -25,7 +25,7 @@ class CommunicateConversationHandler {
 
     async sendMessage() {
         if (this.type === ChannelType.DM) {
-            await ((await Utils.getChannelById(this.client, this.conversation.channelId)) as TextChannel).send(this.message.content);
+            await (Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel).send(this.message.content);
 
         } else if (this.type === ChannelType.GuildText) {
             if (this.message.content.startsWith('!')) return;

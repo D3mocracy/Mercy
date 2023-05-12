@@ -10,19 +10,17 @@ const Config_1 = __importDefault(require("./Config"));
 var Logger;
 (function (Logger) {
     async function logTicket(ticketChannel) {
-        const logChannel = Config_1.default.config.conversationLog;
         const attachment = await (0, discord_html_transcripts_1.createTranscript)(ticketChannel, {
             limit: -1,
             returnType: types_1.ExportReturnType.Attachment,
             filename: 'question_log.html',
         });
-        await logChannel.send({ embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.ticketLog(ticketChannel.name.replaceAll('-', ' '))], files: [attachment] });
+        await Config_1.default.config.conversationLog?.send({ embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.ticketLog(ticketChannel.name.replaceAll('-', ' '))], files: [attachment] });
     }
     Logger.logTicket = logTicket;
     async function logError(error) {
         try {
-            const errorChannel = Config_1.default.config.errorChannel;
-            await errorChannel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)] });
+            await Config_1.default.config.errorChannel?.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)] });
         }
         catch (error) {
             console.error(error);

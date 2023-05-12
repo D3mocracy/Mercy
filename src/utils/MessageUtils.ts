@@ -111,18 +111,20 @@ export namespace MessageUtils {
 
 
         export async function staffMembers() {
-            const managers = await Utils.getUsersWithRoleId(ConfigHandler.config.managerRole.id);
-            const helpers = await Utils.getUsersWithRoleId(ConfigHandler.config.helperRole.id);
+            // await ConfigHandler.config.guild?.members.fetch();
+            const managerRole = ConfigHandler.config.managerRole?.members;
+            const helperRole = ConfigHandler.config.helperRole?.members;
+
             return new EmbedBuilder({
                 author,
                 color: colors.pink,
                 thumbnail: { url: "https://cdn-icons-png.flaticon.com/512/2332/2332039.png" },
                 title: "צוות השרת",
                 description: `**מנהלים:**
-                ${managers.map(manager => `${manager.user}`)}
+                ${managerRole?.map((manager: any) => `${manager.user}`)}
 
                 **תומכים:**
-                ${helpers.map(helper => `${helper.user}`).join('\n')}
+                ${helperRole?.map((helper: any) => `${helper.user}`).join('\n')}
                 `,
 
                 footer: { iconURL: author.iconURL, text: "תמיד כאן בשבילכם! - הנהלת הקהילה" }

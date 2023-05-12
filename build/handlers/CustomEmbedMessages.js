@@ -35,7 +35,7 @@ class CustomEmbedMessages {
         }
     }
     async sendMessage() {
-        (await Utils_1.Utils.getChannelById(this.client, this.channelId)).send({
+        Utils_1.Utils.getChannelById(this.client, this.channelId).send({
             embeds: [
                 new discord_js_1.EmbedBuilder({
                     ...this.message,

@@ -23,25 +23,25 @@ var Utils;
     }
     Utils.getNumberOfConversationFromDB = getNumberOfConversationFromDB;
     ;
-    async function getChannelById(client, channelId) {
+    function getChannelById(client, channelId) {
         return client.channels.cache.get(channelId);
     }
     Utils.getChannelById = getChannelById;
-    async function getRoleById(roleId) {
-        return Config_1.default.config.guild.roles.cache.get(roleId);
+    function getRoleById(roleId) {
+        return Config_1.default.config.guild?.roles.cache.get(roleId);
     }
     Utils.getRoleById = getRoleById;
     async function getUserByID(client, userId) {
         return await client.users.fetch(userId);
     }
     Utils.getUserByID = getUserByID;
-    async function getUsersWithRoleId(roleId) {
-        // const config: Config = await new ConfigHandler().getConfig();
-        return Config_1.default.config.guild.members.cache.filter(member => member.roles.cache.find(role => role.id === roleId));
+    async function getMembersWithRole(role) {
+        await Config_1.default.config.guild?.members.fetch();
+        return role.members.map(m => m);
     }
-    Utils.getUsersWithRoleId = getUsersWithRoleId;
+    Utils.getMembersWithRole = getMembersWithRole;
     async function updatePermissionToChannel(client, conversation) {
-        const channel = await Utils.getChannelById(client, conversation.channelId);
+        const channel = Utils.getChannelById(client, conversation.channelId);
         await channel.lockPermissions();
         if (!conversation.staffMemberId || conversation.staffMemberId.length === 0 || channel === null)
             return;
@@ -52,23 +52,16 @@ var Utils;
         return { usernames, conversation, channel };
     }
     Utils.updatePermissionToChannel = updatePermissionToChannel;
-    async function isTicketChannel(channel) {
-        // const config: Config = await new ConfigHandler().getConfig();
+    function isTicketChannel(channel) {
         return channel.type === discord_js_1.ChannelType.GuildText && channel.parent === Config_1.default.config.conversationCatagory;
     }
     Utils.isTicketChannel = isTicketChannel;
-    async function isGuildMember(userId) {
-        // const config: Config = await new ConfigHandler().getConfig();
-        return Config_1.default.config.guild.members.cache.find((member) => member.id === userId);
-    }
-    Utils.isGuildMember = isGuildMember;
     function getMembersById(...userId) {
-        return userId.map(userId => Config_1.default.config.guild.members.cache.get(userId));
-        // return Utils.getGuild().members.cache.map(member => member.user.id === )
+        return userId.map(userId => Config_1.default.config.guild?.members.cache.get(userId));
     }
     Utils.getMembersById = getMembersById;
     function isManager(userId) {
-        return Config_1.default.config.guild.members.cache.get(userId)?.roles.cache.find((r) => r.id === Config_1.default.config.managerRole.id);
+        return Config_1.default.config.guild?.members.cache.get(userId)?.roles.cache.find((r) => r.id === Config_1.default.config.managerRole?.id);
     }
     Utils.isManager = isManager;
 })(Utils = exports.Utils || (exports.Utils = {}));

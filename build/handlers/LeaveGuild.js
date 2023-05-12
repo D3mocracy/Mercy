@@ -24,7 +24,7 @@ class LeaveGuildHandler {
     async closeConversation() {
         if (!this.conversation.userId)
             return;
-        const channel = await Utils_1.Utils.getChannelById(this.client, this.conversation.channelId);
+        const channel = Utils_1.Utils.getChannelById(this.client, this.conversation.channelId);
         const closedMessage = { embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.chatClosed("משתמש שיצא", channel.name)] };
         this.conversation.open = false;
         await Promise.all([

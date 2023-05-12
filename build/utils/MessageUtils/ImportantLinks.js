@@ -18,30 +18,28 @@ var ImportantLinksMessageUtils;
             red: 0xff0000,
             green: 0x33C76E
         };
-        function mainMessage() {
-            return new discord_js_1.EmbedBuilder({
-                author,
-                color: colors.pink,
-                thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
-                title: "מידע שימושי",
-                description: `**לשרותכם מידע ולינקים חשובים בשרת**
-                ${Config_1.default.config.importantChannels.map(channel => (`<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`)).join('\n')}`,
-                footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
-            });
-        }
-        EmbedMessages.mainMessage = mainMessage;
-        function suggestIdea(interaction) {
+        EmbedMessages.mainMessage = new discord_js_1.EmbedBuilder({
+            author,
+            color: colors.pink,
+            thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
+            title: "מידע שימושי",
+            description: `**לשרותכם מידע ולינקים חשובים בשרת**
+                ${Config_1.default.config.importantChannels?.map(channel => (`<#${Object.keys(channel).toString()}> - ${Object.values(channel)}`)).join('\n')}`,
+            footer: { iconURL: author.iconURL, text: "בברכה, הנהלת הקהילה" }
+        });
+        function suggestIdea(expain, comments, member) {
             return new discord_js_1.EmbedBuilder({
                 author: { iconURL: author.iconURL, name: "Mercy - כללי" },
                 title: "התקבלה הצעת ייעול / דיווח על באג",
                 description: `**תיאור ההצעה**
-                ${interaction.fields.getTextInputValue("suggest_explain")}
+                ${expain}
+
                 **הערות נוספות**
-                ${interaction.fields.getTextInputValue("suggest_comments")}`,
+                ${comments}`,
                 fields: [
                     {
                         name: "משתמש מציע:",
-                        value: `${interaction.member}`
+                        value: `${member}`
                     }
                 ],
                 timestamp: new Date(),
@@ -112,10 +110,11 @@ var ImportantLinksMessageUtils;
         }));
         const helperName = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
             customId: 'helperName',
-            label: 'שם התומך',
+            label: "שם התומך / מספר הצ'אט",
             style: discord_js_1.TextInputStyle.Short,
+            minLength: 4,
             required: true,
-            placeholder: `לדוגמה: D3mocracy#8662`
+            placeholder: `לדוגמה: D3mocracy#8662 / צ'אט 43`
         }));
         Modals.reportHelperModal = new discord_js_1.ModalBuilder({
             customId: 'reportHelperModal',

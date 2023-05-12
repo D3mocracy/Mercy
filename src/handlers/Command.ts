@@ -28,7 +28,7 @@ class CommandHandler {
         const helperOfTheMonth = ConfigHandler.config.helperOfTheMonthRole;
         const staffChannel = ConfigHandler.config.staffChannel;
         if (!helper || !helperOfTheMonth || !staffChannel || !staffChannel.isTextBased()) return;
-        ConfigHandler.config.guild.members.cache.filter(member => member.roles.cache.has(helperOfTheMonth.id)).forEach(async helper => await helper.roles.remove(helperOfTheMonth));
+        ConfigHandler.config.guild?.members.cache.filter(member => member.roles.cache.has(helperOfTheMonth.id)).forEach(async helper => await helper.roles.remove(helperOfTheMonth));
         helper.roles.add(helperOfTheMonth);
         staffChannel.send({ embeds: [MessageUtils.EmbedMessages.helperOfTheMonth(helper)] });
         await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! התומך קיבל את הדרגה ונשלחה הכרזה", ephemeral: true });
@@ -36,7 +36,7 @@ class CommandHandler {
 
     async importantLinks() {
         await this.interaction.channel?.send({
-            embeds: [ImportantLinksMessageUtils.EmbedMessages.mainMessage()],
+            embeds: [ImportantLinksMessageUtils.EmbedMessages.mainMessage],
             components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
                 ImportantLinksMessageUtils.Actions.user_report_helper,
                 ImportantLinksMessageUtils.Actions.user_suggest
