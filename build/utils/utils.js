@@ -31,10 +31,10 @@ var Utils;
         return Config_1.default.config.guild?.roles.cache.get(roleId);
     }
     Utils.getRoleById = getRoleById;
-    async function getUserByID(client, userId) {
-        return await client.users.fetch(userId);
+    function getMemberByID(userId) {
+        return Config_1.default.config.guild?.members.cache.get(userId);
     }
-    Utils.getUserByID = getUserByID;
+    Utils.getMemberByID = getMemberByID;
     async function getMembersWithRole(role) {
         await Config_1.default.config.guild?.members.fetch();
         return role.members.map(m => m);
@@ -48,7 +48,7 @@ var Utils;
         conversation.staffMemberId.forEach(async (memberId) => {
             await channel.permissionOverwrites.create(memberId, { SendMessages: true });
         });
-        const usernames = await Promise.all(conversation.staffMemberId.map(memberId => Utils.getUserByID(client, memberId)));
+        const usernames = await Promise.all(conversation.staffMemberId.map(memberId => Utils.getMemberByID(memberId)));
         return { usernames, conversation, channel };
     }
     Utils.updatePermissionToChannel = updatePermissionToChannel;

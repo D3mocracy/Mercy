@@ -111,7 +111,6 @@ export namespace MessageUtils {
 
 
         export async function staffMembers() {
-            // await ConfigHandler.config.guild?.members.fetch();
             const managerRole = ConfigHandler.config.managerRole?.members;
             const helperRole = ConfigHandler.config.helperRole?.members;
 

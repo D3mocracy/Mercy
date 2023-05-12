@@ -78,13 +78,13 @@ class ConversationManageHandler {
     }
 
     async revealUser() {
-        if (!(await ConfigHandler.config.guild?.members.fetch(this.interaction.user.id))?.permissions.has("Administrator")) {
+        if (!(ConfigHandler.config.guild?.members.cache.get(this.interaction.user.id))?.permissions.has("Administrator")) {
             await this.interaction.reply({ content: "אין לך מספיק הרשאות כדי לבצע פעולה זו", ephemeral: true });
             return;
         }
         await this.interaction.reply({
             ephemeral: true,
-            embeds: [await ConversationManageMessageUtils.EmbedMessages.revealUserMessage(this.client, this.conversation.userId)]
+            embeds: [await ConversationManageMessageUtils.EmbedMessages.revealUserMessage(this.conversation.userId)]
         });
     }
 
@@ -95,7 +95,6 @@ class ConversationManageHandler {
     }
 
     async changeHelpersMessage() {
-        // await ConfigHandler.config.guild?.members.fetch();
         const helpersList = ConfigHandler.config.helperRole?.members.map(m => m);
 
         if (helpersList?.length) {

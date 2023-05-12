@@ -75,13 +75,13 @@ class ConversationManageHandler {
         await this.interaction.reply({ ephemeral: true, content: "פסססטט...הצ'אט הזה כבר שויך למישהו" });
     }
     async revealUser() {
-        if (!(await Config_1.default.config.guild?.members.fetch(this.interaction.user.id))?.permissions.has("Administrator")) {
+        if (!(Config_1.default.config.guild?.members.cache.get(this.interaction.user.id))?.permissions.has("Administrator")) {
             await this.interaction.reply({ content: "אין לך מספיק הרשאות כדי לבצע פעולה זו", ephemeral: true });
             return;
         }
         await this.interaction.reply({
             ephemeral: true,
-            embeds: [await ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.revealUserMessage(this.client, this.conversation.userId)]
+            embeds: [await ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.revealUserMessage(this.conversation.userId)]
         });
     }
     async resetHelpers() {
@@ -90,7 +90,6 @@ class ConversationManageHandler {
         await this.interaction.channel.send({ embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.helpersReseted] });
     }
     async changeHelpersMessage() {
-        // await ConfigHandler.config.guild?.members.fetch();
         const helpersList = Config_1.default.config.helperRole?.members.map(m => m);
         if (helpersList?.length) {
             await this.interaction.reply({

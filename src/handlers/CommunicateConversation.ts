@@ -25,12 +25,11 @@ class CommunicateConversationHandler {
 
     async sendMessage() {
         if (this.type === ChannelType.DM) {
-            await (Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel).send(this.message.content);
+            (Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel).send(this.message.content);
 
         } else if (this.type === ChannelType.GuildText) {
             if (this.message.content.startsWith('!')) return;
-
-            (await this.client.users.fetch(this.conversation.userId)).send(this.message.content);
+            this.client.users.send(this.conversation.userId, this.message.content);
         }
 
     }

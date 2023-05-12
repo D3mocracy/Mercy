@@ -1,11 +1,11 @@
-import { ActionRowBuilder, ButtonBuilder, Client, EmbedBuilder, ModalSubmitInteraction, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ModalSubmitInteraction, StringSelectMenuBuilder } from "discord.js";
 export declare namespace ConversationManageMessageUtils {
     namespace EmbedMessages {
         function referManager(interaction: ModalSubmitInteraction): EmbedBuilder;
         function staffMemberAttached(staffMemberUsername: string): EmbedBuilder;
         const ManagerTools: EmbedBuilder;
         function newChatStaff(): EmbedBuilder;
-        function revealUserMessage(client: Client, userId: string): Promise<EmbedBuilder>;
+        function revealUserMessage(userId: string): Promise<EmbedBuilder>;
         const changeHelper: EmbedBuilder;
         const helpersReseted: EmbedBuilder;
         function chatClosed(closedBy: string, chatTitle: string): EmbedBuilder;

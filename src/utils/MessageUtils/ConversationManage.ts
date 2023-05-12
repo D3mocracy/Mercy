@@ -50,8 +50,8 @@ export namespace ConversationManageMessageUtils {
             });
         }
 
-        export async function revealUserMessage(client: Client, userId: string) {
-            const user = await Utils.getUserByID(client, userId);
+        export async function revealUserMessage(userId: string) {
+            const user = Utils.getMemberByID(userId)?.user;
             return new EmbedBuilder({
                 author,
                 color: colors.blue,
@@ -59,14 +59,14 @@ export namespace ConversationManageMessageUtils {
                 description: "מנהל יקר, שים לב כי בחרת להפר את מדיניות האנונימיות - עקב כך הפרטים בהודעה בהמשך גלויים אך ורק לך",
                 footer: { text: "מומלץ להנחות את אחד התומכים להמשיך לדבר עם המשתמש עד לסיום העברת המידע לגורמים הרלוונטים" }
             }).addFields([
-                { name: "שם", value: user.username },
-                { name: "טאג", value: user.tag },
-                { name: "תיוג", value: user.toString() },
+                { name: "שם", value: `${user?.username}` },
+                { name: "טאג", value: `${user?.tag}` },
+                { name: "תיוג", value: `${user}` },
                 { name: "מספר משתמש/ID", value: userId },
-                { name: "קישור לתמונת הפרופיל", value: user.avatarURL() || "לא זמין" },
-                { name: "קישור לבאנר הפרופיל", value: user.bannerURL() || "לא זמין" },
-                { name: "האם בוט", value: user.bot ? "כן" : "לא" },
-                { name: "תאריך יצירת המשתמש", value: user.createdAt.toString() },
+                { name: "קישור לתמונת הפרופיל", value: user?.avatarURL() || "לא זמין" },
+                { name: "קישור לבאנר הפרופיל", value: user?.bannerURL() || "לא זמין" },
+                { name: "האם בוט", value: user?.bot ? "כן" : "לא" },
+                { name: "תאריך יצירת המשתמש", value: `${user?.createdAt}` },
             ])
         }
 

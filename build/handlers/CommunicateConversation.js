@@ -34,12 +34,12 @@ class CommunicateConversationHandler {
     }
     async sendMessage() {
         if (this.type === discord_js_1.ChannelType.DM) {
-            await Utils_1.Utils.getChannelById(this.client, this.conversation.channelId).send(this.message.content);
+            Utils_1.Utils.getChannelById(this.client, this.conversation.channelId).send(this.message.content);
         }
         else if (this.type === discord_js_1.ChannelType.GuildText) {
             if (this.message.content.startsWith('!'))
                 return;
-            (await this.client.users.fetch(this.conversation.userId)).send(this.message.content);
+            this.client.users.send(this.conversation.userId, this.message.content);
         }
     }
 }

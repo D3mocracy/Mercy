@@ -1,4 +1,4 @@
-import { Channel, User, TextChannel, Client, Role } from "discord.js";
+import { Channel, TextChannel, Client, Role, GuildMember } from "discord.js";
 import { Conversation } from "./types";
 export declare namespace Utils {
     function hasOpenConversation(userId: string): Promise<boolean>;
@@ -6,15 +6,15 @@ export declare namespace Utils {
     function getNumberOfConversationFromDB(): Promise<number>;
     function getChannelById(client: Client, channelId: string): Channel | undefined;
     function getRoleById(roleId: string): Role | undefined;
-    function getUserByID(client: Client, userId: string): Promise<User>;
-    function getMembersWithRole(role: Role): Promise<import("discord.js").GuildMember[]>;
+    function getMemberByID(userId: string): GuildMember | undefined;
+    function getMembersWithRole(role: Role): Promise<GuildMember[]>;
     function updatePermissionToChannel(client: Client, conversation: Conversation): Promise<{
-        usernames: User[];
+        usernames: (GuildMember | undefined)[];
         conversation: Conversation;
         channel: TextChannel;
     } | undefined>;
     function isTicketChannel(channel: Channel): boolean;
-    function getMembersById(...userId: string[]): (import("discord.js").GuildMember | undefined)[];
+    function getMembersById(...userId: string[]): (GuildMember | undefined)[];
     function isManager(userId: string): Role | undefined;
 }
 //# sourceMappingURL=Utils.d.ts.map

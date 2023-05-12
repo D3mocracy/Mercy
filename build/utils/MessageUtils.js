@@ -109,7 +109,6 @@ var MessageUtils;
         }
         EmbedMessages.helperOfTheMonth = helperOfTheMonth;
         async function staffMembers() {
-            // await ConfigHandler.config.guild?.members.fetch();
             const managerRole = Config_1.default.config.managerRole?.members;
             const helperRole = Config_1.default.config.helperRole?.members;
             return new discord_js_1.EmbedBuilder({

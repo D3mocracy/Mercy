@@ -1,4 +1,4 @@
-import { Channel, User, TextChannel, ChannelType, Client, Role } from "discord.js";
+import { Channel, User, TextChannel, ChannelType, Client, Role, GuildMember } from "discord.js";
 import DataBase from "./db";
 import { Conversation } from "./types";
 import ConfigHandler from "../handlers/Config";
@@ -25,8 +25,8 @@ export namespace Utils {
         return ConfigHandler.config.guild?.roles.cache.get(roleId);
     }
 
-    export async function getUserByID(client: Client, userId: string): Promise<User> {
-        return await client.users.fetch(userId);
+    export function getMemberByID(userId: string): GuildMember | undefined {
+        return ConfigHandler.config.guild?.members.cache.get(userId);
     }
 
     export async function getMembersWithRole(role: Role) {
@@ -44,7 +44,7 @@ export namespace Utils {
             await channel.permissionOverwrites.create(memberId, { SendMessages: true })
         })
 
-        const usernames = await Promise.all(conversation.staffMemberId.map(memberId => Utils.getUserByID(client, memberId)));
+        const usernames = await Promise.all(conversation.staffMemberId.map(memberId => Utils.getMemberByID(memberId)));
         return { usernames, conversation, channel };
     }
 
