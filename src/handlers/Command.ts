@@ -1,12 +1,13 @@
-import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember, ActionRowBuilder, ButtonBuilder, TextChannel } from "discord.js"
+import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember, ActionRowBuilder, ButtonBuilder, TextChannel, ContextMenuCommandInteraction, EmbedBuilder } from "discord.js"
 import { MessageUtils } from "../utils/MessageUtils";
 import { Utils } from "../utils/Utils";
 import ConfigHandler from "./Config";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
+import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class CommandHandler {
 
-    constructor(private interaction: ChatInputCommandInteraction | UserContextMenuCommandInteraction) { }
+    constructor(private interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction) { }
 
     async openChat() {
         this.interaction.channel?.send({
@@ -18,7 +19,7 @@ class CommandHandler {
 
     async sendStaffMessage() {
         this.interaction.channel?.send({
-            embeds: [await MessageUtils.EmbedMessages.staffMembers()]
+            embeds: [MessageUtils.EmbedMessages.staffMembers()]
         })
         await this.interaction.reply({ content: 'Sent!', ephemeral: true });
     }
@@ -32,6 +33,24 @@ class CommandHandler {
         helper.roles.add(helperOfTheMonth);
         staffChannel.send({ embeds: [MessageUtils.EmbedMessages.helperOfTheMonth(helper)] });
         await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! התומך קיבל את הדרגה ונשלחה הכרזה", ephemeral: true });
+    }
+
+    async approveVacation() {
+        if (!this.interaction.isMessageContextMenuCommand()) return;
+        if (this.interaction.channelId === ConfigHandler.config.vacationChannel?.id) {
+            const newEmbed = new EmbedBuilder(this.interaction.targetMessage.embeds[0].data);
+            newEmbed.setColor(0x33C76E);
+            this.interaction.targetMessage.edit({
+                content: "",
+                embeds: [newEmbed],
+                components: [MessageUtils.Actions.disabledGreenButton("סטטוס: טופל")]
+            });
+            await this.interaction.reply({ content: "הבקשה אושרה", ephemeral: true });
+        } else {
+            await this.interaction.reply({ content: "ניתן להשתמש בפקודה זו רק בצ'אנל היעדרות והפחתה", ephemeral: true });
+        }
+
+
     }
 
     async importantLinks() {

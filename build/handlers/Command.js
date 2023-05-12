@@ -21,7 +21,7 @@ class CommandHandler {
     }
     async sendStaffMessage() {
         this.interaction.channel?.send({
-            embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.staffMembers()]
+            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.staffMembers()]
         });
         await this.interaction.reply({ content: 'Sent!', ephemeral: true });
     }
@@ -35,6 +35,23 @@ class CommandHandler {
         helper.roles.add(helperOfTheMonth);
         staffChannel.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.helperOfTheMonth(helper)] });
         await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! התומך קיבל את הדרגה ונשלחה הכרזה", ephemeral: true });
+    }
+    async approveVacation() {
+        if (!this.interaction.isMessageContextMenuCommand())
+            return;
+        if (this.interaction.channelId === Config_1.default.config.vacationChannel?.id) {
+            const newEmbed = new discord_js_1.EmbedBuilder(this.interaction.targetMessage.embeds[0].data);
+            newEmbed.setColor(0x33C76E);
+            this.interaction.targetMessage.edit({
+                content: "",
+                embeds: [newEmbed],
+                components: [MessageUtils_1.MessageUtils.Actions.disabledGreenButton("סטטוס: טופל")]
+            });
+            await this.interaction.reply({ content: "הבקשה אושרה", ephemeral: true });
+        }
+        else {
+            await this.interaction.reply({ content: "ניתן להשתמש בפקודה זו רק בצ'אנל היעדרות והפחתה", ephemeral: true });
+        }
     }
     async importantLinks() {
         await this.interaction.channel?.send({

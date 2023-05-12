@@ -5,6 +5,7 @@ import DataBase from "../utils/db";
 import { Conversation } from "../utils/types";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
+import { MessageUtils } from "../utils/MessageUtils";
 
 export class ModalSubmitHandler {
 
@@ -17,6 +18,21 @@ export class ModalSubmitHandler {
             components: [ConversationManageMessageUtils.Actions.markAsDone(false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.interaction.channelId}`)]
         });
         await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
+    }
+
+    async sendVacationMessage() {
+        const [type, dateOne, dateTwo, cause] = [
+            this.interaction.fields.getTextInputValue('vacation_type'),
+            this.interaction.fields.getTextInputValue('vacation_date_one'),
+            this.interaction.fields.getTextInputValue('vacation_date_two'),
+            this.interaction.fields.getTextInputValue('vacation_cause'),
+        ]
+        await this.interaction.reply({ content: `בקשה ל${type} נשלחה בהצלחה לצ'אנל היעדרויות`, ephemeral: true });
+        ConfigHandler.config.vacationChannel?.send({
+            content: `${ConfigHandler.config.managerRole}`,
+            embeds: [MessageUtils.EmbedMessages.vacation(this.interaction.member as GuildMember, type, dateOne, dateTwo, cause)],
+            components: [MessageUtils.Actions.disabledGreyButton(`סטטוס: בטיפול`)]
+        });
     }
 
     async suggestIdea() {

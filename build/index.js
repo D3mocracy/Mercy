@@ -146,6 +146,9 @@ client.on('interactionCreate', async (interaction) => {
         ['suggestIdea', async () => {
                 await new ModalSubmit_1.ModalSubmitHandler(interaction).suggestIdea();
             }],
+        ['vacationModal', async () => {
+                await new ModalSubmit_1.ModalSubmitHandler(interaction).sendVacationMessage();
+            }],
         ['helpers_list', async () => {
                 await new ChangeHelper_1.default(client, interaction).handle();
             }],
@@ -155,6 +158,9 @@ client.on('interactionCreate', async (interaction) => {
         ['תומך החודש', async () => {
                 await new Command_1.default(interaction).makeHelperOfTheMonth();
             }],
+        ['אשר חופשה', async () => {
+                await new Command_1.default(interaction).approveVacation();
+            }],
         ['manage', async () => {
                 await ConversationManage_1.default.sendManageTools(interaction);
             }],
@@ -163,6 +169,9 @@ client.on('interactionCreate', async (interaction) => {
             }],
         ['sendstaffmessage', async () => {
                 await new Command_1.default(interaction).sendStaffMessage();
+            }],
+        ['vacation', async () => {
+                await interaction.showModal(MessageUtils_1.MessageUtils.Modals.vacationModal);
             }]
     ]);
     try {

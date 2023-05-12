@@ -23,6 +23,7 @@ export type ConfigDocument = {
     errorChannelId: string,
     importantChannels: { [key: string]: string }[],
     suggestIdeasChannelId: string,
+    vacationChannelId: string,
 }
 
 export type Config = Partial<{
@@ -33,6 +34,7 @@ export type Config = Partial<{
     staffChannel: TextChannel,
     errorChannel: TextChannel,
     suggestIdeasChannel: TextChannel,
+    vacationChannel: TextChannel,
     managerRole: Role,
     helperRole: Role,
     memberRole: Role,

@@ -9,6 +9,7 @@ const Utils_1 = require("../utils/Utils");
 const db_1 = __importDefault(require("../utils/db"));
 const ImportantLinks_1 = require("../utils/MessageUtils/ImportantLinks");
 const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
+const MessageUtils_1 = require("../utils/MessageUtils");
 class ModalSubmitHandler {
     interaction;
     constructor(interaction) {
@@ -21,6 +22,20 @@ class ModalSubmitHandler {
             components: [ConversationManage_1.ConversationManageMessageUtils.Actions.markAsDone(false), ConversationManage_1.ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild?.id}/${this.interaction.channelId}`)]
         });
         await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
+    }
+    async sendVacationMessage() {
+        const [type, dateOne, dateTwo, cause] = [
+            this.interaction.fields.getTextInputValue('vacation_type'),
+            this.interaction.fields.getTextInputValue('vacation_date_one'),
+            this.interaction.fields.getTextInputValue('vacation_date_two'),
+            this.interaction.fields.getTextInputValue('vacation_cause'),
+        ];
+        await this.interaction.reply({ content: `בקשה ל${type} נשלחה בהצלחה לצ'אנל היעדרויות`, ephemeral: true });
+        Config_1.default.config.vacationChannel?.send({
+            content: `${Config_1.default.config.managerRole}`,
+            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.vacation(this.interaction.member, type, dateOne, dateTwo, cause)],
+            components: [MessageUtils_1.MessageUtils.Actions.disabledGreyButton(`סטטוס: בטיפול`)]
+        });
     }
     async suggestIdea() {
         const suggestExplain = this.interaction.fields.getTextInputValue("suggest_explain");

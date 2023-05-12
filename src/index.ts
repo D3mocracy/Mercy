@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, ButtonInteraction, IntentsBitField, ActivityFlags, ActivityType } from "discord.js";
+import { ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, ButtonInteraction, IntentsBitField, ActivityFlags, ActivityType, ContextMenuCommandInteraction } from "discord.js";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
 import CommandHandler from "./handlers/Command";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
@@ -147,6 +147,9 @@ client.on('interactionCreate', async interaction => {
         ['suggestIdea', async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).suggestIdea();
         }],
+        ['vacationModal', async () => {
+            await new ModalSubmitHandler(interaction as ModalSubmitInteraction).sendVacationMessage();
+        }],
         ['helpers_list', async () => {
             await new ChangeHelperHandler(client, interaction as StringSelectMenuInteraction).handle();
         }],
@@ -154,7 +157,10 @@ client.on('interactionCreate', async interaction => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).openChat();
         }],
         ['תומך החודש', async () => {
-            await new CommandHandler(interaction as ChatInputCommandInteraction).makeHelperOfTheMonth();
+            await new CommandHandler(interaction as ContextMenuCommandInteraction).makeHelperOfTheMonth();
+        }],
+        ['אשר חופשה', async () => {
+            await new CommandHandler(interaction as ContextMenuCommandInteraction).approveVacation();
         }],
         ['manage', async () => {
             await ConversationManageHandler.sendManageTools(interaction as ChatInputCommandInteraction)
@@ -164,6 +170,9 @@ client.on('interactionCreate', async interaction => {
         }],
         ['sendstaffmessage', async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).sendStaffMessage();
+        }],
+        ['vacation', async () => {
+            await (interaction as ChatInputCommandInteraction).showModal(MessageUtils.Modals.vacationModal);
         }]
     ]);
 

@@ -9,14 +9,18 @@ export declare namespace MessageUtils {
         const openChat: EmbedBuilder;
         const sureMessageToClose: EmbedBuilder;
         function helperOfTheMonth(helper: GuildMember): EmbedBuilder;
-        function staffMembers(): Promise<EmbedBuilder>;
+        function staffMembers(): EmbedBuilder;
+        function vacation(helperMember: GuildMember, vacationType: string, dateOne: string, dateTwo: string, cause: string): EmbedBuilder;
     }
     namespace Actions {
         const openChatButton: ActionRowBuilder<ButtonBuilder>;
         function linkButton(url: string, label: string): ActionRowBuilder<ButtonBuilder>;
+        function disabledGreyButton(label: string): ActionRowBuilder<ButtonBuilder>;
+        function disabledGreenButton(label: string): ActionRowBuilder<ButtonBuilder>;
     }
     namespace Modals {
         const referManagerModal: ModalBuilder;
+        const vacationModal: ModalBuilder;
     }
 }
 //# sourceMappingURL=MessageUtils.d.ts.map

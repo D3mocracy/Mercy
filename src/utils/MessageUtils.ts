@@ -110,7 +110,7 @@ export namespace MessageUtils {
 
 
 
-        export async function staffMembers() {
+        export function staffMembers() {
             const managerRole = ConfigHandler.config.managerRole?.members;
             const helperRole = ConfigHandler.config.helperRole?.members;
 
@@ -127,6 +127,23 @@ export namespace MessageUtils {
                 `,
 
                 footer: { iconURL: author.iconURL, text: "תמיד כאן בשבילכם! - הנהלת הקהילה" }
+            })
+        }
+
+        export function vacation(helperMember: GuildMember, vacationType: string, dateOne: string, dateTwo: string, cause: string) {
+            return new EmbedBuilder({
+                author: { iconURL: author.iconURL, name: "Mercy - הנהלה" },
+                color: colors.pink,
+                title: `הודעה על היעדרות או הפחתת פעילות`,
+                description: `**פירוט הבקשה:**
+                ${cause}`,
+                fields: [
+                    { name: "תומך", value: `${helperMember}`, inline: false },
+                    { name: "סוג הבקשה", value: vacationType, inline: false },
+                    { name: "עד תאריך", value: dateTwo, inline: true },
+                    { name: "מתאריך", value: dateOne, inline: true },
+                ],
+                timestamp: new Date()
             })
         }
 
@@ -152,6 +169,28 @@ export namespace MessageUtils {
             )
         }
 
+        export function disabledGreyButton(label: string) {
+            return new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder({
+                    style: ButtonStyle.Secondary,
+                    label,
+                    disabled: true,
+                    customId: "disabledButton"
+                })
+            )
+        }
+
+        export function disabledGreenButton(label: string) {
+            return new ActionRowBuilder<ButtonBuilder>().addComponents(
+                new ButtonBuilder({
+                    style: ButtonStyle.Success,
+                    label,
+                    disabled: true,
+                    customId: "disabledButtonGreen"
+                })
+            )
+        }
+
     };
 
     export namespace Modals {
@@ -169,7 +208,43 @@ export namespace MessageUtils {
             title: "שליחת בקשה למנהל / הפנה מנהל"
         }).addComponents(reportCause);
 
+        //Ask Vacation
+        const vacationType = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
+            customId: 'vacation_type',
+            label: 'סוג',
+            style: TextInputStyle.Short,
+            placeholder: "היעדרות/הפחתת פעילות",
+            required: true
+        }));
 
+        const date1 = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
+            customId: 'vacation_date_one',
+            label: 'מהתאריך',
+            style: TextInputStyle.Short,
+            placeholder: `${new Date()}`,
+            required: true
+        }));
+
+        const date2 = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
+            customId: 'vacation_date_two',
+            label: 'עד התאריך',
+            style: TextInputStyle.Short,
+            placeholder: `ניתן להשאיר ריק אם מדובר ביום אחד`,
+            required: false
+        }));
+
+        const causeVacation = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
+            customId: 'vacation_cause',
+            label: 'סיבה',
+            style: TextInputStyle.Paragraph,
+            placeholder: `לא חובה`,
+            required: false,
+        }));
+
+        export const vacationModal = new ModalBuilder({
+            customId: 'vacationModal',
+            title: "בקשה להיעדרות / הפחתת פעילות"
+        }).addComponents([vacationType, date1, date2, causeVacation]);
 
 
     }

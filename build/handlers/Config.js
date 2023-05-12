@@ -13,6 +13,7 @@ class ConfigHandler {
         staffChannel: {},
         errorChannel: {},
         suggestIdeasChannel: {},
+        vacationChannel: {},
         managerRole: {},
         helperRole: {},
         memberRole: {},
@@ -47,6 +48,9 @@ class ConfigHandler {
             },
             get suggestIdeasChannel() {
                 return client.channels.cache.get(configDocument.suggestIdeasChannelId);
+            },
+            get vacationChannel() {
+                return client.channels.cache.get(configDocument.vacationChannelId);
             },
             get managerRole() {
                 return guild.roles.cache.get(configDocument.managerRole);

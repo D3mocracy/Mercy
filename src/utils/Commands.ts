@@ -11,6 +11,10 @@ export namespace Command {
         .setDescription('שולח הודעה עם לינקים ומידע חשוב')
         .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
 
+    const vacation = new SlashCommandBuilder()
+        .setName('vacation')
+        .setDescription('בקשה להיעדרות / הפחתת פעילות');
+
     const manageChat = new SlashCommandBuilder()
         .setName("manage")
         .setDescription("כלי הניהול של צ'אט זה")
@@ -25,6 +29,11 @@ export namespace Command {
         .setType(ApplicationCommandType.User)
         .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
 
+    const approveVacation = new ContextMenuCommandBuilder()
+        .setName('אשר חופשה')
+        .setType(ApplicationCommandType.Message)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
 
-    export const commands = [openChat, setHelperOfTheMonth, manageChat, importantLinks, sendStaffMessage]
+
+    export const commands = [openChat, setHelperOfTheMonth, manageChat, importantLinks, sendStaffMessage, vacation, approveVacation]
 }

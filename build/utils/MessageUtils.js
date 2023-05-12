@@ -108,7 +108,7 @@ var MessageUtils;
             });
         }
         EmbedMessages.helperOfTheMonth = helperOfTheMonth;
-        async function staffMembers() {
+        function staffMembers() {
             const managerRole = Config_1.default.config.managerRole?.members;
             const helperRole = Config_1.default.config.helperRole?.members;
             return new discord_js_1.EmbedBuilder({
@@ -126,6 +126,23 @@ var MessageUtils;
             });
         }
         EmbedMessages.staffMembers = staffMembers;
+        function vacation(helperMember, vacationType, dateOne, dateTwo, cause) {
+            return new discord_js_1.EmbedBuilder({
+                author: { iconURL: author.iconURL, name: "Mercy - הנהלה" },
+                color: colors.pink,
+                title: `הודעה על היעדרות או הפחתת פעילות`,
+                description: `**פירוט הבקשה:**
+                ${cause}`,
+                fields: [
+                    { name: "תומך", value: `${helperMember}`, inline: false },
+                    { name: "סוג הבקשה", value: vacationType, inline: false },
+                    { name: "עד תאריך", value: dateTwo, inline: true },
+                    { name: "מתאריך", value: dateOne, inline: true },
+                ],
+                timestamp: new Date()
+            });
+        }
+        EmbedMessages.vacation = vacation;
     })(EmbedMessages = MessageUtils.EmbedMessages || (MessageUtils.EmbedMessages = {}));
     let Actions;
     (function (Actions) {
@@ -144,6 +161,24 @@ var MessageUtils;
             }));
         }
         Actions.linkButton = linkButton;
+        function disabledGreyButton(label) {
+            return new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder({
+                style: discord_js_1.ButtonStyle.Secondary,
+                label,
+                disabled: true,
+                customId: "disabledButton"
+            }));
+        }
+        Actions.disabledGreyButton = disabledGreyButton;
+        function disabledGreenButton(label) {
+            return new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.ButtonBuilder({
+                style: discord_js_1.ButtonStyle.Success,
+                label,
+                disabled: true,
+                customId: "disabledButtonGreen"
+            }));
+        }
+        Actions.disabledGreenButton = disabledGreenButton;
     })(Actions = MessageUtils.Actions || (MessageUtils.Actions = {}));
     ;
     let Modals;
@@ -159,6 +194,39 @@ var MessageUtils;
             customId: 'referManager',
             title: "שליחת בקשה למנהל / הפנה מנהל"
         }).addComponents(reportCause);
+        //Ask Vacation
+        const vacationType = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
+            customId: 'vacation_type',
+            label: 'סוג',
+            style: discord_js_1.TextInputStyle.Short,
+            placeholder: "היעדרות/הפחתת פעילות",
+            required: true
+        }));
+        const date1 = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
+            customId: 'vacation_date_one',
+            label: 'מהתאריך',
+            style: discord_js_1.TextInputStyle.Short,
+            placeholder: `${new Date()}`,
+            required: true
+        }));
+        const date2 = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
+            customId: 'vacation_date_two',
+            label: 'עד התאריך',
+            style: discord_js_1.TextInputStyle.Short,
+            placeholder: `ניתן להשאיר ריק אם מדובר ביום אחד`,
+            required: false
+        }));
+        const causeVacation = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
+            customId: 'vacation_cause',
+            label: 'סיבה',
+            style: discord_js_1.TextInputStyle.Paragraph,
+            placeholder: `לא חובה`,
+            required: false,
+        }));
+        Modals.vacationModal = new discord_js_1.ModalBuilder({
+            customId: 'vacationModal',
+            title: "בקשה להיעדרות / הפחתת פעילות"
+        }).addComponents([vacationType, date1, date2, causeVacation]);
     })(Modals = MessageUtils.Modals || (MessageUtils.Modals = {}));
 })(MessageUtils = exports.MessageUtils || (exports.MessageUtils = {}));
 //# sourceMappingURL=MessageUtils.js.map

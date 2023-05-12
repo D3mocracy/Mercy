@@ -12,6 +12,9 @@ var Command;
         .setName('importantlinks')
         .setDescription('שולח הודעה עם לינקים ומידע חשוב')
         .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator);
+    const vacation = new discord_js_1.SlashCommandBuilder()
+        .setName('vacation')
+        .setDescription('בקשה להיעדרות / הפחתת פעילות');
     const manageChat = new discord_js_1.SlashCommandBuilder()
         .setName("manage")
         .setDescription("כלי הניהול של צ'אט זה");
@@ -23,6 +26,10 @@ var Command;
         .setName('תומך החודש')
         .setType(discord_js_1.ApplicationCommandType.User)
         .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator);
-    Command.commands = [openChat, setHelperOfTheMonth, manageChat, importantLinks, sendStaffMessage];
+    const approveVacation = new discord_js_1.ContextMenuCommandBuilder()
+        .setName('אשר חופשה')
+        .setType(discord_js_1.ApplicationCommandType.Message)
+        .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator);
+    Command.commands = [openChat, setHelperOfTheMonth, manageChat, importantLinks, sendStaffMessage, vacation, approveVacation];
 })(Command = exports.Command || (exports.Command = {}));
 //# sourceMappingURL=Commands.js.map
