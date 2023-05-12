@@ -23,7 +23,6 @@ class ConfigHandler {
     async loadConfig(client) {
         const configDocument = (await db_1.default.configCollection.find({}).toArray())[0];
         const guild = client.guilds.cache.get(process.env.GuildID);
-        console.log(configDocument);
         return ConfigHandler.config = {
             get guild() {
                 return guild;
