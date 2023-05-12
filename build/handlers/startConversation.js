@@ -18,7 +18,7 @@ class StartConversation {
     async precondition() {
         const openConversation = await Utils_1.Utils.getOpenConversation(this.interaction.user.id);
         openConversation
-            ? this.interaction.reply({
+            ? await this.interaction.reply({
                 content: "היי, נראה שכבר יש לך צ'אט פתוח",
                 components: [MessageUtils_1.MessageUtils.Actions.linkButton(`https://discord.com/channels/${Config_1.default.config.guild?.id}/${openConversation.channelId}`, "העבר אותי לצ'אט")],
                 ephemeral: true
