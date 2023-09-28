@@ -1,224 +1,252 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, EmbedBuilder, ModalSubmitInteraction, StringSelectMenuBuilder } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  Client,
+  EmbedBuilder,
+  ModalSubmitInteraction,
+  StringSelectMenuBuilder,
+} from "discord.js";
 import { Utils } from "../Utils";
 
 export namespace ConversationManageMessageUtils {
+  export namespace EmbedMessages {
+    const author = {
+      iconURL: "https://i.imgur.com/ATfQQi7.png",
+      name: "Mercy - אנונימי",
+    };
+    const colors = {
+      blue: 0x86b5dd,
+      pink: 0xfe929f,
+      gold: 0xfcc22d,
+      red: 0xff0000,
+      green: 0x33c76e,
+      white: 0xffffff,
+    };
 
-    export namespace EmbedMessages {
-        const author = { iconURL: 'https://i.imgur.com/ATfQQi7.png', name: 'Mercy - אנונימי' };
-        const colors = {
-            blue: 0x86b5dd,
-            pink: 0xfe929f,
-            gold: 0xfcc22d,
-            red: 0xff0000,
-            green: 0x33C76E
-        }
-
-        export function referManager(interaction: ModalSubmitInteraction) {
-            return new EmbedBuilder({
-                author,
-                color: colors.pink,
-                title: `התקבלה בקשה חדשה מתומך`,
-                description: `${interaction.fields.getTextInputValue('referCause')}`
-            }).addFields([
-                { name: "תומך:", value: `${interaction.user.tag}` },
-                { name: "סטטוס טיפול", value: `לא טופל` },
-            ])
-        };
-
-        export function staffMemberAttached(staffMemberUsername: string) {
-            return new EmbedBuilder({
-                author,
-                color: colors.blue,
-                title: `הצ'אט שויך לתומכ/ים שנבחר/ו`,
-                description: `כעת יש ל${staffMemberUsername} גישה מלאה לכתיבה ולעזרה בצאנל`
-            });
-        }
-
-        export const ManagerTools = new EmbedBuilder({
-            author,
-            color: colors.blue,
-            title: "הגדרות ניהול",
-            description: "מנהלים יקרים, שימו לב שהפרת אנונימיות של משתמש היא נושא רגיש מאוד. אם אין לכם חשד כי מדובר בעבירה על אחד מחוקי המדינה ו/או פגיעה עצמית ו/או פגיעה בסובבים את האינדיבידואל, השתדל שלא להפר מדיניות זו."
-        });
-
-        export function newChatStaff() {
-            return new EmbedBuilder({
-                author,
-                color: colors.pink,
-                title: `ניהול צ'אט נוכחי`,
-                description: `משתמש פתח צ'אט, נא לתת סיוע בהתאם!`,
-            });
-        }
-
-        export async function revealUserMessage(userId: string) {
-            const user = Utils.getMemberByID(userId)?.user;
-            return new EmbedBuilder({
-                author,
-                color: colors.blue,
-                title: "פרטי המשתמש",
-                description: "מנהל יקר, שים לב כי בחרת להפר את מדיניות האנונימיות - עקב כך הפרטים בהודעה בהמשך גלויים אך ורק לך",
-                footer: { text: "מומלץ להנחות את אחד התומכים להמשיך לדבר עם המשתמש עד לסיום העברת המידע לגורמים הרלוונטים" }
-            }).addFields([
-                { name: "שם", value: `${user?.username}` },
-                { name: "טאג", value: `${user?.tag}` },
-                { name: "תיוג", value: `${user}` },
-                { name: "מספר משתמש/ID", value: userId },
-                { name: "קישור לתמונת הפרופיל", value: user?.avatarURL() || "לא זמין" },
-                { name: "קישור לבאנר הפרופיל", value: user?.bannerURL() || "לא זמין" },
-                { name: "האם בוט", value: user?.bot ? "כן" : "לא" },
-                { name: "תאריך יצירת המשתמש", value: `${user?.createdAt}` },
-            ])
-        }
-
-        export const changeHelper = new EmbedBuilder({
-            author,
-            color: colors.blue,
-            title: "החלפת תומך",
-            description: "יש לבחור מתוך הרשימה למטה את התומך שתרצה לשייך אליו את הפנייה. ניתן לבחור יותר מתומך אחד.",
-            footer: { text: "שימו לב כי החלפה בין התומכים תשפיע על הרשאות התגובה שלהם בצ'אנל בהתאם.  " }
-        });
-
-        export const helpersReseted = new EmbedBuilder({
-            author,
-            color: colors.blue,
-            title: "הרשאות הוסרו",
-            description: "כל הרשאות התומכים של צ'אט זה אופסו, ניתן כעת להגדיר תומכים חדשים",
-        });
-
-        export function chatClosed(closedBy: string, chatTitle: string) {
-            return new EmbedBuilder({
-                author,
-                color: colors.pink,
-                title: `${chatTitle.replaceAll('-', ' ')} נסגר`,
-                description: `הצ'אט נסגר על ידי ${closedBy}`,
-            });
-        }
+    export function referSupervisor(interaction: ModalSubmitInteraction) {
+      return new EmbedBuilder({
+        color: colors.white,
+        title: "התקבלה בקשה להפניית מפקח",
+        description: `**תיאור**\n${interaction.fields.getTextInputValue("referCause")}`,
+      }).addFields([
+        { name: "תומך", value: `${interaction.user.tag}` },
+        {name: "בטיפול של", value: "לא משויך"},
+        { name: "סטטוס טיפול", value: `לא טופל` },
+      ]);
     }
 
-    export namespace Actions {
-        export function attachReport(isAttached: boolean) {
-            return new ActionRowBuilder<ButtonBuilder>().addComponents(
-                new ButtonBuilder({
-                    customId: 'manager_attach_report',
-                    label: 'שייך דיווח',
-                    disabled: isAttached,
-                    emoji: "🔀",
-                    style: ButtonStyle.Success
-                })
-            );
-        }
+    export function staffMemberAttached(staffMemberUsername: string) {
+      return new EmbedBuilder({
+        color: colors.white,
+        title: `הצ'אט שויך לתומכ/ים שנבחר/ו`,
+        description: `כעת יש ל${staffMemberUsername} גישה מלאה לכתיבה בצ'אט`,
+      });
+    }
 
-        export function markAsDone(isAttached: boolean) {
-            return new ActionRowBuilder<ButtonBuilder>().addComponents(
-                new ButtonBuilder({
-                    customId: 'manager_mark_as_done',
-                    label: 'סמן כבוצע',
-                    disabled: isAttached,
-                    emoji: "✔️",
-                    style: ButtonStyle.Success
-                })
-            );
-        }
+    export const ManagerTools = new EmbedBuilder({
+      color: colors.blue,
+      title: "הגדרות ניהול",
+      description:
+        "מנהלים יקרים, שימו לב שהפרת אנונימיות של משתמש היא נושא רגיש מאוד. אם אין לכם חשד כי מדובר בעבירה על אחד מחוקי המדינה ו/או פגיעה עצמית ו/או פגיעה בסובבים את האינדיבידואל, השתדל שלא להפר מדיניות זו.",
+    });
 
-        export function tools_report_link(url: string) {
-            return new ActionRowBuilder<ButtonBuilder>().addComponents([
-                new ButtonBuilder({
-                    label: "העבר אותי לצ'אט",
-                    url,
-                    style: ButtonStyle.Link
-                }),
-            ])
-        }
+    export function newChatStaff(title: string, description: string) {
+      return new EmbedBuilder({
+        color: colors.white,
+        title,
+        description,
+      });
+    }
 
-        export function tools_sure_close_yes_no() {
-            return new ActionRowBuilder<ButtonBuilder>().addComponents([
-                new ButtonBuilder({
-                    label: "אני בטוח/ה",
-                    customId: 'sure_yes',
-                    style: ButtonStyle.Success
-                }),
-                new ButtonBuilder({
-                    label: "התחרטתי",
-                    customId: "sure_no",
-                    style: ButtonStyle.Danger
-                })
-            ])
-        }
+    export async function revealUserMessage(userId: string) {
+      const user = Utils.getMemberByID(userId)?.user;
+      return new EmbedBuilder({
+        color: colors.blue,
+        title: "פרטי המשתמש",
+        description:
+          "מנהל יקר, שים לב כי בחרת להפר את מדיניות האנונימיות - עקב כך הפרטים בהודעה בהמשך גלויים אך ורק לך",
+        footer: {
+          text: "מומלץ להנחות את אחד התומכים להמשיך לדבר עם המשתמש עד לסיום העברת המידע לגורמים הרלוונטים",
+        },
+      }).addFields([
+        { name: "שם", value: `${user?.username}` },
+        { name: "טאג", value: `${user?.tag}` },
+        { name: "תיוג", value: `${user}` },
+        { name: "מספר משתמש/ID", value: userId },
+        { name: "קישור לתמונת הפרופיל", value: user?.avatarURL() || "לא זמין" },
+        { name: "קישור לבאנר הפרופיל", value: user?.bannerURL() || "לא זמין" },
+        { name: "האם בוט", value: user?.bot ? "כן" : "לא" },
+        { name: "תאריך יצירת המשתמש", value: `${user?.createdAt}` },
+      ]);
+    }
 
-        export const tools_attach = new ButtonBuilder({
-            customId: "tools_attach",
-            label: "שיוך צ'אט אליי",
-            emoji: "🔀",
-            style: ButtonStyle.Success
-        });
+    export const changeHelper = new EmbedBuilder({
+      color: colors.blue,
+      title: "החלפת תומך",
+      description:
+        "יש לבחור מתוך הרשימה מטה את התומך שתרצו לשייך אליו את הפנייה. ניתן לבחור יותר מתומך אחד.",
+      footer: {
+        text: "שימו לב כי ההחלפה בין התומכים תשפיע על הרשאות התגובה שלהם בצ'אט בהתאם.  ",
+      },
+    });
 
-        export const tools_manager = new ButtonBuilder({
-            customId: "tools_manager",
-            label: "הגדרות ניהול",
-            emoji: '⚙️',
-            style: ButtonStyle.Primary
-        });
+    export const helpersReseted = new EmbedBuilder({
+      color: colors.white,
+      title: "הרשאות הוסרו",
+      description:
+        "כל הרשאות התומכים בצ'אט זה אופסו, ניתן כעת להגדיר תומכים חדשים.",
+    });
 
-        export const tools_close = new ButtonBuilder({
-            customId: "tools_close",
-            label: "סגירת צ'אט",
-            emoji: '✖️',
-            style: ButtonStyle.Danger
+    export function chatClosed(closedBy: string, chatTitle: string) {
+      return new EmbedBuilder({
+        color: colors.red,
+        title: `${chatTitle.replaceAll("-", " ")} נסגר`,
+        description: `הצ'אט נסגר על ידי ${closedBy}`,
+      });
+    }
+  }
+
+  export namespace Actions {
+    export function attachReport(isAttached: boolean) {
+      return new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder({
+          customId: "manager_attach_report",
+          label: "שייך דיווח",
+          disabled: isAttached,
+          emoji: "🔀",
+          style: ButtonStyle.Success,
         })
+      );
+    }
 
-        export const tools_report = new ButtonBuilder({
-            customId: "tools_refer_manager",
-            label: "הפנה מנהל",
-            emoji: '🧑‍💼',
-            style: ButtonStyle.Secondary
+    export function supervisorRefferedTools(doneDisabled: boolean, inProgressDisabled: boolean) {
+      return new ActionRowBuilder<ButtonBuilder>().addComponents(
+        [new ButtonBuilder({
+          customId: "manager_mark_as_done",
+          label: "טופל",
+          disabled: doneDisabled,
+          emoji: "✔️",
+          style: ButtonStyle.Success,
+        }),
+        new ButtonBuilder({
+          customId: "manager_in_progress",
+          label: "בטיפול",
+          disabled: inProgressDisabled,
+          emoji: "👍",
+          style: ButtonStyle.Primary,
+        })
+      ]
+      );
+    }
+
+    export function tools_report_link(url: string) {
+      return new ActionRowBuilder<ButtonBuilder>().addComponents([
+        new ButtonBuilder({
+          label: "העבר אותי לצ'אט",
+          url,
+          style: ButtonStyle.Link,
+        }),
+      ]);
+    }
+
+    export function tools_sure_close_yes_no() {
+      return new ActionRowBuilder<ButtonBuilder>().addComponents([
+        new ButtonBuilder({
+          label: "לא",
+          customId: "sure_no",
+          style: ButtonStyle.Danger,
+        }),
+        new ButtonBuilder({
+          label: "כן",
+          customId: "sure_yes",
+          style: ButtonStyle.Success,
+        }),
+      ]);
+    }
+
+    export const tools_attach = new ButtonBuilder({
+      customId: "tools_attach",
+      label: "שיוך צ'אט אליי",
+      emoji: "🔀",
+      style: ButtonStyle.Success,
+    });
+
+    export const tools_manager = new ButtonBuilder({
+      customId: "tools_manager",
+      label: "הגדרות ניהול",
+      emoji: "⚙️",
+      style: ButtonStyle.Secondary,
+    });
+
+    export const tools_close = new ButtonBuilder({
+      customId: "tools_close",
+      label: "סגירת הצ'אט",
+      emoji: "✖️",
+      style: ButtonStyle.Danger,
+    });
+
+    export const tools_report = new ButtonBuilder({
+      customId: "tools_refer_manager",
+      label: "הפניית מפקח",
+      emoji: "🧑‍💼",
+      style: ButtonStyle.Primary,
+    });
+
+    export const supporterTools =
+      new ActionRowBuilder<ButtonBuilder>().addComponents([
+        tools_manager,
+        tools_attach,
+        tools_close,
+        tools_report,
+      ]);
+
+    export const managerTools =
+      new ActionRowBuilder<ButtonBuilder>().addComponents([
+        new ButtonBuilder({
+          customId: "tools_manager_reveal",
+          label: "חשיפת זהות המשתמש",
+          emoji: "👁️",
+          style: ButtonStyle.Danger,
+        }),
+        new ButtonBuilder({
+          customId: "tools_manager_change_supporter",
+          label: "החלפת תומך",
+          emoji: "👼",
+          style: ButtonStyle.Primary,
+        }),
+      ]);
+
+    export function changeHelper(helpers: any[]) {
+      const selectMenu = new StringSelectMenuBuilder({
+        customId: "helpers_list",
+        placeholder: "יש לבחור תומך אחד או יותר",
+        minValues: 1,
+        maxValues: helpers.length,
+      });
+      helpers.forEach((helper) => {
+        selectMenu.addOptions({
+          label: helper.displayName,
+          description: "Helper",
+          value: helper.id,
+          emoji: "🇭",
         });
-
-        export const supporterTools = new ActionRowBuilder<ButtonBuilder>().addComponents([
-            tools_close,
-            tools_manager,
-            tools_report,
-            tools_attach,
-        ]);
-
-        export const managerTools = new ActionRowBuilder<ButtonBuilder>().addComponents([
-            new ButtonBuilder({
-                customId: "tools_manager_change_supporter",
-                label: "החלפת תומך",
-                emoji: '👼',
-                style: ButtonStyle.Success,
-            }),
-            new ButtonBuilder({
-                customId: "tools_manager_reveal",
-                label: "גילוי משתמש",
-                emoji: '👁️',
-                style: ButtonStyle.Secondary,
-            }),
-        ]);
-
-        export function changeHelper(helpers: any[]) {
-            const selectMenu = new StringSelectMenuBuilder({
-                customId: "helpers_list",
-                placeholder: "בחר תומך אחד או יותר",
-                minValues: 1,
-                maxValues: helpers.length,
-            });
-            helpers.forEach(helper => {
-                selectMenu.addOptions({ label: helper.displayName, description: "Helper", value: helper.id, emoji: '🇭' });
-            });
-            return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
-        };
-
-        export const resetHelpers = new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder({
-                label: "מחיקת הרשאות לכל התומכים",
-                customId: 'tools_reset_helpers',
-                emoji: '🔄',
-                style: ButtonStyle.Danger,
-            })
-        );
+      });
+      return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+        selectMenu
+      );
     }
 
-    export namespace Modals {
+    export const resetHelpers =
+      new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder({
+          label: "מחיקת הרשאות לכל התומכים",
+          customId: "tools_reset_helpers",
+          emoji: "🔄",
+          style: ButtonStyle.Danger,
+        })
+      );
+  }
 
-    }
+  export namespace Modals {}
 }

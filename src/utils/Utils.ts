@@ -1,4 +1,4 @@
-import { Channel, User, TextChannel, ChannelType, Client, Role, GuildMember } from "discord.js";
+import { Channel, User, TextChannel, ChannelType, Client, Role, GuildMember, PermissionFlagsBits } from "discord.js";
 import DataBase from "./db";
 import { Conversation } from "./types";
 import ConfigHandler from "../handlers/Config";
@@ -34,6 +34,13 @@ export namespace Utils {
         return role.members.map(m => m);
     }
 
+    export function getHelperClaimedConversationNumber(helperId: string) {
+        return (ConfigHandler.config.conversationCatagory as any)?.children.cache.filter((c : TextChannel) => {
+            const helperPermission = c.permissionOverwrites.cache.get(helperId);
+            return helperPermission?.allow?.has(PermissionFlagsBits.SendMessages);
+        }).size;
+    }
+
     export async function updatePermissionToChannel(client: Client, conversation: Conversation) {
         const channel: TextChannel = Utils.getChannelById(client, conversation.channelId) as TextChannel;
         await channel.lockPermissions();
@@ -56,8 +63,24 @@ export namespace Utils {
         return userId.map(userId => ConfigHandler.config.guild?.members.cache.get(userId));
     }
 
+    export function isAdministrator(userId: string) {
+        return Utils.getMemberByID(userId)?.permissions.has("Administrator");
+    }
+
     export function isManager(userId: string) {
         return ConfigHandler.config.guild?.members.cache.get(userId)?.roles.cache.find((r) => r.id === ConfigHandler.config.managerRole?.id);
+    }
+
+    export function isSupervisor(userId: string) {
+        return ConfigHandler.config.guild?.members.cache.get(userId)?.roles.cache.find((r) => r.id === ConfigHandler.config.supervisorRole?.id);
+    }
+
+    export function isHelper(userId: string) {
+        return ConfigHandler.config.guild?.members.cache.get(userId)?.roles.cache.find((r) => r.id === ConfigHandler.config.helperRole?.id);
+    }
+
+    export function isSeniorStaff(userId: string) {
+        return isManager(userId) || isSupervisor(userId) || isAdministrator(userId);
     }
 
 }

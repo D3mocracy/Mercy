@@ -55,8 +55,7 @@ var ConversationManageMessageUtils;
         async function revealUserMessage(userId) {
             const user = Utils_1.Utils.getMemberByID(userId)?.user;
             return new discord_js_1.EmbedBuilder({
-                author,
-                color: colors.blue,
+                color: colors.red,
                 title: "פרטי המשתמש",
                 description: "מנהל יקר, שים לב כי בחרת להפר את מדיניות האנונימיות - עקב כך הפרטים בהודעה בהמשך גלויים אך ורק לך",
                 footer: { text: "מומלץ להנחות את אחד התומכים להמשיך לדבר עם המשתמש עד לסיום העברת המידע לגורמים הרלוונטים" }
@@ -87,8 +86,7 @@ var ConversationManageMessageUtils;
         });
         function chatClosed(closedBy, chatTitle) {
             return new discord_js_1.EmbedBuilder({
-                author,
-                color: colors.pink,
+                color: colors.red,
                 title: `${chatTitle.replaceAll('-', ' ')} נסגר`,
                 description: `הצ'אט נסגר על ידי ${closedBy}`,
             });
@@ -156,13 +154,13 @@ var ConversationManageMessageUtils;
         });
         Actions.tools_close = new discord_js_1.ButtonBuilder({
             customId: "tools_close",
-            label: "סגירת צ'אט",
-            emoji: '✖️',
+            label: "סגירת הצ'אט",
+            emoji: '❌',
             style: discord_js_1.ButtonStyle.Danger
         });
         Actions.tools_report = new discord_js_1.ButtonBuilder({
             customId: "tools_refer_manager",
-            label: "הפנה מנהל",
+            label: "הפניית מפקח",
             emoji: '🧑‍💼',
             style: discord_js_1.ButtonStyle.Secondary
         });

@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, ButtonInteraction, IntentsBitField, ActivityFlags, ActivityType, ContextMenuCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, ButtonInteraction, IntentsBitField, ActivityFlags, ActivityType, ContextMenuCommandInteraction, Guild, BaseGuildTextChannel } from "discord.js";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
 import CommandHandler from "./handlers/Command";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
@@ -17,6 +17,7 @@ import { Command } from "./utils/Commands";
 import { ModalSubmitHandler } from "./handlers/ModalSubmit";
 import { ImportantLinksMessageUtils } from "./utils/MessageUtils/ImportantLinks";
 import { ConversationManageMessageUtils } from "./utils/MessageUtils/ConversationManage";
+import CreateConversationHandler from "./handlers/CreateConversation";
 
 //4194303
 const client: Client = new Client({
@@ -32,7 +33,7 @@ const client: Client = new Client({
 
 DataBase.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
-    client.user?.setActivity({ type: ActivityType.Listening, name: "your ❤️" })
+    client.user?.setActivity({ type: ActivityType.Listening, name: "your heart" })
     await client.application?.commands.set(Command.commands);
 }).catch((error) => {
     Logger.logError(error)
@@ -56,6 +57,10 @@ client.on('messageCreate', async message => {
             message.delete();
         }
 
+        if (message.channel.id === "1148286189925838858" && message.channel instanceof BaseGuildTextChannel) {
+            message.react("🤍");
+            message.channel.permissionOverwrites.edit(message.author.id, { SendMessages: false });
+        }
 
         const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
         if ((message.channel.isDMBased() && hasOpenConversation) || Utils.isTicketChannel(message.channel)) {
@@ -71,13 +76,21 @@ client.on('interactionCreate', async interaction => {
 
     const actionHandler = new Map<string, () => Promise<void>>([
         ['openChatButton', async () => {
-            await new StartConversation(interaction as ButtonInteraction).precondition();
+            const hanlder = await StartConversation.createHandler(interaction as ButtonInteraction);
+            await hanlder.handle();
+        }],
+        ['select_subject', async () => {
+            const hanlder = await CreateConversationHandler.createHandler(interaction as StringSelectMenuInteraction);
+            await hanlder.handle();
         }],
         ['manager_attach_report', async () => {
             await new ConversationStaffToolsHandler(interaction as ButtonInteraction).managerAttachReport();
         }],
         ['manager_mark_as_done', async () => {
             await new ConversationStaffToolsHandler(interaction as ButtonInteraction).managerMarkRequestAsDone();
+        }],
+        ['manager_in_progress', async () => {
+            await new ConversationStaffToolsHandler(interaction as ButtonInteraction).supervisorInProgress();
         }],
         ['tools_attach', async () => {
             const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
@@ -109,12 +122,12 @@ client.on('interactionCreate', async interaction => {
             (interaction as ButtonInteraction).message.edit({ components: [] });
         }],
         ['tools_manager', async () => {
-            Utils.isManager(interaction.user.id)
+            Utils.isSeniorStaff(interaction.user.id)
                 ? await (interaction as ButtonInteraction).reply({
                     ephemeral: true, embeds: [ConversationManageMessageUtils.EmbedMessages.ManagerTools],
                     components: [ConversationManageMessageUtils.Actions.managerTools]
                 })
-                : await (interaction as ButtonInteraction).reply({ content: "ברכות על הקידום", ephemeral: true });
+                : await (interaction as ButtonInteraction).reply({ content: "אין לך הרשאות להשתמש בהגדרות ניהול", ephemeral: true });
         }],
         ['tools_manager_reveal', async () => {
             const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
@@ -130,10 +143,14 @@ client.on('interactionCreate', async interaction => {
             await conversationManage.saveConversation();
         }],
         ['tools_refer_manager', async () => {
-            await (interaction as ButtonInteraction).showModal(MessageUtils.Modals.referManagerModal);
+            const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+            await conversationManage.openRefferSupervisorModal();
         }],
         ['user_report_helper', async () => {
             await (interaction as ButtonInteraction).showModal(ImportantLinksMessageUtils.Modals.reportHelperModal);
+        }],
+        ['user_volunteer', async () => {
+            await (interaction as ButtonInteraction).showModal(ImportantLinksMessageUtils.Modals.volunteerModal);
         }],
         ['user_suggest', async () => {
             await (interaction as ButtonInteraction).showModal(ImportantLinksMessageUtils.Modals.suggestIdeaModal);
@@ -143,6 +160,9 @@ client.on('interactionCreate', async interaction => {
         }],
         ['referManager', async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).referManager();
+        }],
+        ['volunteer_modal', async () => {
+            await new ModalSubmitHandler(interaction as ModalSubmitInteraction).sendVolunteerMessage();
         }],
         ['suggestIdea', async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).suggestIdea();
@@ -157,7 +177,10 @@ client.on('interactionCreate', async interaction => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).openChat();
         }],
         ['תומך החודש', async () => {
-            await new CommandHandler(interaction as ContextMenuCommandInteraction).makeHelperOfTheMonth();
+            await new CommandHandler(interaction as ContextMenuCommandInteraction).makeHelperOfTheMonth("helper");
+        }],
+        ['תומכת החודש', async () => {
+            await new CommandHandler(interaction as ContextMenuCommandInteraction).makeHelperOfTheMonth("helperit");
         }],
         ['אשר חופשה', async () => {
             await new CommandHandler(interaction as ContextMenuCommandInteraction).approveVacation();

@@ -19,7 +19,15 @@ class ConversationStaffToolsHandler {
         const newEmbed = new EmbedBuilder(this.interaction.message.embeds[0].data);
         newEmbed.setColor(0x33C76E);
         newEmbed.data.fields!.find(field => field.name === "סטטוס טיפול")!.value = "טופל";
-        await this.interaction.message.edit({ embeds: [newEmbed], components: [ConversationManageMessageUtils.Actions.markAsDone(true)] });
+        await this.interaction.message.edit({ embeds: [newEmbed], components: [ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, true)] });
+    }
+
+    async supervisorInProgress() {
+        const newEmbed = new EmbedBuilder(this.interaction.message.embeds[0].data);
+        newEmbed.setColor(0x5865F2);
+        newEmbed.data.fields!.find(field => field.name === "סטטוס טיפול")!.value = "בטיפול";
+        newEmbed.data.fields!.find(field => field.name === "בטיפול של")!.value = this.interaction.user.username;
+        await this.interaction.message.edit({ embeds: [newEmbed], components: [ConversationManageMessageUtils.Actions.supervisorRefferedTools(false, true), this.interaction.message.components[1]] });
     }
 }
 export default ConversationStaffToolsHandler;

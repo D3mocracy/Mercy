@@ -12,12 +12,12 @@ export class ModalSubmitHandler {
     constructor(protected interaction: ModalSubmitInteraction) { }
 
     async referManager() {
-        await ConfigHandler.config.requestHelperChannel?.send({
-            content: `${ConfigHandler.config.managerRole}`,
-            embeds: [ConversationManageMessageUtils.EmbedMessages.referManager(this.interaction)],
-            components: [ConversationManageMessageUtils.Actions.markAsDone(false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.interaction.channelId}`)]
-        });
-        await this.interaction.reply({ content: "הבקשה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
+        (await ConfigHandler.config.requestHelperChannel?.send({
+            content: `${ConfigHandler.config.supervisorRole} ${ConfigHandler.config.managerRole}`,
+            embeds: [ConversationManageMessageUtils.EmbedMessages.referSupervisor(this.interaction)],
+            components: [ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.interaction.channelId}`)]
+        }))?.edit({content: null})
+        await this.interaction.reply({ content: "בקשתך נשלחה בהצלחה למפקחים", ephemeral: true });
     }
 
     async sendVacationMessage() {
@@ -32,6 +32,21 @@ export class ModalSubmitHandler {
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [MessageUtils.EmbedMessages.vacation(this.interaction.member as GuildMember, type, dateOne, dateTwo, cause)],
             components: [MessageUtils.Actions.disabledGreyButton(`סטטוס: בטיפול`)]
+        });
+    }
+
+    async sendVolunteerMessage() {
+        const [dateOfBirth, aboutYourself, why, freq, other] = [
+            this.interaction.fields.getTextInputValue('date_of_birth'),
+            this.interaction.fields.getTextInputValue('about_yourself'),
+            this.interaction.fields.getTextInputValue('why'),
+            this.interaction.fields.getTextInputValue('freq'),
+            this.interaction.fields.getTextInputValue('other'),
+        ]
+        await this.interaction.reply({ content: `בקשה להתנדבות נשלחה בהצלחה לצ'אנל ההתנדבויות`, ephemeral: true });
+        ConfigHandler.config.volunteerChannel?.send({
+            content: `${ConfigHandler.config.managerRole}`,
+            embeds: [ImportantLinksMessageUtils.EmbedMessages.volunteer(this.interaction.user, dateOfBirth, aboutYourself, why, freq, other)],
         });
     }
 

@@ -24,14 +24,14 @@ class CommandHandler {
         await this.interaction.reply({ content: 'Sent!', ephemeral: true });
     }
 
-    async makeHelperOfTheMonth() {
+    async makeHelperOfTheMonth(gender: "helper" | "helperit") {
         const helper = (this.interaction as UserContextMenuCommandInteraction).targetMember as GuildMember;
-        const helperOfTheMonth = ConfigHandler.config.helperOfTheMonthRole;
+        const helpersOfTheMonth = gender === "helper" ? ConfigHandler.config.helperOfTheMonthRole : ConfigHandler.config.helperitOfTheMonthRole;
         const staffChannel = ConfigHandler.config.staffChannel;
-        if (!helper || !helperOfTheMonth || !staffChannel || !staffChannel.isTextBased()) return;
-        ConfigHandler.config.guild?.members.cache.filter(member => member.roles.cache.has(helperOfTheMonth.id)).forEach(async helper => await helper.roles.remove(helperOfTheMonth));
-        helper.roles.add(helperOfTheMonth);
-        staffChannel.send({ embeds: [MessageUtils.EmbedMessages.helperOfTheMonth(helper)] });
+        if (!helper || !helpersOfTheMonth || !staffChannel || !staffChannel.isTextBased()) return;
+        ConfigHandler.config.guild?.members.cache.filter(member => (member.roles.cache.has(ConfigHandler.config.helperOfTheMonthRole!.id) || member.roles.cache.has(ConfigHandler.config.helperitOfTheMonthRole!.id))).forEach(async helper => await helper.roles.remove(helpersOfTheMonth));
+        helper.roles.add(helpersOfTheMonth);
+        (await staffChannel.send({ content: `${ConfigHandler.config.memberRole}`, embeds: [MessageUtils.EmbedMessages.helperOfTheMonth(helper)] })).edit({ content: ""});
         await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! התומך קיבל את הדרגה ונשלחה הכרזה", ephemeral: true });
     }
 
@@ -54,13 +54,27 @@ class CommandHandler {
     }
 
     async importantLinks() {
-        await this.interaction.channel?.send({
-            embeds: [ImportantLinksMessageUtils.EmbedMessages.mainMessage()],
-            components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
-                ImportantLinksMessageUtils.Actions.user_report_helper,
-                ImportantLinksMessageUtils.Actions.user_suggest
-            ])]
-        });
+        const messages = [
+            {
+                embeds: [ImportantLinksMessageUtils.EmbedMessages.volunteerMessage],
+                components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
+                    ImportantLinksMessageUtils.Actions.user_volunteer,
+                ])]
+            },
+            {
+                embeds: [ImportantLinksMessageUtils.EmbedMessages.reportMessage],
+                components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
+                    ImportantLinksMessageUtils.Actions.user_report_helper,
+                ])]
+            },
+            {
+                embeds: [ImportantLinksMessageUtils.EmbedMessages.suggestIdeasMessage],
+                components: [new ActionRowBuilder<ButtonBuilder>().addComponents([
+                    ImportantLinksMessageUtils.Actions.user_suggest,
+                ])]
+            }
+        ]
+        messages.forEach(message => this.interaction.channel?.send(message));
         await this.interaction.reply({ content: "Sent", ephemeral: true })
     }
 

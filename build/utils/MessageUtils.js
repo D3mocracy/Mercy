@@ -14,20 +14,21 @@ var MessageUtils;
         pink: 0xfe929f,
         gold: 0xfcc22d,
         red: 0xff0000,
-        green: 0x33C76E
+        green: 0x33C76E,
+        white: 0xffffff
     };
     let EmbedMessages;
     (function (EmbedMessages) {
         EmbedMessages.StartConversationAsk = new discord_js_1.EmbedBuilder({
             author,
-            color: colors.blue,
+            color: colors.white,
             title: "אתם עומדים לפתוח צ'אט אנונימי",
             description: "לחיצה על כפתור ההסכמה תפתח צ'אט אנונימי עם אחד מחברי צוות השרת, וכל הודעה שתשלחו תופיע לאיש הצוות בצ'אנל נפרד בשרת. אתם מוזמנים לשתף אותנו בכל אשר על ליבכם - ברגשות, במחשבות, בבעיות ובפחדים, והצוות ישמח להעניק לכם מענה חם ואוהב בחזרה. שימו לב כי המערכת אנונימית - למעט מקרים העוברים על חוקי המדינה או מקרים חריגים אחרים אשר ידרשו פעולות דיווח.",
             footer: { text: "בלחיצה על כפתור ההסכמה אתם מאשרים את תנאי השימוש של השרת ומודעים לכך שצוות השרת אינו צוות מוסמך או מקצועי." }
         });
         EmbedMessages.chatIsNotAvailable = new discord_js_1.EmbedBuilder({
             author,
-            color: colors.pink,
+            color: colors.white,
             title: "צ'אט לא פעיל",
             description: "צ'אט זה אינו פעיל יותר עקב סגירתו ולכן לא ניתן לבצע בו פעולות נוספות",
             footer: { text: "למידע נוסף ניתן לפנות לצוות התומכים" }
@@ -45,8 +46,7 @@ var MessageUtils;
         EmbedMessages.errorLog = errorLog;
         function newChatUser(numberOfConversation) {
             return new discord_js_1.EmbedBuilder({
-                author,
-                color: colors.pink,
+                color: colors.white,
                 title: `צ'אט מספר ${numberOfConversation}`,
                 description: `צוות השרת קיבל את הודעתכם בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`,
             });
@@ -55,7 +55,7 @@ var MessageUtils;
         async function ticketLog(channelTitle) {
             return new discord_js_1.EmbedBuilder({
                 author: { name: 'Mercy - הנהלה', iconURL: author.iconURL },
-                color: colors.blue,
+                color: colors.white,
                 title: `לוג ${channelTitle}`,
                 description: "על מנת לראות את לוג השאלה יש להוריד את קובץ הhtml ולפתוח אותו על המחשב"
             });
@@ -63,20 +63,17 @@ var MessageUtils;
         EmbedMessages.ticketLog = ticketLog;
         ;
         EmbedMessages.openChat = new discord_js_1.EmbedBuilder({
-            author,
-            color: colors.blue,
+            color: colors.white,
             title: `אתם לא לבד - דברו איתנו!`,
             description: `
-            על מנת לפתוח צ'אט ולשוחח עם אחד התומכים באופן אנונימי יש ללחוץ על הכפתור מטה, ו**הצ'אט יפתח באופן אוטומטי**. לאחר פתיחתו תקבלו הודעה פרטית מהבוט האנונימי שלנו כי הצ'אט אכן נפתח. \n
-            באמצעות ההודעה הפרטית אתם מוזמנים לכתוב לנו ולפרוק בחופשיות את כל מה שעל ליבכם, ונשמח להעניק לכם אוזן קשבת ומענה חם ואוהב בחזרה. \n
-            **שימו ❤️, לחיצה על הכפתור מהווה את אישורכם לתנאי השימוש.**
-            `,
-            thumbnail: { url: author.iconURL }
+            על מנת לפתוח צ'אט ולשוחח עם אחד התומכים באופן אנונימי יש ללחוץ על הכפתור מטה, ולאחר מכן תקבלו הודעה פרטית מהבוט לצורך המשכת התהליך ופתיחת הצ'אט. לאחר פתיחתו תקבלו הודעה פרטית מהבוט האנונימי שלנו כי הצ'אט אכן נפתח. \n
+            אתם מוזמנים לכתוב ולפרוק לנו בחופשיות את כל מה שעל ליבכם, ונשמח להעניק לכם אוזן קשבת ומענה חם ואוהב בחזרה. \n
+            **שימו 🤍, לחיצה על הכפתור מהווה את אישורכם לתנאי השימוש.**
+            `
         });
         EmbedMessages.sureMessageToClose = new discord_js_1.EmbedBuilder({
-            author,
-            color: colors.pink,
-            title: "האם את/ה בטוח/ה שברצונך לסגור את הצ'אט?",
+            color: colors.red,
+            title: "האם אתם בטוחים שברצונכם לסגור את הצ'אט?",
             description: "פעולה זו אינה הפיכה"
         });
         const monthNames = {

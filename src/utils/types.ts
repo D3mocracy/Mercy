@@ -7,6 +7,7 @@ export type Conversation = {
     channelId: string,
     open: boolean,
     date: Date,
+    subject: string,
 }
 
 export type ConfigDocument = {
@@ -14,16 +15,19 @@ export type ConfigDocument = {
     conversationLogId: string,
     managerRole: string,
     helperRole: string,
+    supervisorRole: string,
     memberRole: string,
     guildId: string,
     reportChannelId: string,
     requestHelperChannelId: string,
     staffChannelId: string,
     helperOfTheMonthRoleId: string,
+    helperitOfTheMonthRoleId: string,
     errorChannelId: string,
     importantChannels: { [key: string]: string }[],
     suggestIdeasChannelId: string,
     vacationChannelId: string,
+    volunteerChannelId: string,
 }
 
 export type Config = Partial<{
@@ -35,10 +39,13 @@ export type Config = Partial<{
     errorChannel: TextChannel,
     suggestIdeasChannel: TextChannel,
     vacationChannel: TextChannel,
+    volunteerChannel: TextChannel,
     managerRole: Role,
     helperRole: Role,
+    supervisorRole: Role,
     memberRole: Role,
     helperOfTheMonthRole: Role,
+    helperitOfTheMonthRole: Role,
     guild: Guild,
     importantChannels: { [key: string]: string }[],
 }>
