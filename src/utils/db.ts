@@ -8,6 +8,12 @@ namespace DataBase {
     export const configCollection = DataBase.client.db("Angel").collection("Config");
 
     export const embedMessagesCollection = DataBase.client.db("Angel").collection("EmbedMessages");
+
+    export const volunteerCollection = DataBase.client.db("Angel").collection("Volunteer");
+
+    export const reportCollection = DataBase.client.db("Angel").collection("Reports");
+
+    export const suggestionCollection = DataBase.client.db("Angel").collection("Suggestions");
 }
 
 export default DataBase;

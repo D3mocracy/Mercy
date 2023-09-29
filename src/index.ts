@@ -18,6 +18,7 @@ import { ModalSubmitHandler } from "./handlers/ModalSubmit";
 import { ImportantLinksMessageUtils } from "./utils/MessageUtils/ImportantLinks";
 import { ConversationManageMessageUtils } from "./utils/MessageUtils/ConversationManage";
 import CreateConversationHandler from "./handlers/CreateConversation";
+import OpenModalHandler from "./handlers/OpenModal";
 
 //4194303
 const client: Client = new Client({
@@ -147,13 +148,13 @@ client.on('interactionCreate', async interaction => {
             await conversationManage.openRefferSupervisorModal();
         }],
         ['user_report_helper', async () => {
-            await (interaction as ButtonInteraction).showModal(ImportantLinksMessageUtils.Modals.reportHelperModal);
+            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
         }],
         ['user_volunteer', async () => {
-            await (interaction as ButtonInteraction).showModal(ImportantLinksMessageUtils.Modals.volunteerModal);
+            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
         }],
         ['user_suggest', async () => {
-            await (interaction as ButtonInteraction).showModal(ImportantLinksMessageUtils.Modals.suggestIdeaModal);
+            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
         }],
         ['reportHelperModal', async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).reportHelper();

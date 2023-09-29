@@ -16,7 +16,7 @@ export class ModalSubmitHandler {
             content: `${ConfigHandler.config.supervisorRole} ${ConfigHandler.config.managerRole}`,
             embeds: [ConversationManageMessageUtils.EmbedMessages.referSupervisor(this.interaction)],
             components: [ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.interaction.channelId}`)]
-        }))?.edit({content: null})
+        }))?.edit({ content: null })
         await this.interaction.reply({ content: "ההפנייה נשלחה בהצלחה למפקחים", ephemeral: true });
     }
 
@@ -43,11 +43,23 @@ export class ModalSubmitHandler {
             this.interaction.fields.getTextInputValue('freq'),
             this.interaction.fields.getTextInputValue('other'),
         ]
-        await this.interaction.reply({ content: `הטופס שמילאתם עבור התנדבות לשרת נשלח בהצלחה למנהלים`, ephemeral: true });
         ConfigHandler.config.volunteerChannel?.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [ImportantLinksMessageUtils.EmbedMessages.volunteer(this.interaction.user, dateOfBirth, aboutYourself, why, freq, other)],
         });
+
+        await DataBase.volunteerCollection.insertOne({
+            userId: this.interaction.user.id,
+            createdAt: new Date(),
+            dateOfBirth,
+            aboutYourself,
+            why,
+            freq,
+            other
+        })
+
+        await this.interaction.reply({ content: `הטופס שמילאתם עבור התנדבות לשרת נשלח בהצלחה למנהלים`, ephemeral: true });
+
     }
 
     async suggestIdea() {
@@ -62,23 +74,35 @@ export class ModalSubmitHandler {
                 this.interaction.member as GuildMember
             )]
         });
+
+        await DataBase.suggestionCollection.insertOne({
+            userId: this.interaction.user.id,
+            createdAt: new Date(),
+            suggestExplain,
+            suggestComments
+        })
+
         await this.interaction.reply({ content: "הטופס שמילאתם עבור פידבקים, הצעות ודיווחי באגים נשלח בהצלחה למנהלים", ephemeral: true });
     }
 
     async reportHelper() {
-        let helpers: string = "";
-        const lastConversation: Conversation = await DataBase.conversationsCollection.findOne({ userId: this.interaction.user.id, open: true }) ||
-            await DataBase.conversationsCollection.find({ userId: this.interaction.user.id }).sort({ _id: -1 }).limit(1).next() as any;
 
-        (lastConversation && lastConversation.staffMemberId)
-            ? helpers = Utils.getMembersById(...lastConversation.staffMemberId).map(member => member?.displayName).join(', ')
-            : helpers = "לא נמצא צ'אט אחרון / המשתמש לא פתח צ'אט / לא שויך תומך לצ'אט האחרון"
+        const helperName = this.interaction.fields.getTextInputValue("helperName")
+        const reportCause = this.interaction.fields.getTextInputValue('reportHelperCause');
 
-        await ConfigHandler.config.reportChannel?.send({
+        ConfigHandler.config.reportChannel?.send({
             content: `${ConfigHandler.config.managerRole}`,
-            embeds: [await ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
+            embeds: [ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(helperName, reportCause)],
             components: [ConversationManageMessageUtils.Actions.attachReport(false)]
         });
+
+        await DataBase.reportCollection.insertOne({
+            userId: this.interaction.user.id,
+            createdAt: new Date(),
+            helperName,
+            reportCause,
+        })
+
         await this.interaction.reply({ content: "הטופס שמילאתם עבור דיווחים ותלונות על חברי צוות נשלח בהצלחה למנהלים", ephemeral: true });
     }
 

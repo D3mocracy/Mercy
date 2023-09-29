@@ -43,16 +43,15 @@ export namespace ImportantLinksMessageUtils {
             })
         }
 
-        export async function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string) {
+        export function reportHelperMessage(helperName: string, reportCause: string) {
             return new EmbedBuilder({
                 color: colors.red,
                 title: `התקבל טופס תלונה או דיווח על חבר צוות`,
                 description: `**סיבת הדיווח**
-                ${interaction.fields.getTextInputValue('reportHelperCause')},
+                ${reportCause},
                 `, timestamp: new Date(),
             }).addFields([
-                { name: "שם התומך על פי המשתמש", value: `${interaction.fields.getTextInputValue("helperName")}`, inline: true },
-                { name: "תומך אחרון שזוהה לפי המערכת", value: `${helpers}`, inline: true },
+                { name: "שם התומך על פי המשתמש", value: `${helperName}`, inline: true },
                 { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
             ])
         };
