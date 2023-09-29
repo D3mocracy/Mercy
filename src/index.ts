@@ -19,6 +19,7 @@ import { ImportantLinksMessageUtils } from "./utils/MessageUtils/ImportantLinks"
 import { ConversationManageMessageUtils } from "./utils/MessageUtils/ConversationManage";
 import CreateConversationHandler from "./handlers/CreateConversation";
 import OpenModalHandler from "./handlers/OpenModal";
+import PunishMemberHandler from "./handlers/PunishMember";
 
 //4194303
 const client: Client = new Client({
@@ -138,6 +139,10 @@ client.on('interactionCreate', async interaction => {
             const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
             await conversationManage.changeHelpersMessage();
         }],
+        ['tools_manager_punish', async () => {
+            const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+            await conversationManage.sendPunishMessage();
+        }],
         ['tools_reset_helpers', async () => {
             const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
             await conversationManage.resetHelpers();
@@ -197,13 +202,39 @@ client.on('interactionCreate', async interaction => {
         }],
         ['vacation', async () => {
             await (interaction as ChatInputCommandInteraction).showModal(MessageUtils.Modals.vacationModal);
-        }]
+        }],
+        ['punish_menu', async () => {
+            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+        }],
+        ['punish_history', async () => {
+            //TODO
+            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+        }],
+        ['punish_timeout', async () => {
+            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+        }],
+        ['punish_kick', async () => {
+            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+        }],
+        ['punish_ban', async () => {
+            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+        }],
+        ['punishKickModal', async () => {
+            await (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction)).kick();
+        }],
+        ['punishBanModal', async () => {
+            await (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction)).ban();
+        }],
+        ['punishMuteModal', async () => {
+            await (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction)).mute();
+        }],
     ]);
 
     try {
         if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu() || interaction.isCommand()) {
             const action = interaction.isCommand() ? interaction.commandName : interaction.customId;
             const handler = actionHandler.get(action);
+
             if (handler) {
                 await handler();
                 if (!(interaction.deferred || interaction.replied)) {

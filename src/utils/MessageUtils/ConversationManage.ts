@@ -4,8 +4,11 @@ import {
   ButtonStyle,
   Client,
   EmbedBuilder,
+  ModalBuilder,
   ModalSubmitInteraction,
   StringSelectMenuBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
 import { Utils } from "../Utils";
 
@@ -31,7 +34,7 @@ export namespace ConversationManageMessageUtils {
         description: `**תיאור**\n${interaction.fields.getTextInputValue("referCause")}`,
       }).addFields([
         { name: "התומך המפנה", value: `${interaction.user.tag}` },
-        {name: "בטיפול של", value: "לא משויך"},
+        { name: "בטיפול של", value: "לא משויך" },
         { name: "סטטוס טיפול", value: `לא טופל` },
       ]);
     }
@@ -105,7 +108,14 @@ export namespace ConversationManageMessageUtils {
         description: `הצ'אט נסגר על ידי ${closedBy}`,
       });
     }
+
+    export const punishMessage = new EmbedBuilder({
+      title: "מערכת בקרת עונשים",
+      description: "להלן מערכת בקרת עונשים, בחר באפשרות הרצוייה",
+      color: colors.red
+    });
   }
+
 
   export namespace Actions {
     export function attachReport(isAttached: boolean) {
@@ -136,7 +146,7 @@ export namespace ConversationManageMessageUtils {
           emoji: "⏳",
           style: ButtonStyle.Primary,
         })
-      ]
+        ]
       );
     }
 
@@ -215,6 +225,12 @@ export namespace ConversationManageMessageUtils {
           emoji: "👼",
           style: ButtonStyle.Primary,
         }),
+        new ButtonBuilder({
+          customId: "tools_manager_punish",
+          label: "הענש משתמש",
+          emoji: "👊",
+          style: ButtonStyle.Secondary
+        })
       ]);
 
     export function changeHelper(helpers: any[]) {
@@ -246,7 +262,151 @@ export namespace ConversationManageMessageUtils {
           style: ButtonStyle.Danger,
         })
       );
+
+    // export const punishMember =
+    //   new ActionRowBuilder<ButtonBuilder>().addComponents([
+    //     new ButtonBuilder({
+    //       label: "Ban",
+    //       customId: "punish_ban",
+    //       emoji: "⛔",
+    //       style: ButtonStyle.Danger,
+    //     }),
+    //     new ButtonBuilder({
+    //       label: "Kick",
+    //       customId: "punish_kick",
+    //       emoji: "🦵",
+    //       style: ButtonStyle.Danger,
+    //     }),
+    //     new ButtonBuilder({
+    //       label: "timeout",
+    //       customId: "punish_timeout",
+    //       emoji: "😶",
+    //       style: ButtonStyle.Danger,
+    //     }),
+    //     new ButtonBuilder({
+    //       label: "history",
+    //       customId: "punish_history",
+    //       emoji: "🗒️",
+    //       style: ButtonStyle.Danger,
+    //     }),
+    //   ]);
+
+    export function punishMenu() {
+      const selectMenu = new StringSelectMenuBuilder({
+        customId: "punish_menu",
+        placeholder: "יש לבחור את הפעולה הרצויה",
+      });
+      selectMenu.addOptions([
+        {
+          label: "ban",
+          description: "ban",
+          value: "punish_ban",
+          emoji: "⛔"
+        }, {
+          label: "kick",
+          description: "kick",
+          value: "punish_kick",
+          emoji: "🦵"
+        }, {
+          label: "timeout",
+          description: "timeout",
+          value: "punish_timeout",
+          emoji: "😶"
+        },
+        {
+          label: "history",
+          description: "history",
+          value: "punish_history",
+          emoji: "🗒️"
+        },
+
+      ]);
+
+      return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
+    }
+
+
+
+    // export const punishMember_mute =
+    //   new ActionRowBuilder<ButtonBuilder>().addComponents(
+    //     new ButtonBuilder({
+    //       label: "Mute",
+    //       customId: "punish_timeout",
+    //       emoji: "⛔",
+    //       style: ButtonStyle.Danger,
+    //     })
+    //   );
+
+    // export const punishMember_kick =
+    //   new ActionRowBuilder<ButtonBuilder>().addComponents(
+    //     new ButtonBuilder({
+    //       label: "Kick",
+    //       customId: "punish_kick",
+    //       emoji: "⛔",
+    //       style: ButtonStyle.Danger,
+    //     })
+    //   );
   }
 
-  export namespace Modals {}
+  export namespace Modals {
+    //Mute Member Punish
+    const muteTime = new ActionRowBuilder<TextInputBuilder>().addComponents(
+      new TextInputBuilder({
+        customId: "punish_mute_time",
+        label: "זמן השתקה",
+        placeholder: "יש להכניס ערך בין 1 ל28 בלבד",
+        max_length: 2,
+        min_length: 1,
+        style: TextInputStyle.Short,
+        required: true,
+      }),
+    );
+
+    const muteCause = new ActionRowBuilder<TextInputBuilder>().addComponents(
+      new TextInputBuilder({
+        customId: "punish_mute_cause",
+        label: "סיבת השתקה",
+        placeholder: "יש לכתוב בפירוט",
+        style: TextInputStyle.Paragraph,
+        required: true,
+      }),
+    );
+
+    export const punishMuteModal = new ModalBuilder({
+      customId: "punishMuteModal",
+      title: "השתקת משתמש - Timeout",
+    }).addComponents([muteTime, muteCause]);
+
+    //Kick Member Punish
+    const kickMemberTextInputs = new ActionRowBuilder<TextInputBuilder>().addComponents([
+      new TextInputBuilder({
+        customId: "punish_kick_reason",
+        label: "סיבה",
+        placeholder: "יש לכתוב סיבה בפירוט",
+        style: TextInputStyle.Paragraph,
+        required: true,
+      }),
+    ]);
+
+    export const punishKickModal = new ModalBuilder({
+      customId: "punishKickModal",
+      title: "Kick - הסר משתמש מהשרת",
+    }).addComponents(kickMemberTextInputs);
+
+    //Ban Member Punish
+    const banMemberTextInputs = new ActionRowBuilder<TextInputBuilder>().addComponents([
+      new TextInputBuilder({
+        customId: "punish_ban_reason",
+        label: "סיבה",
+        placeholder: "יש לכתוב סיבה בפירוט",
+        style: TextInputStyle.Paragraph,
+        required: true,
+      }),
+    ]);
+
+    export const punishBanModal = new ModalBuilder({
+      customId: "punishBanModal",
+      title: "הסר מהשרת לצמיתות - Ban",
+    }).addComponents(banMemberTextInputs);
+  }
 }

@@ -1,10 +1,11 @@
-import { ButtonInteraction } from "discord.js";
+import { ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 import DataBase from "../utils/db";
+import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class OpenModalHandler {
 
-    constructor(private interaction: ButtonInteraction) { }
+    constructor(private interaction: ButtonInteraction | StringSelectMenuInteraction) { }
 
     static async load() {
 
@@ -12,8 +13,9 @@ class OpenModalHandler {
 
     async openModal() {
         const checkUpDate = new Date();
+        const customId = this.interaction instanceof ButtonInteraction ? this.interaction.customId : this.interaction.values[0];
 
-        switch (this.interaction.customId) {
+        switch (customId) {
             case "user_report_helper":
                 checkUpDate.setDate(checkUpDate.getDate() - 1);
                 const reports = await DataBase.reportCollection.find({
@@ -48,6 +50,18 @@ class OpenModalHandler {
                 suggestion.length >= 1
                     ? await this.interaction.reply({ content: "ניתן לשלוח הצעת שיפור ופידבק אחת ל24 שעות, נסה שוב במועד מאוחר יותר", ephemeral: true })
                     : await this.interaction.showModal(ImportantLinksMessageUtils.Modals.suggestIdeaModal);
+                break;
+
+            case "punish_timeout":
+                await this.interaction.showModal(ConversationManageMessageUtils.Modals.punishMuteModal);
+                break;
+
+            case "punish_kick":
+                await this.interaction.showModal(ConversationManageMessageUtils.Modals.punishKickModal);
+                break;
+
+            case "punish_ban":
+                await this.interaction.showModal(ConversationManageMessageUtils.Modals.punishBanModal);
                 break;
 
             default:

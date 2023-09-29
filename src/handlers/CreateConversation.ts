@@ -58,7 +58,7 @@ class CreateConversationHandler {
 
   async createConversation() {
     const numberOfConversation =
-      (await Utils.getNumberOfConversationFromDB()) + 1;
+      (await Utils.getNumberOfConversationFromDB() + 1);
     const convChannel = await ConfigHandler.config.guild?.channels.create({
       name: `צ'אט ${numberOfConversation}`,
       type: ChannelType.GuildText,

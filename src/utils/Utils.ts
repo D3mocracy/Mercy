@@ -14,7 +14,9 @@ export namespace Utils {
     }
 
     export async function getNumberOfConversationFromDB() {
-        return (await DataBase.conversationsCollection.find().toArray()).length;
+        return (await DataBase.conversationsCollection.find({
+            subject: { $exists: true }
+        }).toArray()).length;
     };
 
     export function getChannelById(client: Client, channelId: string): Channel | undefined {
@@ -35,7 +37,7 @@ export namespace Utils {
     }
 
     export function getHelperClaimedConversationNumber(helperId: string) {
-        return (ConfigHandler.config.conversationCatagory as any)?.children.cache.filter((c : TextChannel) => {
+        return (ConfigHandler.config.conversationCatagory as any)?.children.cache.filter((c: TextChannel) => {
             const helperPermission = c.permissionOverwrites.cache.get(helperId);
             return helperPermission?.allow?.has(PermissionFlagsBits.SendMessages);
         }).size;

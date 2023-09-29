@@ -191,6 +191,15 @@ class ConversationManageHandler {
     }
   }
 
+  async sendPunishMessage() {
+    await this.interaction.reply({
+      embeds: [ConversationManageMessageUtils.EmbedMessages.punishMessage],
+      components: [ConversationManageMessageUtils.Actions.punishMenu()],
+      ephemeral: true
+    });
+
+  }
+
 
 }
 
