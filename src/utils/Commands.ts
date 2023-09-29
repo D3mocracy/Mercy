@@ -9,17 +9,20 @@ export namespace Command {
   const openChat = new SlashCommandBuilder()
     .setName("openchat")
     .setDescription("שולח את ההודעה של פתיחת שאלה")
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);;
 
   const importantLinks = new SlashCommandBuilder()
     .setName("importantlinks")
     .setDescription("שולח הודעה עם לינקים ומידע חשוב")
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);;
 
   const vacation = new SlashCommandBuilder()
     .setName("vacation")
     .setDescription("בקשה להיעדרות / הפחתת פעילות")
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);
 
   const manageChat = new SlashCommandBuilder()
     .setName("manage")
@@ -28,22 +31,26 @@ export namespace Command {
   const sendStaffMessage = new SlashCommandBuilder()
     .setName("sendstaffmessage")
     .setDescription("שולח הודעה עם רשימה של הצוות")
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);
 
   const setHelperOfTheMonth = new ContextMenuCommandBuilder()
     .setName("תומך החודש")
     .setType(ApplicationCommandType.User)
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);;
 
   const setHelperitOfTheMonth = new ContextMenuCommandBuilder()
     .setName("תומכת החודש")
     .setType(ApplicationCommandType.User)
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);;
 
   const approveVacation = new ContextMenuCommandBuilder()
     .setName("אשר חופשה")
     .setType(ApplicationCommandType.Message)
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);;
 
   export const commands = [
     openChat,

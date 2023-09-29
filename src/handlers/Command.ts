@@ -1,8 +1,9 @@
-import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember, ActionRowBuilder, ButtonBuilder, TextChannel, ContextMenuCommandInteraction, EmbedBuilder } from "discord.js"
+import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember, ActionRowBuilder, ButtonBuilder, ContextMenuCommandInteraction, EmbedBuilder, TextChannel } from "discord.js"
 import { MessageUtils } from "../utils/MessageUtils";
-import { Utils } from "../utils/Utils";
 import ConfigHandler from "./Config";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
+import { Utils } from "../utils/Utils";
+import DataBase from "../utils/db";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class CommandHandler {
@@ -31,7 +32,7 @@ class CommandHandler {
         if (!helper || !helpersOfTheMonth || !staffChannel || !staffChannel.isTextBased()) return;
         ConfigHandler.config.guild?.members.cache.filter(member => (member.roles.cache.has(ConfigHandler.config.helperOfTheMonthRole!.id) || member.roles.cache.has(ConfigHandler.config.helperitOfTheMonthRole!.id))).forEach(async helper => await helper.roles.remove(helpersOfTheMonth));
         helper.roles.add(helpersOfTheMonth);
-        (await staffChannel.send({ content: `${ConfigHandler.config.memberRole}`, embeds: [MessageUtils.EmbedMessages.helperOfTheMonth(helper)] })).edit({ content: ""});
+        (await staffChannel.send({ content: `${ConfigHandler.config.memberRole}`, embeds: [MessageUtils.EmbedMessages.helperOfTheMonth(helper)] })).edit({ content: "" });
         await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! התומך קיבל את הדרגה ונשלחה הכרזה", ephemeral: true });
     }
 
@@ -49,8 +50,43 @@ class CommandHandler {
         } else {
             await this.interaction.reply({ content: "ניתן להשתמש בפקודה זו רק בצ'אנל היעדרות והפחתה", ephemeral: true });
         }
+    }
 
+    async sendManageTools() {
+        const [numberOfConversation, conversation] = await Promise.all([
+            Utils.getNumberOfConversationFromDB(),
+            DataBase.conversationsCollection.findOne({
+                userId: this.interaction.user.id,
+                open: true,
+            }),
+        ]);
 
+        if (Utils.isTicketChannel(this.interaction.channel as TextChannel)) {
+            await this.interaction.reply({
+                embeds: [
+                    ConversationManageMessageUtils.EmbedMessages.newChatStaff(
+                        `צ'אט ${numberOfConversation + 1}`,
+                        `משתמש פתח צ'אט בנושא ${conversation?.subject}, נא לתת סיוע בהתאם!`
+                    ),
+                ],
+                components: [ConversationManageMessageUtils.Actions.supporterTools],
+            });
+        } else if (this.interaction.channel?.isDMBased() && !!conversation?.subject) {
+            await this.interaction.reply({
+                embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        ConversationManageMessageUtils.Actions.tools_close
+                    ),
+                ],
+            })
+
+        } else {
+            await this.interaction.reply({
+                content: "שגיאה בביצוע הפקודה: שימוש שגוי בפקודה",
+                ephemeral: true,
+            });
+        }
     }
 
     async importantLinks() {

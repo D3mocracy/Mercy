@@ -57,32 +57,6 @@ class ConversationManageHandler {
     );
   }
 
-  static async sendManageTools(interaction: ChatInputCommandInteraction) {
-    const [numberOfConversation, conversation] = await Promise.all([
-      Utils.getNumberOfConversationFromDB(),
-      DataBase.conversationsCollection.findOne({
-        channelId: interaction.channelId,
-        open: true,
-      }),
-    ]);
-    if (Utils.isTicketChannel(interaction.channel as TextChannel)) {
-      await interaction.reply({
-        embeds: [
-          ConversationManageMessageUtils.EmbedMessages.newChatStaff(
-            `צ'אט ${numberOfConversation + 1}`,
-            `משתמש פתח צ'אט בנושא ${conversation?.subject}, נא לתת סיוע בהתאם!`
-          ),
-        ],
-        components: [ConversationManageMessageUtils.Actions.supporterTools],
-      });
-    } else {
-      await interaction.reply({
-        content: "ניתן לבצע את הפקודה הזו רק בצ'אטים",
-        ephemeral: true,
-      });
-    }
-  }
-
   async sendSureMessageToClose() {
     await this.interaction.reply({
       embeds: [MessageUtils.EmbedMessages.sureMessageToClose],
@@ -129,7 +103,7 @@ class ConversationManageHandler {
     await this.channel.send(closedMessage);
     const user = this.client.users.cache.get(this.conversation.userId);
     Promise.all([
-      Logger.logTicket(this.channel, user), 
+      Logger.logTicket(this.channel, user),
       this.interaction.message.edit({ components: [] }),
       user?.send(closedMessage) || "",
     ]).finally(() => this.channel.delete());

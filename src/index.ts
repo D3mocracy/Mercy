@@ -186,7 +186,7 @@ client.on('interactionCreate', async interaction => {
             await new CommandHandler(interaction as ContextMenuCommandInteraction).approveVacation();
         }],
         ['manage', async () => {
-            await ConversationManageHandler.sendManageTools(interaction as ChatInputCommandInteraction)
+            await new CommandHandler(interaction as ChatInputCommandInteraction).sendManageTools();
         }],
         ['importantlinks', async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).importantLinks();
