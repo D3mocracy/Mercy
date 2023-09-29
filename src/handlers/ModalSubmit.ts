@@ -42,11 +42,12 @@ export class ModalSubmitHandler {
             this.interaction.fields.getTextInputValue('why'),
             this.interaction.fields.getTextInputValue('freq'),
             this.interaction.fields.getTextInputValue('other'),
-        ]
-        ConfigHandler.config.volunteerChannel?.send({
+        ];
+
+        (await ConfigHandler.config.volunteerChannel?.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [ImportantLinksMessageUtils.EmbedMessages.volunteer(this.interaction.user, dateOfBirth, aboutYourself, why, freq, other)],
-        });
+        }))?.edit({ content: null });
 
         await DataBase.volunteerCollection.insertOne({
             userId: this.interaction.user.id,
@@ -66,14 +67,14 @@ export class ModalSubmitHandler {
         const suggestExplain = this.interaction.fields.getTextInputValue("suggest_explain");
         const suggestComments = this.interaction.fields.getTextInputValue("suggest_comments");
 
-        ConfigHandler.config.suggestIdeasChannel?.send({
+        (await ConfigHandler.config.suggestIdeasChannel?.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [ImportantLinksMessageUtils.EmbedMessages.suggestIdea(
                 suggestExplain,
                 suggestComments,
                 this.interaction.member as GuildMember
             )]
-        });
+        }))?.edit({ content: null })
 
         await DataBase.suggestionCollection.insertOne({
             userId: this.interaction.user.id,
@@ -90,11 +91,11 @@ export class ModalSubmitHandler {
         const helperName = this.interaction.fields.getTextInputValue("helperName")
         const reportCause = this.interaction.fields.getTextInputValue('reportHelperCause');
 
-        ConfigHandler.config.reportChannel?.send({
+        (await ConfigHandler.config.reportChannel?.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(helperName, reportCause)],
             components: [ConversationManageMessageUtils.Actions.attachReport(false)]
-        });
+        }))?.edit({ content: null });
 
         await DataBase.reportCollection.insertOne({
             userId: this.interaction.user.id,
