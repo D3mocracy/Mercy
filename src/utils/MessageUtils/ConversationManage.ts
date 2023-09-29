@@ -30,7 +30,7 @@ export namespace ConversationManageMessageUtils {
         title: "התקבלה בקשה להפניית מפקח",
         description: `**תיאור**\n${interaction.fields.getTextInputValue("referCause")}`,
       }).addFields([
-        { name: "תומך", value: `${interaction.user.tag}` },
+        { name: "התומך המפנה", value: `${interaction.user.tag}` },
         {name: "בטיפול של", value: "לא משויך"},
         { name: "סטטוס טיפול", value: `לא טופל` },
       ]);
@@ -62,7 +62,7 @@ export namespace ConversationManageMessageUtils {
     export async function revealUserMessage(userId: string) {
       const user = Utils.getMemberByID(userId)?.user;
       return new EmbedBuilder({
-        color: colors.blue,
+        color: colors.white,
         title: "פרטי המשתמש",
         description:
           "מנהל יקר, שים לב כי בחרת להפר את מדיניות האנונימיות - עקב כך הפרטים בהודעה בהמשך גלויים אך ורק לך",
@@ -126,14 +126,14 @@ export namespace ConversationManageMessageUtils {
           customId: "manager_mark_as_done",
           label: "טופל",
           disabled: doneDisabled,
-          emoji: "✔️",
+          emoji: "✅",
           style: ButtonStyle.Success,
         }),
         new ButtonBuilder({
           customId: "manager_in_progress",
           label: "בטיפול",
           disabled: inProgressDisabled,
-          emoji: "👍",
+          emoji: "⏳",
           style: ButtonStyle.Primary,
         })
       ]

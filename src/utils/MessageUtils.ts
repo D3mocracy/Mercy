@@ -160,13 +160,12 @@ export namespace MessageUtils {
       cause: string
     ) {
       return new EmbedBuilder({
-        author: { iconURL: author.iconURL, name: "Mercy - הנהלה" },
         color: colors.pink,
         title: `הודעה על היעדרות או הפחתת פעילות`,
         description: `**פירוט הבקשה:**
                 ${cause}`,
         fields: [
-          { name: "תומך", value: `${helperMember}`, inline: false },
+          { name: "התומך המפנה", value: `${helperMember}`, inline: false },
           { name: "סוג הבקשה", value: vacationType, inline: false },
           { name: "עד תאריך", value: dateTwo, inline: true },
           { name: "מתאריך", value: dateOne, inline: true },
@@ -224,7 +223,8 @@ export namespace MessageUtils {
     const reportCause = new ActionRowBuilder<TextInputBuilder>().addComponents(
       new TextInputBuilder({
         customId: "referCause",
-        label: "בקשה",
+        label: "פירוט סיבת ההפנייה",
+        max_length: 100,
         style: TextInputStyle.Paragraph,
         required: true,
       })
@@ -232,7 +232,7 @@ export namespace MessageUtils {
 
     export const referManagerModal = new ModalBuilder({
       customId: "referManager",
-      title: "שליחת בקשה למנהל / הפנה מנהל",
+      title: "הפניית מפקח",
     }).addComponents(reportCause);
 
     //Ask Vacation

@@ -18,7 +18,8 @@ export namespace Command {
 
   const vacation = new SlashCommandBuilder()
     .setName("vacation")
-    .setDescription("בקשה להיעדרות / הפחתת פעילות");
+    .setDescription("בקשה להיעדרות / הפחתת פעילות")
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator);
 
   const manageChat = new SlashCommandBuilder()
     .setName("manage")

@@ -17,7 +17,7 @@ export class ModalSubmitHandler {
             embeds: [ConversationManageMessageUtils.EmbedMessages.referSupervisor(this.interaction)],
             components: [ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.interaction.channelId}`)]
         }))?.edit({content: null})
-        await this.interaction.reply({ content: "בקשתך נשלחה בהצלחה למפקחים", ephemeral: true });
+        await this.interaction.reply({ content: "ההפנייה נשלחה בהצלחה למפקחים", ephemeral: true });
     }
 
     async sendVacationMessage() {
@@ -43,7 +43,7 @@ export class ModalSubmitHandler {
             this.interaction.fields.getTextInputValue('freq'),
             this.interaction.fields.getTextInputValue('other'),
         ]
-        await this.interaction.reply({ content: `בקשה להתנדבות נשלחה בהצלחה לצ'אנל ההתנדבויות`, ephemeral: true });
+        await this.interaction.reply({ content: `הטופס שמילאתם עבור התנדבות לשרת נשלח בהצלחה למנהלים`, ephemeral: true });
         ConfigHandler.config.volunteerChannel?.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [ImportantLinksMessageUtils.EmbedMessages.volunteer(this.interaction.user, dateOfBirth, aboutYourself, why, freq, other)],
@@ -62,7 +62,7 @@ export class ModalSubmitHandler {
                 this.interaction.member as GuildMember
             )]
         });
-        await this.interaction.reply({ content: "ההצעה שלך נשלחה בהצלחה למנהלים", ephemeral: true });
+        await this.interaction.reply({ content: "הטופס שמילאתם עבור פידבקים, הצעות ודיווחי באגים נשלח בהצלחה למנהלים", ephemeral: true });
     }
 
     async reportHelper() {
@@ -79,7 +79,7 @@ export class ModalSubmitHandler {
             embeds: [await ImportantLinksMessageUtils.EmbedMessages.reportHelperMessage(this.interaction, helpers)],
             components: [ConversationManageMessageUtils.Actions.attachReport(false)]
         });
-        await this.interaction.reply({ content: "הדיווח שלך נשלח בהצלחה למנהלים", ephemeral: true });
+        await this.interaction.reply({ content: "הטופס שמילאתם עבור דיווחים ותלונות על חברי צוות נשלח בהצלחה למנהלים", ephemeral: true });
     }
 
 }

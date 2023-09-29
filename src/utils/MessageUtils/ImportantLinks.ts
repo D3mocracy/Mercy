@@ -32,19 +32,12 @@ export namespace ImportantLinksMessageUtils {
 
         export function suggestIdea(expain: string, comments: string, member: GuildMember) {
             return new EmbedBuilder({
-                author: { iconURL: author.iconURL, name: "Mercy - כללי" },
-                title: "התקבלה הצעת ייעול / דיווח על באג",
-                description: `**תיאור ההצעה**
+                title: "התקבל טופס פידבקים, הצעות ודיווחי באגים",
+                description: `**תיאור**
                 ${expain}
 
                 **הערות נוספות**
                 ${comments}`,
-                fields: [
-                    {
-                        name: "משתמש מציע:",
-                        value: `${member}`
-                    }
-                ],
                 timestamp: new Date(),
                 color: colors.green
             })
@@ -52,11 +45,11 @@ export namespace ImportantLinksMessageUtils {
 
         export async function reportHelperMessage(interaction: ModalSubmitInteraction, helpers: string) {
             return new EmbedBuilder({
-                color: colors.blue,
-                title: `התקבל דיווח על תומך`,
-                description: `**סיבת הדיווח:**
-                ${interaction.fields.getTextInputValue('reportHelperCause')}
-                `,
+                color: colors.red,
+                title: `התקבל טופס תלונה או דיווח על חבר צוות`,
+                description: `**סיבת הדיווח**
+                ${interaction.fields.getTextInputValue('reportHelperCause')},
+                `, timestamp: new Date(),
             }).addFields([
                 { name: "שם התומך על פי המשתמש", value: `${interaction.fields.getTextInputValue("helperName")}`, inline: true },
                 { name: "תומך אחרון שזוהה לפי המערכת", value: `${helpers}`, inline: true },
@@ -65,18 +58,23 @@ export namespace ImportantLinksMessageUtils {
         };
         export const volunteerMessage = new EmbedBuilder({
             color: colors.white,
-            title: "הצעת התנדבות",
-            description: `לו`,
+            title: "התנדבות בשרת",
+            description: `הנהלת השרת מחפשת מתנדבים בעלי זמן פנוי, יכולת הקשבה והכלה, יכולת לעמוד בעומס רגשי, ויכולות ביטוי גבוהות בכתב.
+            אם אתם חושבים שאתם מתאימים אתם מוזמנים להגיש את טופס ההתנדבות בהתאם והנהלת השרת תבחון אותו. אם תמצאו כמתאימים, אחד מהמנהלים יפנה אליכם בהודעה פרטית להמשך התהליך.
+            תודה לכם על הנכונות והרצון להתנדב ולהצטרף לצוות השרת!
+            **הטופס אינו אנונימי**`,
         });
         export const reportMessage = new EmbedBuilder({
             color: colors.white,
-            title: "דיווח על חבר צוות",
-            description: `לו`,
+            title: "דיווחים ותלונות על חברי צוות",
+            description: `אם ברצונכם לדווח על חבר צוות בשרת, יש למלא את טופס התלונה והנושא יועבר למנהלים ויטופל בהתאם.
+            **הטופס נשלח בצורה אנונימית**`,
         });
         export const suggestIdeasMessage = new EmbedBuilder({
             color: colors.white,
             title: "פידבקים, הצעות ודיווחי באגים",
-            description: `לו`,
+            description: `מעוניינים להציע רעיון לשרת? לדווח על באג/בעיה כזו או אחרת, או להעניק משוב ופידבק לגבי השרת והתנהלותו? מוזמנים לבצע זאת בעזרת הטופס!
+            **הטופס נשלח בצורה אנונימית**`,
         });
         export function volunteer(
             user: User,
@@ -85,44 +83,44 @@ export namespace ImportantLinksMessageUtils {
             whyVolunteer: string,
             freqVolunteer: string,
             moreVolunteer: string
-          ) {
+        ) {
             return new EmbedBuilder({
-              color: colors.white,
-              title: "התקבל טופס להתנדבות בשרת",
-              fields: [
-                { name: "שם בדיסקורד", value: `${user}`, inline: false },
-                { name: "שנת לידה", value: dateVolunteer, inline: false },
-                { name: "ספרו לנו קצת על עצמכם", value: aboutYourselfVolunteer, inline: false },
-                { name: "מדוע אתם רוצים להתנדב בשרת?", value: whyVolunteer, inline: false },
-                { name: "מהי תדירות הפעילות הכללית שלכם בדיסקורד?", value: freqVolunteer, inline: false },
-                { name: "דברים נוספים שברצונכם לציין", value: moreVolunteer, inline: false },
-              ],
-              timestamp: new Date(),
+                color: colors.blue,
+                title: "התקבל טופס התנדבות בשרת",
+                fields: [
+                    { name: "משתמש", value: `${user}`, inline: false },
+                    { name: "שנת לידה", value: dateVolunteer, inline: false },
+                    { name: "ספרו לנו קצת על עצמכם", value: aboutYourselfVolunteer, inline: false },
+                    { name: "מדוע אתם רוצים להתנדב בשרת?", value: whyVolunteer, inline: false },
+                    { name: "מהי תדירות הפעילות הכללית שלכם בדיסקורד?", value: freqVolunteer, inline: false },
+                    { name: "דברים נוספים שברצונכם לציין", value: moreVolunteer, inline: false },
+                ],
+                timestamp: new Date(),
             });
-          }
+        }
     }
 
 
     export namespace Actions {
         export const user_report_helper = new ButtonBuilder({
             customId: "user_report_helper",
-            label: "דווח על חבר צוות",
-            emoji: '🏴',
+            label: "טופס דיווחים ותלונות על חברי צוות",
+            emoji: '⚠️',
             style: ButtonStyle.Danger
         });
 
         export const user_suggest = new ButtonBuilder({
             customId: "user_suggest",
-            label: "יש לי הצעת שיפור",
-            emoji: "✅",
+            label: "טופס פידבקים, הצעות ודיווחי באגים",
+            emoji: "💡",
             style: ButtonStyle.Success
         })
 
         export const user_volunteer = new ButtonBuilder({
             customId: "user_volunteer",
-            label: "התנדבות בשרת",
-            emoji: '🏴',
-            style: ButtonStyle.Secondary
+            label: "טופס התנדבות בשרת",
+            emoji: '🤍',
+            style: ButtonStyle.Primary
         });
     }
 
@@ -133,7 +131,9 @@ export namespace ImportantLinksMessageUtils {
             label: 'שנת לידה',
             style: TextInputStyle.Short,
             required: true,
-            placeholder: "שנת לידה"
+            min_length: 4,
+            max_length: 4,
+            placeholder: "ציינו את שנת הלידה שלכם"
         }));
 
         const aboutYourself = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
@@ -141,7 +141,9 @@ export namespace ImportantLinksMessageUtils {
             label: 'ספרו לנו קצת על עצמכם',
             style: TextInputStyle.Paragraph,
             required: true,
-            placeholder: 'ספרו לנו קצת על עצמכם'
+            min_length: 20,
+            max_length: 300,
+            placeholder: `תעסוקה, תחביבים, תחומי עניין וכל דבר אחר שתרצו לשתף`
         }));
 
         const why = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
@@ -149,7 +151,9 @@ export namespace ImportantLinksMessageUtils {
             label: 'מדוע אתם מעוניינים להתנדב בשרת?',
             style: TextInputStyle.Paragraph,
             required: true,
-            placeholder: 'מדוע אתם מעוניינים להתנדב בשרת?'
+            min_length: 20,
+            max_length: 300,
+            placeholder: 'ציינו את הסיבות מדוע אתם מעוניינים להתנדב בשרת'
         }));
 
         const freq = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
@@ -157,7 +161,8 @@ export namespace ImportantLinksMessageUtils {
             label: 'מהי תדירות הפעילות שלכם בדיסקורד?',
             style: TextInputStyle.Short,
             required: true,
-            placeholder: 'מהי תדירות הפעילות שלכם בדיסקורד?'
+            max_length: 50,
+            placeholder: `לדוגמה: פעם בשבוע, כשעה ביום, כ-5 שעות ביום וכדומה`
         }));
 
         const other = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
@@ -165,7 +170,8 @@ export namespace ImportantLinksMessageUtils {
             label: 'דברים נוספים שברצונכם לציין',
             style: TextInputStyle.Paragraph,
             required: false,
-            placeholder: 'דברים נוספים שברצונכם לציין'
+            max_length: 200,
+            placeholder: 'לא חובה'
         }));
 
 
@@ -180,20 +186,23 @@ export namespace ImportantLinksMessageUtils {
             label: 'פירוט',
             style: TextInputStyle.Paragraph,
             required: true,
-            placeholder: "פרט על הרעיון שלך ככל האפשר"
+            min_length: 10,
+            max_length: 300,
+            placeholder: "פירוט הפידבק/ההצעה/הדיווח"
         }));
 
         const comments = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
             customId: 'suggest_comments',
-            label: 'הערות נוספות',
+            label: "דברים נוספים שברצונכם לציין",
             style: TextInputStyle.Short,
             required: false,
-            placeholder: `הערות נוספות שתרצה לכתוב (לא חובה)`
+            max_length: 200,
+            placeholder: "לא חובה"
         }));
 
         export const suggestIdeaModal = new ModalBuilder({
             customId: 'suggestIdea',
-            title: "הצעת שיפור / דיווח על באג"
+            title: "פידבקים, הצעות ודיווחי באגים"
         }).addComponents([explaination, comments]);
 
         //Report helper modal
@@ -201,21 +210,24 @@ export namespace ImportantLinksMessageUtils {
             customId: 'reportHelperCause',
             label: 'סיבת הדיווח',
             style: TextInputStyle.Paragraph,
+            placeholder: "פרטו על סיבת הדיווח",
+            min_length: 10,
+            max_length: 300,
             required: true
         }));
 
         const helperName = new ActionRowBuilder<TextInputBuilder>().addComponents(new TextInputBuilder({
             customId: 'helperName',
-            label: "שם התומך / מספר הצ'אט",
+            label: "שם חבר הצוות ו/או מספר הצ'אט הרלוונטי",
             style: TextInputStyle.Short,
-            minLength: 4,
             required: true,
-            placeholder: `לדוגמה: D3mocracy#8662 / צ'אט 43`
+            max_length: 20,
+            placeholder: `לדוגמה: מאי / צ'אט 45`
         }));
 
         export const reportHelperModal = new ModalBuilder({
             customId: 'reportHelperModal',
-            title: "דיווח על תומך"
+            title: "דיווחים ותלונות על חברי צוות"
         }).addComponents([helperName, reportHelperCause]);
     }
 }
