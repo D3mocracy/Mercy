@@ -118,8 +118,9 @@ class ConversationManageHandler {
       return;
     }
     if (
-      !this.conversation.staffMemberId ||
-      this.conversation.staffMemberId.length === 0
+      !this.conversation.staffMemberId
+      || this.conversation.staffMemberId.length === 0
+      || Utils.isSeniorStaff(this.interaction.user.id)
     ) {
       this.conversation.staffMemberId = [staffMemberId];
       await Promise.all([
