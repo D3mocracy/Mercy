@@ -91,8 +91,7 @@ export namespace MessageUtils {
 
     export function newChatUser(numberOfConversation: number) {
       return new EmbedBuilder({
-        author,
-        color: colors.blue,
+        color: colors.white,
         title: `צ'אט ${numberOfConversation}`,
         description: `צוות השרת קיבל את הודעתכם בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`,
       });

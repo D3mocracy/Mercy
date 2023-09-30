@@ -4,13 +4,11 @@ import {
   ButtonStyle,
   Client,
   EmbedBuilder,
-  GuildMember,
   ModalBuilder,
   ModalSubmitInteraction,
   StringSelectMenuBuilder,
   TextInputBuilder,
   TextInputStyle,
-  User,
 } from "discord.js";
 import { Utils } from "../Utils";
 
@@ -116,38 +114,6 @@ export namespace ConversationManageMessageUtils {
       description: "יש לבחור בפעולה הרצויה",
       color: colors.red
     });
-
-    export function punishDMMessage(punish: "kick" | "ban" | "timeout", reason: string, mayUser: GuildMember) {
-      const punishConvert = {
-        kick: "קיק",
-        ban: "באן",
-        timeout: "טיים אאוט"
-      }
-      return new EmbedBuilder({
-        title: `קיבלת ${punishConvert[punish]} מהשרת אתם לא לבד`,
-        description: `סיבה: ${reason} \n
-        ניתן להגיש ערעור למנהלת השרת בהודעה פרטית: ${mayUser}
-        `,
-        color: colors.white
-      })
-    }
-
-    export function punishmentHistoryMessage(punishments: any[]) {
-      return new EmbedBuilder({
-        title: `היסטוריית עונשים`,
-        description: `
-          ${punishments.length === 0
-            ? "למשתמש זה אין עונשים"
-            : punishments.map((p, i) => `
-            **עונש ${i + 1}** 
-            **סוג העונש:** ${p.punishType}
-            **סיבה:** ${p.reason}
-            **ניתן בתאריך:** ${p.punishDate as Date}
-          `).join('')}
-        `,
-        color: colors.white
-      })
-    }
   }
 
 
@@ -295,6 +261,34 @@ export namespace ConversationManageMessageUtils {
         })
       );
 
+    // export const punishMember =
+    //   new ActionRowBuilder<ButtonBuilder>().addComponents([
+    //     new ButtonBuilder({
+    //       label: "Ban",
+    //       customId: "punish_ban",
+    //       emoji: "⛔",
+    //       style: ButtonStyle.Danger,
+    //     }),
+    //     new ButtonBuilder({
+    //       label: "Kick",
+    //       customId: "punish_kick",
+    //       emoji: "🦵",
+    //       style: ButtonStyle.Danger,
+    //     }),
+    //     new ButtonBuilder({
+    //       label: "timeout",
+    //       customId: "punish_timeout",
+    //       emoji: "😶",
+    //       style: ButtonStyle.Danger,
+    //     }),
+    //     new ButtonBuilder({
+    //       label: "history",
+    //       customId: "punish_history",
+    //       emoji: "🗒️",
+    //       style: ButtonStyle.Danger,
+    //     }),
+    //   ]);
+
     export function punishMenu() {
       const selectMenu = new StringSelectMenuBuilder({
         customId: "punish_menu",
@@ -331,6 +325,27 @@ export namespace ConversationManageMessageUtils {
       return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
     }
 
+
+
+    // export const punishMember_mute =
+    //   new ActionRowBuilder<ButtonBuilder>().addComponents(
+    //     new ButtonBuilder({
+    //       label: "Mute",
+    //       customId: "punish_timeout",
+    //       emoji: "⛔",
+    //       style: ButtonStyle.Danger,
+    //     })
+    //   );
+
+    // export const punishMember_kick =
+    //   new ActionRowBuilder<ButtonBuilder>().addComponents(
+    //     new ButtonBuilder({
+    //       label: "Kick",
+    //       customId: "punish_kick",
+    //       emoji: "⛔",
+    //       style: ButtonStyle.Danger,
+    //     })
+    //   );
   }
 
   export namespace Modals {
@@ -339,7 +354,7 @@ export namespace ConversationManageMessageUtils {
       new TextInputBuilder({
         customId: "punish_mute_time",
         label: "זמן ההשתקה",
-        placeholder: "יש להכניס ערך בין 1 ל-27 בלבד",
+        placeholder: "יש להכניס ערך בין 1 ל-28 בלבד",
         max_length: 2,
         min_length: 1,
         style: TextInputStyle.Short,
