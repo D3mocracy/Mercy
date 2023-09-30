@@ -204,11 +204,12 @@ client.on('interactionCreate', async interaction => {
             await (interaction as ChatInputCommandInteraction).showModal(MessageUtils.Modals.vacationModal);
         }],
         ['punish_menu', async () => {
-            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+            await new OpenModalHandler(interaction as StringSelectMenuInteraction).openModal();
         }],
         ['punish_history', async () => {
             //TODO
-            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+            // await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+            await PunishMemberHandler.sendPunishmentHistory(interaction as StringSelectMenuInteraction)
         }],
         ['punish_timeout', async () => {
             await new OpenModalHandler(interaction as ButtonInteraction).openModal();
@@ -220,13 +221,16 @@ client.on('interactionCreate', async interaction => {
             await new OpenModalHandler(interaction as ButtonInteraction).openModal();
         }],
         ['punishKickModal', async () => {
-            await (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction)).kick();
+            const handler = (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction))
+            await handler.kick();
         }],
         ['punishBanModal', async () => {
-            await (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction)).ban();
+            const handler = (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction))
+            await handler.ban();
         }],
         ['punishMuteModal', async () => {
-            await (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction)).mute();
+            const handler = (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction))
+            await handler.mute();
         }],
     ]);
 

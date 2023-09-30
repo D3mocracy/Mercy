@@ -23,6 +23,10 @@ export namespace Utils {
         return client.channels.cache.get(channelId);
     }
 
+    export function getChannelByIdNoClient(channelId: string): Channel | undefined {
+        return ConfigHandler.config.guild?.channels.cache.get(channelId);
+    }
+
     export function getRoleById(roleId: string) {
         return ConfigHandler.config.guild?.roles.cache.get(roleId);
     }

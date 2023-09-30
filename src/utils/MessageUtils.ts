@@ -60,6 +60,35 @@ export namespace MessageUtils {
       });
     }
 
+    export function punishmentLog(punishment: any) {
+      const punishConvert: any = {
+        kick: "קיק",
+        ban: "באן",
+        timeout: "טיים אאוט"
+      }
+      const punishType = punishment.punishType;
+      return new EmbedBuilder({
+        title: "התקבלה ענישה חדשה",
+        description: `
+          **המוענש**
+          ${Utils.getMemberByID(punishment.userId)}
+
+          **המעניש**
+          ${Utils.getMemberByID(punishment.punisherId)}
+
+          **מתוך צ'אט**
+          ${punishment.channelName.replace(/[^0-9]/g, '')}
+
+          **סוג העונש**
+          ${punishConvert[punishType]}
+
+          **סיבת ההענשה**
+          ${punishment.reason}
+        `,
+        color: colors.white,
+      }).setTimestamp(punishment.punishDate);
+    }
+
     export function newChatUser(numberOfConversation: number) {
       return new EmbedBuilder({
         author,

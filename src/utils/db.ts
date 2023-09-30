@@ -14,6 +14,8 @@ namespace DataBase {
     export const reportCollection = DataBase.client.db("Angel").collection("Reports");
 
     export const suggestionCollection = DataBase.client.db("Angel").collection("Suggestions");
+
+    export const punishmentsCollection = DataBase.client.db("Angel").collection("Punishments");
 }
 
 export default DataBase;

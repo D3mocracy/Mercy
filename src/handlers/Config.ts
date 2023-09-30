@@ -13,6 +13,7 @@ class ConfigHandler {
     suggestIdeasChannel: {} as TextChannel,
     vacationChannel: {} as TextChannel,
     volunteerChannel: {} as TextChannel,
+    punishmentChannel: {} as TextChannel,
     managerRole: {} as Role,
     helperRole: {} as Role,
     supervisorRole: {} as Role,
@@ -78,6 +79,11 @@ class ConfigHandler {
       get volunteerChannel() {
         return client.channels.cache.get(
           configDocument.volunteerChannelId
+        ) as TextChannel;
+      },
+      get punishmentChannel() {
+        return client.channels.cache.get(
+          configDocument.punishmentChannelId
         ) as TextChannel;
       },
       get managerRole() {

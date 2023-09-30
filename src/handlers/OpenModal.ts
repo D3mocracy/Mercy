@@ -2,6 +2,7 @@ import { ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 import DataBase from "../utils/db";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
+import PunishMemberHandler from "./PunishMember";
 
 class OpenModalHandler {
 
@@ -62,6 +63,10 @@ class OpenModalHandler {
 
             case "punish_ban":
                 await this.interaction.showModal(ConversationManageMessageUtils.Modals.punishBanModal);
+                break;
+
+            case "punish_history":
+                await PunishMemberHandler.sendPunishmentHistory(this.interaction as StringSelectMenuInteraction)
                 break;
 
             default:

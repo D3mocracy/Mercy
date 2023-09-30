@@ -1,8 +1,7 @@
 import { createTranscript } from "discord-html-transcripts";
 import { ExportReturnType } from "discord-html-transcripts/dist/types";
-import { DMChannel, TextChannel, User } from "discord.js";
+import { TextChannel, User } from "discord.js";
 import { MessageUtils } from "../utils/MessageUtils";
-import { Utils } from "../utils/Utils";
 import ConfigHandler from "./Config";
 
 namespace Logger {
@@ -22,6 +21,17 @@ namespace Logger {
             await ConfigHandler.config.errorChannel?.send({ embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    export async function logPunishemnt(punishment: any) {
+        try {
+            (await ConfigHandler.config.punishmentChannel?.send({
+                content: `${ConfigHandler.config.managerRole}`,
+                embeds: [MessageUtils.EmbedMessages.punishmentLog(punishment)]
+            }))?.edit({ content: null })
+        } catch (error: any) {
+            await logError(error)
         }
     }
 
