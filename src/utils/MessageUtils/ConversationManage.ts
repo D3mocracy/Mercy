@@ -48,10 +48,10 @@ export namespace ConversationManageMessageUtils {
     }
 
     export const ManagerTools = new EmbedBuilder({
-      color: colors.blue,
+      color: colors.white,
       title: "הגדרות ניהול",
       description:
-        "מנהלים יקרים, שימו לב שהפרת אנונימיות של משתמש היא נושא רגיש מאוד. אם אין לכם חשד כי מדובר בעבירה על אחד מחוקי המדינה ו/או פגיעה עצמית ו/או פגיעה בסובבים את האינדיבידואל, השתדל שלא להפר מדיניות זו.",
+        "באמצעות הכפתורים מטה ניתן לבצע פעולות ניהוליות על הצ'אט",
     });
 
     export function newChatStaff(title: string, description: string) {
@@ -88,9 +88,9 @@ export namespace ConversationManageMessageUtils {
       color: colors.blue,
       title: "החלפת תומך",
       description:
-        "יש לבחור מתוך הרשימה מטה את התומך שתרצו לשייך אליו את הפנייה. ניתן לבחור יותר מתומך אחד.",
+        "(יש לבחור מתוך הרשימה מטה את התומך שתרצו לשייך אליו את הפנייה (ניתן לבחור יותר מתומך אחד",
       footer: {
-        text: "שימו לב כי ההחלפה בין התומכים תשפיע על הרשאות התגובה שלהם בצ'אט בהתאם.  ",
+        text: "שימו לב כי ההחלפה בין התומכים תשפיע על הרשאות התגובה שלהם בצ'אט בהתאם",
       },
     });
 
@@ -98,7 +98,7 @@ export namespace ConversationManageMessageUtils {
       color: colors.white,
       title: "הרשאות הוסרו",
       description:
-        "כל הרשאות התומכים בצ'אט זה אופסו, ניתן כעת להגדיר תומכים חדשים.",
+        "כל הרשאות התומכים בצ'אט זה אופסו, ניתן כעת להגדיר תומכים חדשים",
     });
 
     export function chatClosed(closedBy: string, chatTitle: string) {
@@ -111,7 +111,7 @@ export namespace ConversationManageMessageUtils {
 
     export const punishMessage = new EmbedBuilder({
       title: "מערכת בקרת עונשים",
-      description: "להלן מערכת בקרת עונשים, בחר באפשרות הרצוייה",
+      description: "יש לבחור בפעולה הרצויה",
       color: colors.red
     });
   }
@@ -214,23 +214,23 @@ export namespace ConversationManageMessageUtils {
     export const managerTools =
       new ActionRowBuilder<ButtonBuilder>().addComponents([
         new ButtonBuilder({
+          customId: "tools_manager_punish",
+          label: "הענשת משתמש",
+          emoji: "👊",
+          style: ButtonStyle.Secondary
+        }),
+        new ButtonBuilder({
+          customId: "tools_manager_change_supporter",
+          label: "החלפת תומך",
+          emoji: "🔄",
+          style: ButtonStyle.Primary,
+        }),
+        new ButtonBuilder({
           customId: "tools_manager_reveal",
           label: "חשיפת זהות המשתמש",
           emoji: "👁️",
           style: ButtonStyle.Danger,
         }),
-        new ButtonBuilder({
-          customId: "tools_manager_change_supporter",
-          label: "החלפת תומך",
-          emoji: "👼",
-          style: ButtonStyle.Primary,
-        }),
-        new ButtonBuilder({
-          customId: "tools_manager_punish",
-          label: "הענש משתמש",
-          emoji: "👊",
-          style: ButtonStyle.Secondary
-        })
       ]);
 
     export function changeHelper(helpers: any[]) {
@@ -243,9 +243,7 @@ export namespace ConversationManageMessageUtils {
       helpers.forEach((helper) => {
         selectMenu.addOptions({
           label: helper.displayName,
-          description: "Helper",
           value: helper.id,
-          emoji: "🇭",
         });
       });
       return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
@@ -256,9 +254,9 @@ export namespace ConversationManageMessageUtils {
     export const resetHelpers =
       new ActionRowBuilder<ButtonBuilder>().addComponents(
         new ButtonBuilder({
-          label: "מחיקת הרשאות לכל התומכים",
+          label: "הסרת הרשאות לכל התומכים",
           customId: "tools_reset_helpers",
-          emoji: "🔄",
+          emoji: "🗑️",
           style: ButtonStyle.Danger,
         })
       );
@@ -298,26 +296,28 @@ export namespace ConversationManageMessageUtils {
       });
       selectMenu.addOptions([
         {
-          label: "ban",
-          description: "ban",
-          value: "punish_ban",
-          emoji: "⛔"
-        }, {
-          label: "kick",
-          description: "kick",
-          value: "punish_kick",
-          emoji: "🦵"
-        }, {
-          label: "timeout",
-          description: "timeout",
+          label: "השתקת משתמש",
+          description: "משתיק את המשתמש לזמן מוגדר",
           value: "punish_timeout",
-          emoji: "😶"
+          emoji: "⏳"
         },
         {
-          label: "history",
-          description: "history",
+          label: "הסרת משתמש מהשרת",
+          description: "מעניק קיק למשתמש",
+          value: "punish_kick",
+          emoji: "🦵"
+        },
+        {
+          label: "חסימת משתמש מהשרת לצמיתות",
+          description: "מעניק באן למשתמש",
+          value: "punish_ban",
+          emoji: "⛔"
+        },
+        {
+          label: "היסטוריית ענישות",
+          description: "מציג את הענישות הקודמות של המשתמש",
           value: "punish_history",
-          emoji: "🗒️"
+          emoji: "📜"
         },
 
       ]);
@@ -353,8 +353,8 @@ export namespace ConversationManageMessageUtils {
     const muteTime = new ActionRowBuilder<TextInputBuilder>().addComponents(
       new TextInputBuilder({
         customId: "punish_mute_time",
-        label: "זמן השתקה",
-        placeholder: "יש להכניס ערך בין 1 ל28 בלבד",
+        label: "זמן ההשתקה",
+        placeholder: "יש להכניס ערך בין 1 ל-28 בלבד",
         max_length: 2,
         min_length: 1,
         style: TextInputStyle.Short,
@@ -365,8 +365,8 @@ export namespace ConversationManageMessageUtils {
     const muteCause = new ActionRowBuilder<TextInputBuilder>().addComponents(
       new TextInputBuilder({
         customId: "punish_mute_cause",
-        label: "סיבת השתקה",
-        placeholder: "יש לכתוב בפירוט",
+        label: "סיבת ההשתקה",
+        placeholder: "יש לציין סיבה ברורה להשתקה - הסיבה נשלחת למשתמש בהודעה פרטית!",
         style: TextInputStyle.Paragraph,
         required: true,
       }),
@@ -374,15 +374,15 @@ export namespace ConversationManageMessageUtils {
 
     export const punishMuteModal = new ModalBuilder({
       customId: "punishMuteModal",
-      title: "השתקת משתמש - Timeout",
+      title: "השתקת משתמש",
     }).addComponents([muteTime, muteCause]);
 
     //Kick Member Punish
     const kickMemberTextInputs = new ActionRowBuilder<TextInputBuilder>().addComponents([
       new TextInputBuilder({
         customId: "punish_kick_reason",
-        label: "סיבה",
-        placeholder: "יש לכתוב סיבה בפירוט",
+        label: "סיבת ההסרה",
+        placeholder: "יש לציין סיבה ברורה להסרה - הסיבה נשלחת למשתמש בהודעה פרטית!",
         style: TextInputStyle.Paragraph,
         required: true,
       }),
@@ -390,15 +390,15 @@ export namespace ConversationManageMessageUtils {
 
     export const punishKickModal = new ModalBuilder({
       customId: "punishKickModal",
-      title: "Kick - הסר משתמש מהשרת",
+      title: "הסרת משתמש מהשרת",
     }).addComponents(kickMemberTextInputs);
 
     //Ban Member Punish
     const banMemberTextInputs = new ActionRowBuilder<TextInputBuilder>().addComponents([
       new TextInputBuilder({
         customId: "punish_ban_reason",
-        label: "סיבה",
-        placeholder: "יש לכתוב סיבה בפירוט",
+        label: "סיבת החסימה",
+        placeholder: "יש לציין סיבה ברורה לחסימה - הסיבה נשלחת למשתמש בהודעה פרטית!",
         style: TextInputStyle.Paragraph,
         required: true,
       }),
@@ -406,7 +406,7 @@ export namespace ConversationManageMessageUtils {
 
     export const punishBanModal = new ModalBuilder({
       customId: "punishBanModal",
-      title: "הסר מהשרת לצמיתות - Ban",
+      title: "חסימת משתמש מהשרת לצמיתות",
     }).addComponents(banMemberTextInputs);
   }
 }
