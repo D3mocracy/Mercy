@@ -207,19 +207,17 @@ client.on('interactionCreate', async interaction => {
             await new OpenModalHandler(interaction as StringSelectMenuInteraction).openModal();
         }],
         ['punish_history', async () => {
-            //TODO
-            // await new OpenModalHandler(interaction as ButtonInteraction).openModal();
             await PunishMemberHandler.sendPunishmentHistory(interaction as StringSelectMenuInteraction)
         }],
-        ['punish_timeout', async () => {
-            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
-        }],
-        ['punish_kick', async () => {
-            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
-        }],
-        ['punish_ban', async () => {
-            await new OpenModalHandler(interaction as ButtonInteraction).openModal();
-        }],
+        // ['punish_timeout', async () => {
+        //     await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+        // }],
+        // ['punish_kick', async () => {
+        //     await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+        // }],
+        // ['punish_ban', async () => {
+        //     await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+        // }],
         ['punishKickModal', async () => {
             const handler = (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction))
             await handler.kick();
@@ -230,7 +228,7 @@ client.on('interactionCreate', async interaction => {
         }],
         ['punishMuteModal', async () => {
             const handler = (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction))
-            await handler.mute();
+            await handler.timeout();
         }],
     ]);
 
@@ -248,7 +246,7 @@ client.on('interactionCreate', async interaction => {
         }
 
     } catch (error: any) {
-        Logger.logError(error);
+        await Logger.logError(error);
     }
 
 });
@@ -260,7 +258,7 @@ client.on('guildMemberRemove', async member => {
         await leaveGuildHandler.loadConversation();
         await leaveGuildHandler.closeConversation();
     } catch (error: any) {
-        Logger.logError(error);
+        await Logger.logError(error);
     }
 });
 
@@ -269,7 +267,7 @@ client.on('guildMemberAdd', async member => {
         const memberRole = ConfigHandler.config.memberRole;
         memberRole && member.roles.add(memberRole);
     } catch (error: any) {
-        Logger.logError(error);
+        await Logger.logError(error);
     }
 });
 
@@ -277,6 +275,6 @@ client.on('channelDelete', async channel => {
     try {
         await DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
     } catch (error: any) {
-        Logger.logError(error);
+        await Logger.logError(error);
     }
 })

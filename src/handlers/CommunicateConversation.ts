@@ -1,8 +1,9 @@
 import DataBase from "../utils/db";
 import { Conversation } from "../utils/types";
-import { ChannelType, Message, TextChannel, Client } from "discord.js"
+import { ChannelType, Message, TextChannel, Client, ActionRowBuilder, ButtonBuilder } from "discord.js"
 import { Utils } from "../utils/Utils";
 import { CantLoadConversationFromDB } from "../utils/Errors";
+import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class CommunicateConversationHandler {
     private conversation: Conversation = {} as any;
@@ -32,7 +33,13 @@ class CommunicateConversationHandler {
         } else if (this.type === ChannelType.GuildText) {
             if (this.message.content.startsWith('!')) return;
             await this.client.users.cache.get(this.conversation.userId)?.dmChannel?.sendTyping();
-            this.client.users.send(this.conversation.userId, this.message.content);
+            this.client.users.send(this.conversation.userId, this.message.content)
+                .catch(() => {
+                    this.message.reply({
+                        content: "המשתמש ביטל את האפשרות לכתיבת הודעות לאחר פתיחת הצ'אט",
+                        components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
+                    })
+                });
         }
 
     }

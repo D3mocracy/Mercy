@@ -10,6 +10,14 @@ export type Conversation = {
     subject: string,
 }
 
+export type Punish = {
+    punishType: "kick" | "timeout" | "ban",
+    reason: string,
+    punisherId: string,
+    channelName: string,
+    punishDate: Date
+} & Conversation
+
 export type ConfigDocument = {
     conversationCatagoryId: string,
     conversationLogId: string,

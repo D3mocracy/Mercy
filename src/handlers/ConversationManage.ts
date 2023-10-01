@@ -106,7 +106,13 @@ class ConversationManageHandler {
       Logger.logTicket(this.channel, user),
       this.interaction.message.edit({ components: [] }),
       user?.send(closedMessage) || "",
-    ]).finally(() => this.channel.delete());
+    ])
+      .catch((error) => {
+        console.log("Can not send message to this user - This Error is fine");
+        Logger.logError(error);
+
+      })
+      .finally(() => this.channel.delete());
   }
 
   async attachHelper(staffMemberId: string): Promise<void> {

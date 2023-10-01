@@ -33,7 +33,6 @@ class PunishMemberHandler {
             channelName: (Utils.getChannelByIdNoClient(this.conversation.channelId) as TextChannel).name,
             punishDate: new Date(),
         }
-        console.log(punishment);
 
         await DataBase.punishmentsCollection.insertOne({
             ...punishment
@@ -61,7 +60,7 @@ class PunishMemberHandler {
         });
     }
 
-    async mute() {
+    async timeout() {
         const time = this.interaction.fields.getTextInputValue('punish_mute_time');
         const reason = this.interaction.fields.getTextInputValue('punish_mute_cause');
         const member = Utils.getMemberByID(this.conversation.userId);
@@ -69,7 +68,7 @@ class PunishMemberHandler {
         console.log(isNaN(+time), +time > 27, +time < 1);
 
         if (isNaN(+time) || +time > 27 || +time < 1) {
-            await this.interaction.reply({
+            this.interaction.reply({
                 content: "שגיאה בכמות הימים - יש לכתוב ערך מספרי שלם בין 1 ל27 בלבד!",
                 ephemeral: true
             })
@@ -87,16 +86,21 @@ class PunishMemberHandler {
         this.punish = "timeout";
         this.reason = reason;
 
-        await this.sendDMMessage();
+        await Promise.all([
+            this.sendDMMessage(),
 
-        await this.interaction.reply({
-            content: "הפעולה בוצעה בהצלחה, המשתמש הושתק ונשלחה אליו הודעת הסבר",
-            ephemeral: true
-        });
+            this.interaction.reply({
+                content: "הפעולה בוצעה בהצלחה, המשתמש הושתק ונשלחה אליו הודעת הסבר",
+                ephemeral: true
+            }),
 
-        await this.savePunish();
+            this.savePunish(),
 
-        await member?.timeout(1000 * 60 * 60 * 24 * +time, reason);
+            member?.timeout(1000 * 60 * 60 * 24 * +time, reason)
+        ]);
+
+
+        await this.closeConversation();
 
     }
 
@@ -106,13 +110,16 @@ class PunishMemberHandler {
         this.punish = "kick";
         this.reason = reason;
 
-        await this.sendDMMessage();
+        await Promise.all([
+            this.sendDMMessage(),
 
-        await this.interaction.reply({
-            content: "הפעולה בוצעה בהצלחה, המשתמש הוסר מהשרת ונשלחה אליו הודעת הסבר",
-            ephemeral: true
-        });
-        await this.savePunish();
+            this.interaction.reply({
+                content: "הפעולה בוצעה בהצלחה, המשתמש הוסר מהשרת ונשלחה אליו הודעת הסבר",
+                ephemeral: true
+            }),
+
+            this.savePunish()
+        ])
 
         await Utils.getMemberByID(this.conversation.userId)?.kick(reason);
 
@@ -124,17 +131,33 @@ class PunishMemberHandler {
         this.punish = "ban";
         this.reason = reason;
 
-        await this.sendDMMessage();
+        await Promise.all([
+            this.sendDMMessage(),
 
-        await this.interaction.reply({
-            content: "הפעולה בוצעה בהצלחה, המשתמש הוסר מהשרת לצמיתות ונשלחה אליו הודעת הסבר",
-            ephemeral: true
-        });
-        await this.savePunish();
+            this.interaction.reply({
+                content: "הפעולה בוצעה בהצלחה, המשתמש הוסר מהשרת לצמיתות ונשלחה אליו הודעת הסבר",
+                ephemeral: true
+            }),
+
+            this.savePunish()
+
+        ])
 
         await Utils.getMemberByID(this.conversation.userId)?.ban({
             reason: reason
         });
+    }
+
+    async closeConversation() {
+        const channel: TextChannel = Utils.getChannelByIdNoClient(this.conversation.channelId) as any;
+        const closedMessage = { embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed("משתמש שיצא", channel.name)] };
+        this.conversation.open = false;
+        await Promise.all([
+            channel.send(closedMessage),
+            Logger.logTicket(channel),
+            DataBase.conversationsCollection.updateOne({ channelId: this.conversation.channelId }, { $set: this.conversation }, { upsert: true })
+        ]);
+        await channel.delete();
     }
 }
 
