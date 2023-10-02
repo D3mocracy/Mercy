@@ -35,13 +35,13 @@ export namespace Command {
     .setDMPermission(false);
 
   const setHelperOfTheMonth = new ContextMenuCommandBuilder()
-    .setName("תומך החודש")
+    .setName("חבר הצוות של החודש")
     .setType(ApplicationCommandType.User)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .setDMPermission(false);;
 
   const setHelperitOfTheMonth = new ContextMenuCommandBuilder()
-    .setName("תומכת החודש")
+    .setName("חברת הצוות של החודש")
     .setType(ApplicationCommandType.User)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .setDMPermission(false);;

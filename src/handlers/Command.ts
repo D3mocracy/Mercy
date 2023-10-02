@@ -33,7 +33,7 @@ class CommandHandler {
         ConfigHandler.config.guild?.members.cache.filter(member => (member.roles.cache.has(ConfigHandler.config.helperOfTheMonthRole!.id) || member.roles.cache.has(ConfigHandler.config.helperitOfTheMonthRole!.id))).forEach(async helper => await helper.roles.remove(helpersOfTheMonth));
         helper.roles.add(helpersOfTheMonth);
         (await staffChannel.send({ content: `${ConfigHandler.config.memberRole}`, embeds: [MessageUtils.EmbedMessages.helperOfTheMonth(helper)] })).edit({ content: "" });
-        await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! התומך קיבל את הדרגה ונשלחה הכרזה", ephemeral: true });
+        await this.interaction.reply({ content: "הפעולה בוצעה בהצלחה! חבר הצוות קיבל את הדרגה ופורסמה הכרזה", ephemeral: true });
     }
 
     async approveVacation() {

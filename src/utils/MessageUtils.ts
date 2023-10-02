@@ -85,14 +85,13 @@ export namespace MessageUtils {
           **סיבת ההענשה**
           ${punishment.reason}
         `,
-        color: colors.white,
+        color: colors.red,
       }).setTimestamp(punishment.punishDate);
     }
 
     export function newChatUser(numberOfConversation: number) {
       return new EmbedBuilder({
-        author,
-        color: colors.blue,
+        color: colors.white,
         title: `צ'אט ${numberOfConversation}`,
         description: `צוות השרת קיבל את הודעתכם בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`,
       });
@@ -142,17 +141,28 @@ export namespace MessageUtils {
     export function helperOfTheMonth(helper: GuildMember) {
       const nameOfMonth = monthNames[new Date().getMonth()];
       return new EmbedBuilder({
-        author: { name: "Mercy - הנהלה", iconURL: author.iconURL },
         color: colors.gold,
-        title: `👑 תומך החודש - ${nameOfMonth} 👑`,
-        description: `שאו ברכה ואיחולים לתומך החודש - לא אחר מאשר ${helper}! \n
-                מזל טוב! זכית ב... 
-                \`\`\`Discord Nitro 👾\`\`\`
-                **כל הכבוד המשך כך!**`,
+        title: `👑 חבר הצוות של החודש - ${nameOfMonth} 👑`,
+        description: `שאו ברכה ואיחולים לחבר הצוות של החודש - לא אחר מאשר ${helper}! \n
+                **כל הכבוד, המשך כך!**`,
         thumbnail: {
           url: "https://cdn-icons-png.flaticon.com/512/6941/6941697.png",
         },
-        footer: { text: "בברכה, מנהלי הקהילה", iconURL: author.iconURL },
+        footer: { text: "בברכה, מנהלי השרת" },
+      });
+    }
+
+    export function helperitOfTheMonth(helper: GuildMember) {
+      const nameOfMonth = monthNames[new Date().getMonth()];
+      return new EmbedBuilder({
+        color: colors.gold,
+        title: `👑 חברת הצוות של החודש - ${nameOfMonth} 👑`,
+        description: `שאו ברכה ואיחולים לחברת הצוות של החודש - לא אחרת מאשר ${helper}! \n
+                **כל הכבוד, המשיכי כך!**`,
+        thumbnail: {
+          url: "https://cdn-icons-png.flaticon.com/512/6941/6941697.png",
+        },
+        footer: { text: "בברכה, מנהלי השרת" },
       });
     }
 

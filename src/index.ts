@@ -182,10 +182,10 @@ client.on('interactionCreate', async interaction => {
         ['openchat', async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).openChat();
         }],
-        ['תומך החודש', async () => {
+        ['חבר הצוות של החודש', async () => {
             await new CommandHandler(interaction as ContextMenuCommandInteraction).makeHelperOfTheMonth("helper");
         }],
-        ['תומכת החודש', async () => {
+        ['חברת הצוות של החודש', async () => {
             await new CommandHandler(interaction as ContextMenuCommandInteraction).makeHelperOfTheMonth("helperit");
         }],
         ['אשר חופשה', async () => {

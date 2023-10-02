@@ -57,23 +57,23 @@ export namespace ImportantLinksMessageUtils {
         };
         export const volunteerMessage = new EmbedBuilder({
             color: colors.white,
-            title: "התנדבות בשרת",
+            title: "טופס התנדבות בשרת",
             description: `הנהלת השרת מחפשת מתנדבים בעלי זמן פנוי, יכולת הקשבה והכלה, יכולת לעמוד בעומס רגשי, ויכולות ביטוי גבוהות בכתב.
             אם אתם חושבים שאתם מתאימים אתם מוזמנים להגיש את טופס ההתנדבות בהתאם והנהלת השרת תבחון אותו. אם תמצאו כמתאימים, אחד מהמנהלים יפנה אליכם בהודעה פרטית להמשך התהליך.
             תודה לכם על הנכונות והרצון להתנדב ולהצטרף לצוות השרת!
-            **הטופס אינו אנונימי**`,
+            **הטופס אינו נשלח באופן אנונימי**`,
         });
         export const reportMessage = new EmbedBuilder({
             color: colors.white,
-            title: "דיווחים ותלונות על חברי צוות",
+            title: "טופס דיווחים ותלונות על חברי צוות",
             description: `אם ברצונכם לדווח על חבר צוות בשרת, יש למלא את טופס התלונה והנושא יועבר למנהלים ויטופל בהתאם.
-            **הטופס נשלח בצורה אנונימית**`,
+            **הטופס נשלח באופן אנונימי**`,
         });
         export const suggestIdeasMessage = new EmbedBuilder({
             color: colors.white,
-            title: "פידבקים, הצעות ודיווחי באגים",
+            title: "טופס פידבקים, הצעות ודיווחי באגים",
             description: `מעוניינים להציע רעיון לשרת? לדווח על באג/בעיה כזו או אחרת, או להעניק משוב ופידבק לגבי השרת והתנהלותו? מוזמנים לבצע זאת בעזרת הטופס!
-            **הטופס נשלח בצורה אנונימית**`,
+            **הטופס נשלח באופן אנונימי**`,
         });
         export function volunteer(
             user: User,
@@ -103,21 +103,21 @@ export namespace ImportantLinksMessageUtils {
     export namespace Actions {
         export const user_report_helper = new ButtonBuilder({
             customId: "user_report_helper",
-            label: "טופס דיווחים ותלונות על חברי צוות",
+            label: "דיווחים ותלונות על חברי צוות",
             emoji: '⚠️',
             style: ButtonStyle.Danger
         });
 
         export const user_suggest = new ButtonBuilder({
             customId: "user_suggest",
-            label: "טופס פידבקים, הצעות ודיווחי באגים",
+            label: "פידבקים, הצעות ודיווחי באגים",
             emoji: "💡",
             style: ButtonStyle.Success
         })
 
         export const user_volunteer = new ButtonBuilder({
             customId: "user_volunteer",
-            label: "טופס התנדבות בשרת",
+            label: "התנדבות בשרת",
             emoji: '🤍',
             style: ButtonStyle.Primary
         });

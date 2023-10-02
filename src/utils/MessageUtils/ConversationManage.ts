@@ -119,16 +119,17 @@ export namespace ConversationManageMessageUtils {
 
     export function punishDMMessage(punish: "kick" | "ban" | "timeout", reason: string, mayUser: GuildMember) {
       const punishConvert = {
-        kick: "קיק",
-        ban: "באן",
-        timeout: "טיים אאוט"
+        kick: "קיק (Kick)",
+        ban: "חסימה (Ban)",
+        timeout: "השתקה (Timeout)"
       }
       return new EmbedBuilder({
         title: `קיבלת ${punishConvert[punish]} מהשרת אתם לא לבד`,
-        description: `סיבה: ${reason} \n
+        description: `**סיבה:** ${reason} \n
         ניתן להגיש ערעור למנהלת השרת בהודעה פרטית: ${mayUser}
         `,
-        color: colors.white
+        color: colors.red,
+        timestamp: new Date(),
       })
     }
 
@@ -137,7 +138,7 @@ export namespace ConversationManageMessageUtils {
         title: `היסטוריית עונשים`,
         description: `
           ${punishments.length === 0
-            ? "למשתמש זה אין עונשים"
+            ? "למשתמש זה אין עונשים קודמים"
             : punishments.map((p, i) => `
             **עונש ${i + 1}** 
             **סוג העונש:** ${p.punishType}
@@ -303,7 +304,7 @@ export namespace ConversationManageMessageUtils {
       selectMenu.addOptions([
         {
           label: "השתקת משתמש",
-          description: "משתיק את המשתמש לזמן מוגדר",
+          description: "משתיק את המשתמש לזמן מוגדר (Timeout)",
           value: "punish_timeout",
           emoji: "⏳"
         },
