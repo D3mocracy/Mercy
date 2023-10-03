@@ -44,7 +44,7 @@ class CreateConversationHandler {
       this.createConversation()
         .catch(async () => {
           this.interaction.message.edit({
-            content: `לא ניתן לפתוח צ’אט - יש לאפשר שליחת הודעות פרטיות בדיסקורד
+            content: `לא ניתן לפתוח צ’אט - יש לאפשר שליחת הודעות פרטיות בדיסקורד.
           למידע נוסף ניתן לעיין ב: https://support.discord.com/hc/en-us/articles/360060145013`,
             embeds: [],
             components: []
