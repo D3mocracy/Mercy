@@ -120,7 +120,7 @@ client.on('interactionCreate', async interaction => {
             }
         }],
         ['sure_no', async () => {
-            await interaction.channel?.send('הפעולה בוטלה');
+            await interaction.channel?.send({ embeds: [ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat] });
             (interaction as ButtonInteraction).message.edit({ components: [] });
         }],
         ['tools_manager', async () => {

@@ -53,12 +53,12 @@ class CreateConversationHandler {
     } else {
       await this.interaction.reply({
         content: "היי, נראה שכבר יש לך צ'אט פתוח",
-        components: [
-          MessageUtils.Actions.linkButton(
-            `https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.conversation.channelId}`,
-            "העבר אותי לצ'אט"
-          ),
-        ],
+        // components: [
+        //   MessageUtils.Actions.linkButton(
+        //     `https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.conversation.channelId}`,
+        //     "העבר אותי לצ'אט"
+        //   ),
+        // ],
         ephemeral: true,
       })
     }

@@ -28,11 +28,11 @@ export class ModalSubmitHandler {
             this.interaction.fields.getTextInputValue('vacation_cause'),
         ]
         await this.interaction.reply({ content: `בקשה ל${type} נשלחה בהצלחה לצ'אנל היעדרויות`, ephemeral: true });
-        ConfigHandler.config.vacationChannel?.send({
+        (await ConfigHandler.config.vacationChannel?.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [MessageUtils.EmbedMessages.vacation(this.interaction.member as GuildMember, type, dateOne, dateTwo, cause)],
             components: [MessageUtils.Actions.disabledGreyButton(`סטטוס: בטיפול`)]
-        });
+        }))?.edit({ content: null });
     }
 
     async sendVolunteerMessage() {

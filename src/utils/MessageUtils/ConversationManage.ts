@@ -133,6 +133,11 @@ export namespace ConversationManageMessageUtils {
       })
     }
 
+    export const actionCancelledCloseChat = new EmbedBuilder({
+      title: 'הפעולה בוטלה',
+      color: colors.red,
+    })
+
     export function punishmentHistoryMessage(punishments: any[]) {
       return new EmbedBuilder({
         title: `היסטוריית עונשים`,
