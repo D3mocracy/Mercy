@@ -25,6 +25,29 @@ class CommandHandler {
         await this.interaction.reply({ content: 'Sent!', ephemeral: true });
     }
 
+    async criticalChat() {
+        if (!this.interaction.channel) return;
+        if (!Utils.isConversationChannel(this.interaction.channel)) {
+            await this.interaction.reply({
+                content: "ניתן לבצע פעולה זו בצ'אטים תחת קטגוריית 'צ'טים' בלבד!",
+                ephemeral: true
+            });
+            return;
+        }
+        if ((Utils.isHelper(this.interaction.user.id)
+            && (this.interaction.channel as TextChannel).permissionOverwrites.cache.has(this.interaction.user.id))
+            || Utils.isSeniorStaff(this.interaction.user.id)) {
+            await this.interaction.showModal(ConversationManageMessageUtils.Modals.criticalChatModal);
+        } else {
+            await this.interaction.reply({
+                content: 'אין לך גישה לבצע פעולה זו',
+                ephemeral: true
+            })
+        }
+
+
+    }
+
     async makeHelperOfTheMonth(gender: "helper" | "helperit") {
         const helper = (this.interaction as UserContextMenuCommandInteraction).targetMember as GuildMember;
         const helpersOfTheMonth = gender === "helper" ? ConfigHandler.config.helperOfTheMonthRole : ConfigHandler.config.helperitOfTheMonthRole;
@@ -61,7 +84,7 @@ class CommandHandler {
             }),
         ]);
 
-        if (Utils.isTicketChannel(this.interaction.channel as TextChannel)) {
+        if (Utils.isConversationChannel(this.interaction.channel as TextChannel)) {
             await this.interaction.reply({
                 embeds: [
                     ConversationManageMessageUtils.EmbedMessages.newChatStaff(

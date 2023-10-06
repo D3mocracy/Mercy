@@ -65,7 +65,7 @@ client.on('messageCreate', async message => {
         }
 
         const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
-        if ((message.channel.isDMBased() && hasOpenConversation) || Utils.isTicketChannel(message.channel)) {
+        if ((message.channel.isDMBased() && hasOpenConversation) || Utils.isConversationChannel(message.channel)) {
             await new CommunicateConversationHandler(client, message, message.channel.type).handle();
         }
 
@@ -176,6 +176,9 @@ client.on('interactionCreate', async interaction => {
         ['vacationModal', async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).sendVacationMessage();
         }],
+        ['criticalChatModal', async () => {
+            await new ModalSubmitHandler(interaction as ModalSubmitInteraction).criticalChat();
+        }],
         ['helpers_list', async () => {
             await new ChangeHelperHandler(client, interaction as StringSelectMenuInteraction).handle();
         }],
@@ -190,6 +193,9 @@ client.on('interactionCreate', async interaction => {
         }],
         ['אשר חופשה', async () => {
             await new CommandHandler(interaction as ContextMenuCommandInteraction).approveVacation();
+        }],
+        ["סמן כצ'אט קריטי", async () => {
+            await new CommandHandler(interaction as ContextMenuCommandInteraction).criticalChat();
         }],
         ['manage', async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).sendManageTools();
@@ -209,15 +215,6 @@ client.on('interactionCreate', async interaction => {
         ['punish_history', async () => {
             await PunishMemberHandler.sendPunishmentHistory(interaction as StringSelectMenuInteraction)
         }],
-        // ['punish_timeout', async () => {
-        //     await new OpenModalHandler(interaction as ButtonInteraction).openModal();
-        // }],
-        // ['punish_kick', async () => {
-        //     await new OpenModalHandler(interaction as ButtonInteraction).openModal();
-        // }],
-        // ['punish_ban', async () => {
-        //     await new OpenModalHandler(interaction as ButtonInteraction).openModal();
-        // }],
         ['punishKickModal', async () => {
             const handler = (await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction))
             await handler.kick();

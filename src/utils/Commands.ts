@@ -10,7 +10,7 @@ export namespace Command {
     .setName("openchat")
     .setDescription("שולח את ההודעה של פתיחת שאלה")
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-    .setDMPermission(false);;
+    .setDMPermission(false);
 
   const importantLinks = new SlashCommandBuilder()
     .setName("importantlinks")
@@ -38,19 +38,25 @@ export namespace Command {
     .setName("חבר הצוות של החודש")
     .setType(ApplicationCommandType.User)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-    .setDMPermission(false);;
+    .setDMPermission(false);
 
   const setHelperitOfTheMonth = new ContextMenuCommandBuilder()
     .setName("חברת הצוות של החודש")
     .setType(ApplicationCommandType.User)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-    .setDMPermission(false);;
+    .setDMPermission(false);
 
   const approveVacation = new ContextMenuCommandBuilder()
     .setName("אשר חופשה")
     .setType(ApplicationCommandType.Message)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-    .setDMPermission(false);;
+    .setDMPermission(false);
+
+  const criticalChat = new ContextMenuCommandBuilder()
+    .setName("סמן כצ'אט קריטי")
+    .setType(ApplicationCommandType.Message)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);
 
   export const commands = [
     openChat,
@@ -61,5 +67,6 @@ export namespace Command {
     sendStaffMessage,
     vacation,
     approveVacation,
+    criticalChat
   ];
 }

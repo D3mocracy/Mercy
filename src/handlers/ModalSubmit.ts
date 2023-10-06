@@ -1,4 +1,4 @@
-import { GuildMember, ModalSubmitInteraction } from "discord.js"
+import { GuildMember, ModalSubmitInteraction, TextChannel } from "discord.js"
 import ConfigHandler from "./Config";
 import { Utils } from "../utils/Utils";
 import DataBase from "../utils/db";
@@ -105,6 +105,17 @@ export class ModalSubmitHandler {
         })
 
         await this.interaction.reply({ content: "הטופס שמילאתם עבור דיווחים ותלונות על חברי צוות נשלח בהצלחה למנהלים", ephemeral: true });
+    }
+
+    async criticalChat() {
+        const channel = (this.interaction.channel as TextChannel);
+        channel.setName(channel.name + " ❗");
+        (await ConfigHandler.config.requestHelperChannel?.send({
+            content: `${ConfigHandler.config.memberRole}`,
+            embeds: [ConversationManageMessageUtils.EmbedMessages.criticalChat(this.interaction)],
+            components: [ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.interaction.channelId}`)]
+        }))?.edit({ content: null });
+        await this.interaction.reply({ content: "ההפנייה נשלחה בהצלחה להנהלה הגבוהה", ephemeral: true });
     }
 
 }

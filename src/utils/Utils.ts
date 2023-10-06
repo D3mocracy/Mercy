@@ -61,7 +61,7 @@ export namespace Utils {
         return { usernames, conversation, channel };
     }
 
-    export function isTicketChannel(channel: Channel) {
+    export function isConversationChannel(channel: Channel) {
         return channel.type === ChannelType.GuildText && (channel as TextChannel).parent === ConfigHandler.config.conversationCatagory;
     }
 
