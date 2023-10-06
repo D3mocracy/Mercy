@@ -15,7 +15,6 @@ export namespace ImportantLinksMessageUtils {
         }
         export function mainMessage() {
             return new EmbedBuilder({
-                author,
                 color: colors.pink,
                 thumbnail: { url: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Circle-icons-clipboard.svg/1200px-Circle-icons-clipboard.svg.png" },
                 title: "מידע שימושי",

@@ -42,7 +42,6 @@ export namespace MessageUtils {
     });
 
     export const chatIsNotAvailable = new EmbedBuilder({
-      author,
       color: colors.white,
       title: "צ'אט לא פעיל",
       description:
@@ -116,7 +115,6 @@ export namespace MessageUtils {
     });
 
     export const sureMessageToClose = new EmbedBuilder({
-      author,
       color: colors.red,
       title: "האם אתם בטוחים שברצונכם לסגור את הצ'אט?",
       description: "פעולה זו אינה הפיכה!",

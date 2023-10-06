@@ -25,7 +25,7 @@ class OpenModalHandler {
                 }).toArray();
 
                 reports.length >= 1
-                    ? await this.interaction.reply({ content: "ניתן לשלוח תלונה על חבר צוות אחת ל24 שעות, נסה שוב במועד מאוחר יותר", ephemeral: true })
+                    ? await this.interaction.reply({ content: "ניתן להגיש טופס דיווחים ותלונות על חברי צוות אחת ל-24 שעות, נסו שוב במועד מאוחר יותר", ephemeral: true })
                     : await this.interaction.showModal(ImportantLinksMessageUtils.Modals.reportHelperModal);
                 break;
 
@@ -37,7 +37,7 @@ class OpenModalHandler {
                 }).toArray();
 
                 volunteers.length >= 1
-                    ? await this.interaction.reply({ content: "ניתן להגיש טופס התנדבות בשרת אחת לשבועיים, נסה שוב במועד מאוחר יותר", ephemeral: true })
+                    ? await this.interaction.reply({ content: "ניתן להגיש טופס התנדבות בשרת אחת לשבועיים, נסו שוב במועד מאוחר יותר", ephemeral: true })
                     : await this.interaction.showModal(ImportantLinksMessageUtils.Modals.volunteerModal);
                 break;
 
@@ -49,7 +49,7 @@ class OpenModalHandler {
                 }).toArray();
 
                 suggestion.length >= 1
-                    ? await this.interaction.reply({ content: "ניתן לשלוח הצעת שיפור ופידבק אחת ל24 שעות, נסה שוב במועד מאוחר יותר", ephemeral: true })
+                    ? await this.interaction.reply({ content: "ניתן להגיש טופס פידבקים, הצעות ודיווחי באגים אחת ל-24 שעות, נסו שוב במועד מאוחר יותר", ephemeral: true })
                     : await this.interaction.showModal(ImportantLinksMessageUtils.Modals.suggestIdeaModal);
                 break;
 
