@@ -54,7 +54,7 @@ var ImportantLinksMessageUtils;
             return new discord_js_1.EmbedBuilder({
                 author: { iconURL: author.iconURL, name: "Mercy - דיווחים" },
                 color: colors.blue,
-                title: `התקבל דיווח על תומך`,
+                title: `התקבל דיווח על חבר צוות`,
                 description: `**סיבת הדיווח:**
                 ${interaction.fields.getTextInputValue('reportHelperCause')}
                 `,

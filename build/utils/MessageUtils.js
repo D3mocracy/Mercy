@@ -93,7 +93,6 @@ var MessageUtils;
         function helperOfTheMonth(helper) {
             const nameOfMonth = monthNames[new Date().getMonth()];
             return new discord_js_1.EmbedBuilder({
-                author: { name: "Mercy - הנהלה", iconURL: author.iconURL },
                 color: colors.gold,
                 title: `👑 תומך החודש - ${nameOfMonth} 👑`,
                 description: `שאו ברכה ואיחולים לתומך החודש - לא אחר מאשר ${helper}! \n
@@ -125,13 +124,12 @@ var MessageUtils;
         EmbedMessages.staffMembers = staffMembers;
         function vacation(helperMember, vacationType, dateOne, dateTwo, cause) {
             return new discord_js_1.EmbedBuilder({
-                author: { iconURL: author.iconURL, name: "Mercy - הנהלה" },
-                color: colors.pink,
+                color: colors.white,
                 title: `הודעה על היעדרות או הפחתת פעילות`,
                 description: `**פירוט הבקשה:**
                 ${cause}`,
                 fields: [
-                    { name: "תומך", value: `${helperMember}`, inline: false },
+                    { name: "נשלח על ידי", value: `${helperMember}`, inline: false },
                     { name: "סוג הבקשה", value: vacationType, inline: false },
                     { name: "עד תאריך", value: dateTwo, inline: true },
                     { name: "מתאריך", value: dateOne, inline: true },

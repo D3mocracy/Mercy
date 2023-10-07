@@ -27,7 +27,7 @@ export class ModalSubmitHandler {
             this.interaction.fields.getTextInputValue('vacation_date_two'),
             this.interaction.fields.getTextInputValue('vacation_cause'),
         ]
-        await this.interaction.reply({ content: `בקשה ל${type} נשלחה בהצלחה לצ'אנל היעדרויות`, ephemeral: true });
+        await this.interaction.reply({ content: `בקשה להיעדרות או להפחתת פעילות נשלחה בהצלחה למנהלים`, ephemeral: true });
         (await ConfigHandler.config.vacationChannel?.send({
             content: `${ConfigHandler.config.managerRole}`,
             embeds: [MessageUtils.EmbedMessages.vacation(this.interaction.member as GuildMember, type, dateOne, dateTwo, cause)],

@@ -196,12 +196,12 @@ export namespace MessageUtils {
       cause: string
     ) {
       return new EmbedBuilder({
-        color: colors.pink,
+        color: colors.white,
         title: `הודעה על היעדרות או הפחתת פעילות`,
-        description: `**פירוט הבקשה:**
+        description: `**פירוט הבקשה**
                 ${cause}`,
         fields: [
-          { name: "התומך המפנה", value: `${helperMember}`, inline: false },
+          { name: "נשלח על ידי", value: `${helperMember}`, inline: false },
           { name: "סוג הבקשה", value: vacationType, inline: false },
           { name: "עד תאריך", value: dateTwo, inline: true },
           { name: "מתאריך", value: dateOne, inline: true },
@@ -277,7 +277,7 @@ export namespace MessageUtils {
         customId: "vacation_type",
         label: "סוג",
         style: TextInputStyle.Short,
-        placeholder: "היעדרות/הפחתת פעילות",
+        placeholder: "היעדרות או הפחתת פעילות",
         required: true,
       })
     );
@@ -287,7 +287,7 @@ export namespace MessageUtils {
         customId: "vacation_date_one",
         label: "מהתאריך",
         style: TextInputStyle.Short,
-        placeholder: `${new Date()}`,
+        placeholder: "יש לציין את התאריך הרלוונטי",
         required: true,
       })
     );
@@ -315,7 +315,7 @@ export namespace MessageUtils {
 
     export const vacationModal = new ModalBuilder({
       customId: "vacationModal",
-      title: "בקשה להיעדרות / הפחתת פעילות",
+      title: "בקשה להיעדרות או להפחתת פעילות",
     }).addComponents([vacationType, date1, date2, causeVacation]);
 
     //Volunteer

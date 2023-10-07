@@ -194,7 +194,7 @@ client.on('interactionCreate', async interaction => {
         ['אשר חופשה', async () => {
             await new CommandHandler(interaction as ContextMenuCommandInteraction).approveVacation();
         }],
-        ["סמן כצ'אט קריטי", async () => {
+        ["דיווח כצ'אט קריטי", async () => {
             await new CommandHandler(interaction as ContextMenuCommandInteraction).criticalChat();
         }],
         ['manage', async () => {

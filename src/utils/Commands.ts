@@ -16,11 +16,11 @@ export namespace Command {
     .setName("importantlinks")
     .setDescription("שולח הודעה עם לינקים ומידע חשוב")
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-    .setDMPermission(false);;
+    .setDMPermission(false);
 
   const vacation = new SlashCommandBuilder()
     .setName("vacation")
-    .setDescription("בקשה להיעדרות / הפחתת פעילות")
+    .setDescription("בקשה להיעדרות או להפחתת פעילות")
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .setDMPermission(false);
 
@@ -53,7 +53,7 @@ export namespace Command {
     .setDMPermission(false);
 
   const criticalChat = new ContextMenuCommandBuilder()
-    .setName("סמן כצ'אט קריטי")
+    .setName("דיווח כצ'אט קריטי")
     .setType(ApplicationCommandType.Message)
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .setDMPermission(false);

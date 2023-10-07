@@ -36,7 +36,7 @@ export namespace ConversationManageMessageUtils {
         title: "התקבלה בקשה להפניית מפקח",
         description: `**תיאור**\n${interaction.fields.getTextInputValue("referCause")}`,
       }).addFields([
-        { name: "התומך המפנה", value: `${interaction.user.tag}` },
+        { name: "המפנה", value: `${interaction.user.tag}` },
         { name: "בטיפול של", value: "לא משויך" },
         { name: "סטטוס טיפול", value: `לא טופל` },
       ]);
@@ -45,7 +45,7 @@ export namespace ConversationManageMessageUtils {
     export function criticalChat(interaction: ModalSubmitInteraction) {
       return new EmbedBuilder({
         color: colors.red,
-        title: "צ'אט סומן כקריטי על ידי חבר צוות",
+        title: "התקבל דיווח על צ'אט קריטי",
         description: `**סיבה**\n${interaction.fields.getTextInputValue("critical_chat_reason")}`,
         timestamp: new Date(),
       }).addFields([
@@ -150,6 +150,7 @@ export namespace ConversationManageMessageUtils {
 
     export const actionCancelledCloseChat = new EmbedBuilder({
       title: 'הפעולה בוטלה',
+      description: "הצ'אט נשאר פתוח כרגיל",
       color: colors.red,
     })
 
@@ -420,15 +421,15 @@ export namespace ConversationManageMessageUtils {
       new TextInputBuilder({
         customId: "critical_chat_reason",
         label: "סיבה",
-        placeholder: "יש לציין מדוע אתם מעוניינים לסמן צ'אט זה כקריטי, לדוגמה: משתמש מאיים להתאבד",
-        style: TextInputStyle.Short,
+        placeholder: "יש לציין את הסיבה לדיווח הצ'אט כקריטי, לדוגמה: משתמש מאיים להתאבד",
+        style: TextInputStyle.Paragraph,
         required: true,
       }),
     ]);
 
     export const criticalChatModal = new ModalBuilder({
       customId: "criticalChatModal",
-      title: "סמן כצ'אט קריטי",
+      title: "דיווח כצ'אט קריטי",
     }).addComponents(criticalChatReason);
   }
 }
