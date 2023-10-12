@@ -4,8 +4,10 @@ declare class CommandHandler {
     constructor(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction);
     openChat(): Promise<void>;
     sendStaffMessage(): Promise<void>;
-    makeHelperOfTheMonth(): Promise<void>;
+    criticalChat(): Promise<void>;
+    makeHelperOfTheMonth(gender: "helper" | "helperit"): Promise<void>;
     approveVacation(): Promise<void>;
+    sendManageTools(): Promise<void>;
     importantLinks(): Promise<void>;
 }
 export default CommandHandler;

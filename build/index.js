@@ -20,8 +20,10 @@ const db_1 = __importDefault(require("./utils/db"));
 const Logger_1 = __importDefault(require("./handlers/Logger"));
 const Commands_1 = require("./utils/Commands");
 const ModalSubmit_1 = require("./handlers/ModalSubmit");
-const ImportantLinks_1 = require("./utils/MessageUtils/ImportantLinks");
 const ConversationManage_2 = require("./utils/MessageUtils/ConversationManage");
+const CreateConversation_1 = __importDefault(require("./handlers/CreateConversation"));
+const OpenModal_1 = __importDefault(require("./handlers/OpenModal"));
+const PunishMember_1 = __importDefault(require("./handlers/PunishMember"));
 //4194303
 const client = new discord_js_1.Client({
     intents: [
@@ -35,7 +37,7 @@ const client = new discord_js_1.Client({
 });
 db_1.default.client.connect().then(async () => {
     await client.login(process.env.TOKEN);
-    client.user?.setActivity({ type: discord_js_1.ActivityType.Listening, name: "your ❤️" });
+    client.user?.setActivity({ type: discord_js_1.ActivityType.Listening, name: "your heart" });
     await client.application?.commands.set(Commands_1.Command.commands);
 }).catch((error) => {
     Logger_1.default.logError(error);
@@ -56,8 +58,12 @@ client.on('messageCreate', async (message) => {
             await (await CustomEmbedMessages_1.default.createHandler(client, CustomEmbedMessages_1.default.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
             message.delete();
         }
+        if (message.channel.id === "1148286189925838858" && message.channel instanceof discord_js_1.BaseGuildTextChannel) {
+            message.react("🤍");
+            message.channel.permissionOverwrites.edit(message.author.id, { SendMessages: false });
+        }
         const hasOpenConversation = await Utils_1.Utils.hasOpenConversation(message.author.id);
-        if ((message.channel.isDMBased() && hasOpenConversation) || Utils_1.Utils.isTicketChannel(message.channel)) {
+        if ((message.channel.isDMBased() && hasOpenConversation) || Utils_1.Utils.isConversationChannel(message.channel)) {
             await new CommunicateConversation_1.default(client, message, message.channel.type).handle();
         }
     }
@@ -68,13 +74,21 @@ client.on('messageCreate', async (message) => {
 client.on('interactionCreate', async (interaction) => {
     const actionHandler = new Map([
         ['openChatButton', async () => {
-                await new StartConversation_1.default(interaction).precondition();
+                const hanlder = await StartConversation_1.default.createHandler(interaction);
+                await hanlder.handle();
+            }],
+        ['select_subject', async () => {
+                const hanlder = await CreateConversation_1.default.createHandler(interaction);
+                await hanlder.handle();
             }],
         ['manager_attach_report', async () => {
                 await new ConversationStaffTools_1.default(interaction).managerAttachReport();
             }],
         ['manager_mark_as_done', async () => {
                 await new ConversationStaffTools_1.default(interaction).managerMarkRequestAsDone();
+            }],
+        ['manager_in_progress', async () => {
+                await new ConversationStaffTools_1.default(interaction).supervisorInProgress();
             }],
         ['tools_attach', async () => {
                 const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
@@ -104,16 +118,16 @@ client.on('interactionCreate', async (interaction) => {
                 }
             }],
         ['sure_no', async () => {
-                await interaction.channel?.send('הפעולה בוטלה');
+                await interaction.channel?.send({ embeds: [ConversationManage_2.ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat] });
                 interaction.message.edit({ components: [] });
             }],
         ['tools_manager', async () => {
-                Utils_1.Utils.isManager(interaction.user.id)
+                Utils_1.Utils.isSeniorStaff(interaction.user.id)
                     ? await interaction.reply({
                         ephemeral: true, embeds: [ConversationManage_2.ConversationManageMessageUtils.EmbedMessages.ManagerTools],
                         components: [ConversationManage_2.ConversationManageMessageUtils.Actions.managerTools]
                     })
-                    : await interaction.reply({ content: "ברכות על הקידום", ephemeral: true });
+                    : await interaction.reply({ content: "אין לך הרשאות להשתמש בהגדרות ניהול", ephemeral: true });
             }],
         ['tools_manager_reveal', async () => {
                 const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
@@ -123,19 +137,27 @@ client.on('interactionCreate', async (interaction) => {
                 const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
                 await conversationManage.changeHelpersMessage();
             }],
+        ['tools_manager_punish', async () => {
+                const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
+                await conversationManage.sendPunishMessage();
+            }],
         ['tools_reset_helpers', async () => {
                 const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
                 await conversationManage.resetHelpers();
                 await conversationManage.saveConversation();
             }],
         ['tools_refer_manager', async () => {
-                await interaction.showModal(MessageUtils_1.MessageUtils.Modals.referManagerModal);
+                const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
+                await conversationManage.openRefferSupervisorModal();
             }],
         ['user_report_helper', async () => {
-                await interaction.showModal(ImportantLinks_1.ImportantLinksMessageUtils.Modals.reportHelperModal);
+                await new OpenModal_1.default(interaction).openModal();
+            }],
+        ['user_volunteer', async () => {
+                await new OpenModal_1.default(interaction).openModal();
             }],
         ['user_suggest', async () => {
-                await interaction.showModal(ImportantLinks_1.ImportantLinksMessageUtils.Modals.suggestIdeaModal);
+                await new OpenModal_1.default(interaction).openModal();
             }],
         ['reportHelperModal', async () => {
                 await new ModalSubmit_1.ModalSubmitHandler(interaction).reportHelper();
@@ -143,11 +165,17 @@ client.on('interactionCreate', async (interaction) => {
         ['referManager', async () => {
                 await new ModalSubmit_1.ModalSubmitHandler(interaction).referManager();
             }],
+        ['volunteer_modal', async () => {
+                await new ModalSubmit_1.ModalSubmitHandler(interaction).sendVolunteerMessage();
+            }],
         ['suggestIdea', async () => {
                 await new ModalSubmit_1.ModalSubmitHandler(interaction).suggestIdea();
             }],
         ['vacationModal', async () => {
                 await new ModalSubmit_1.ModalSubmitHandler(interaction).sendVacationMessage();
+            }],
+        ['criticalChatModal', async () => {
+                await new ModalSubmit_1.ModalSubmitHandler(interaction).criticalChat();
             }],
         ['helpers_list', async () => {
                 await new ChangeHelper_1.default(client, interaction).handle();
@@ -155,14 +183,20 @@ client.on('interactionCreate', async (interaction) => {
         ['openchat', async () => {
                 await new Command_1.default(interaction).openChat();
             }],
-        ['תומך החודש', async () => {
-                await new Command_1.default(interaction).makeHelperOfTheMonth();
+        ['חבר הצוות של החודש', async () => {
+                await new Command_1.default(interaction).makeHelperOfTheMonth("helper");
+            }],
+        ['חברת הצוות של החודש', async () => {
+                await new Command_1.default(interaction).makeHelperOfTheMonth("helperit");
             }],
         ['אשר חופשה', async () => {
                 await new Command_1.default(interaction).approveVacation();
             }],
+        ["דיווח כצ'אט קריטי", async () => {
+                await new Command_1.default(interaction).criticalChat();
+            }],
         ['manage', async () => {
-                await ConversationManage_1.default.sendManageTools(interaction);
+                await new Command_1.default(interaction).sendManageTools();
             }],
         ['importantlinks', async () => {
                 await new Command_1.default(interaction).importantLinks();
@@ -172,7 +206,25 @@ client.on('interactionCreate', async (interaction) => {
             }],
         ['vacation', async () => {
                 await interaction.showModal(MessageUtils_1.MessageUtils.Modals.vacationModal);
-            }]
+            }],
+        ['punish_menu', async () => {
+                await new OpenModal_1.default(interaction).openModal();
+            }],
+        ['punish_history', async () => {
+                await PunishMember_1.default.sendPunishmentHistory(interaction);
+            }],
+        ['punishKickModal', async () => {
+                const handler = (await PunishMember_1.default.createHandler(interaction));
+                await handler.kick();
+            }],
+        ['punishBanModal', async () => {
+                const handler = (await PunishMember_1.default.createHandler(interaction));
+                await handler.ban();
+            }],
+        ['punishMuteModal', async () => {
+                const handler = (await PunishMember_1.default.createHandler(interaction));
+                await handler.timeout();
+            }],
     ]);
     try {
         if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu() || interaction.isCommand()) {
@@ -187,7 +239,7 @@ client.on('interactionCreate', async (interaction) => {
         }
     }
     catch (error) {
-        Logger_1.default.logError(error);
+        await Logger_1.default.logError(error);
     }
 });
 client.on('guildMemberRemove', async (member) => {
@@ -199,7 +251,7 @@ client.on('guildMemberRemove', async (member) => {
         await leaveGuildHandler.closeConversation();
     }
     catch (error) {
-        Logger_1.default.logError(error);
+        await Logger_1.default.logError(error);
     }
 });
 client.on('guildMemberAdd', async (member) => {
@@ -208,7 +260,7 @@ client.on('guildMemberAdd', async (member) => {
         memberRole && member.roles.add(memberRole);
     }
     catch (error) {
-        Logger_1.default.logError(error);
+        await Logger_1.default.logError(error);
     }
 });
 client.on('channelDelete', async (channel) => {
@@ -216,7 +268,7 @@ client.on('channelDelete', async (channel) => {
         await db_1.default.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } });
     }
     catch (error) {
-        Logger_1.default.logError(error);
+        await Logger_1.default.logError(error);
     }
 });
 //# sourceMappingURL=index.js.map

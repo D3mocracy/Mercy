@@ -19,7 +19,14 @@ class ConversationStaffToolsHandler {
         const newEmbed = new discord_js_1.EmbedBuilder(this.interaction.message.embeds[0].data);
         newEmbed.setColor(0x33C76E);
         newEmbed.data.fields.find(field => field.name === "סטטוס טיפול").value = "טופל";
-        await this.interaction.message.edit({ embeds: [newEmbed], components: [ConversationManage_1.ConversationManageMessageUtils.Actions.markAsDone(true)] });
+        await this.interaction.message.edit({ embeds: [newEmbed], components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, true)] });
+    }
+    async supervisorInProgress() {
+        const newEmbed = new discord_js_1.EmbedBuilder(this.interaction.message.embeds[0].data);
+        newEmbed.setColor(0x5865F2);
+        newEmbed.data.fields.find(field => field.name === "סטטוס טיפול").value = "בטיפול";
+        newEmbed.data.fields.find(field => field.name === "בטיפול של").value = this.interaction.user.username;
+        await this.interaction.message.edit({ embeds: [newEmbed], components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supervisorRefferedTools(false, true), this.interaction.message.components[1]] });
     }
 }
 exports.default = ConversationStaffToolsHandler;

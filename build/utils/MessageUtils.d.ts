@@ -4,11 +4,13 @@ export declare namespace MessageUtils {
         const StartConversationAsk: EmbedBuilder;
         const chatIsNotAvailable: EmbedBuilder;
         function errorLog(error: Error): EmbedBuilder;
+        function punishmentLog(punishment: any): EmbedBuilder;
         function newChatUser(numberOfConversation: number): EmbedBuilder;
         function ticketLog(channelTitle: string): Promise<EmbedBuilder>;
         const openChat: EmbedBuilder;
         const sureMessageToClose: EmbedBuilder;
         function helperOfTheMonth(helper: GuildMember): EmbedBuilder;
+        function helperitOfTheMonth(helper: GuildMember): EmbedBuilder;
         function staffMembers(): EmbedBuilder;
         function vacation(helperMember: GuildMember, vacationType: string, dateOne: string, dateTwo: string, cause: string): EmbedBuilder;
     }
@@ -21,6 +23,7 @@ export declare namespace MessageUtils {
     namespace Modals {
         const referManagerModal: ModalBuilder;
         const vacationModal: ModalBuilder;
+        const volunteerModal: ModalBuilder;
     }
 }
 //# sourceMappingURL=MessageUtils.d.ts.map

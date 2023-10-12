@@ -4,6 +4,7 @@ declare class ConversationStaffToolsHandler {
     constructor(interaction: ButtonInteraction);
     managerAttachReport(): Promise<void>;
     managerMarkRequestAsDone(): Promise<void>;
+    supervisorInProgress(): Promise<void>;
 }
 export default ConversationStaffToolsHandler;
 //# sourceMappingURL=ConversationStaffTools.d.ts.map

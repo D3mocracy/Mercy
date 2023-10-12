@@ -19,7 +19,9 @@ var Utils;
     }
     Utils.getOpenConversation = getOpenConversation;
     async function getNumberOfConversationFromDB() {
-        return (await db_1.default.conversationsCollection.find().toArray()).length;
+        return (await db_1.default.conversationsCollection.find({
+            subject: { $exists: true }
+        }).toArray()).length;
     }
     Utils.getNumberOfConversationFromDB = getNumberOfConversationFromDB;
     ;
@@ -27,6 +29,10 @@ var Utils;
         return client.channels.cache.get(channelId);
     }
     Utils.getChannelById = getChannelById;
+    function getChannelByIdNoClient(channelId) {
+        return Config_1.default.config.guild?.channels.cache.get(channelId);
+    }
+    Utils.getChannelByIdNoClient = getChannelByIdNoClient;
     function getRoleById(roleId) {
         return Config_1.default.config.guild?.roles.cache.get(roleId);
     }
@@ -40,6 +46,13 @@ var Utils;
         return role.members.map(m => m);
     }
     Utils.getMembersWithRole = getMembersWithRole;
+    function getHelperClaimedConversationNumber(helperId) {
+        return Config_1.default.config.conversationCatagory?.children.cache.filter((c) => {
+            const helperPermission = c.permissionOverwrites.cache.get(helperId);
+            return helperPermission?.allow?.has(discord_js_1.PermissionFlagsBits.SendMessages);
+        }).size;
+    }
+    Utils.getHelperClaimedConversationNumber = getHelperClaimedConversationNumber;
     async function updatePermissionToChannel(client, conversation) {
         const channel = Utils.getChannelById(client, conversation.channelId);
         await channel.lockPermissions();
@@ -52,17 +65,33 @@ var Utils;
         return { usernames, conversation, channel };
     }
     Utils.updatePermissionToChannel = updatePermissionToChannel;
-    function isTicketChannel(channel) {
+    function isConversationChannel(channel) {
         return channel.type === discord_js_1.ChannelType.GuildText && channel.parent === Config_1.default.config.conversationCatagory;
     }
-    Utils.isTicketChannel = isTicketChannel;
+    Utils.isConversationChannel = isConversationChannel;
     function getMembersById(...userId) {
         return userId.map(userId => Config_1.default.config.guild?.members.cache.get(userId));
     }
     Utils.getMembersById = getMembersById;
+    function isAdministrator(userId) {
+        return Utils.getMemberByID(userId)?.permissions.has("Administrator");
+    }
+    Utils.isAdministrator = isAdministrator;
     function isManager(userId) {
         return Config_1.default.config.guild?.members.cache.get(userId)?.roles.cache.find((r) => r.id === Config_1.default.config.managerRole?.id);
     }
     Utils.isManager = isManager;
-})(Utils = exports.Utils || (exports.Utils = {}));
+    function isSupervisor(userId) {
+        return Config_1.default.config.guild?.members.cache.get(userId)?.roles.cache.find((r) => r.id === Config_1.default.config.supervisorRole?.id);
+    }
+    Utils.isSupervisor = isSupervisor;
+    function isHelper(userId) {
+        return Config_1.default.config.guild?.members.cache.get(userId)?.roles.cache.find((r) => r.id === Config_1.default.config.helperRole?.id);
+    }
+    Utils.isHelper = isHelper;
+    function isSeniorStaff(userId) {
+        return isManager(userId) || isSupervisor(userId) || isAdministrator(userId);
+    }
+    Utils.isSeniorStaff = isSeniorStaff;
+})(Utils || (exports.Utils = Utils = {}));
 //# sourceMappingURL=Utils.js.map

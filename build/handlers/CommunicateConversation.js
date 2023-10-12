@@ -7,6 +7,7 @@ const db_1 = __importDefault(require("../utils/db"));
 const discord_js_1 = require("discord.js");
 const Utils_1 = require("../utils/Utils");
 const Errors_1 = require("../utils/Errors");
+const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
 class CommunicateConversationHandler {
     client;
     message;
@@ -34,12 +35,21 @@ class CommunicateConversationHandler {
     }
     async sendMessage() {
         if (this.type === discord_js_1.ChannelType.DM) {
-            Utils_1.Utils.getChannelById(this.client, this.conversation.channelId).send(this.message.content);
+            const channel = Utils_1.Utils.getChannelById(this.client, this.conversation.channelId);
+            await channel.sendTyping();
+            channel.send(this.message.content);
         }
         else if (this.type === discord_js_1.ChannelType.GuildText) {
             if (this.message.content.startsWith('!'))
                 return;
-            this.client.users.send(this.conversation.userId, this.message.content);
+            await this.client.users.cache.get(this.conversation.userId)?.dmChannel?.sendTyping();
+            this.client.users.send(this.conversation.userId, this.message.content)
+                .catch(() => {
+                this.message.reply({
+                    content: "המשתמש ביטל את האפשרות לכתיבת הודעות לאחר פתיחת הצ'אט",
+                    components: [new discord_js_1.ActionRowBuilder().addComponents(ConversationManage_1.ConversationManageMessageUtils.Actions.tools_close)]
+                });
+            });
         }
     }
 }

@@ -26,8 +26,14 @@ class ConversationManageHandler {
     }
     async loadConversation() {
         this.interaction.channel?.isDMBased()
-            ? this.conversation = await db_1.default.conversationsCollection.findOne({ userId: this.interaction.user.id, open: true })
-            : this.conversation = await db_1.default.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true });
+            ? (this.conversation = (await db_1.default.conversationsCollection.findOne({
+                userId: this.interaction.user.id,
+                open: true,
+            })))
+            : (this.conversation = (await db_1.default.conversationsCollection.findOne({
+                channelId: this.interaction.channelId,
+                open: true,
+            })));
         if (this.conversation) {
             this.channel = Utils_1.Utils.getChannelById(this.client, this.conversation.channelId);
         }
@@ -38,70 +44,134 @@ class ConversationManageHandler {
     async saveConversation() {
         await db_1.default.conversationsCollection.updateOne({ channelId: this.conversation.channelId }, { $set: this.conversation }, { upsert: true });
     }
-    static async sendManageTools(interaction) {
-        if (await Utils_1.Utils.isTicketChannel(interaction.channel)) {
-            await interaction.reply({
-                embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.newChatStaff()],
-                components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supporterTools]
+    async sendSureMessageToClose() {
+        await this.interaction.reply({
+            embeds: [MessageUtils_1.MessageUtils.EmbedMessages.sureMessageToClose],
+            components: [
+                ConversationManage_1.ConversationManageMessageUtils.Actions.tools_sure_close_yes_no(),
+            ],
+        });
+    }
+    async openRefferSupervisorModal() {
+        if ((!this.conversation.staffMemberId?.includes(this.interaction.user.id)
+            && Utils_1.Utils.isHelper(this.interaction.user.id)
+            && !Utils_1.Utils.isAdministrator(this.interaction.user.id)) || Utils_1.Utils.isSupervisor(this.interaction.user.id)) {
+            await this.interaction.reply({
+                content: "אין לך הרשאות להפנות למפקחים",
+                ephemeral: true,
             });
+            return;
         }
         else {
-            await interaction.reply({ content: "ניתן לבצע את הפקודה הזו רק בצ'אטים", ephemeral: true });
+            await this.interaction.showModal(MessageUtils_1.MessageUtils.Modals.referManagerModal);
         }
     }
-    async sendSureMessageToClose() {
-        await this.interaction.reply({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.sureMessageToClose], components: [ConversationManage_1.ConversationManageMessageUtils.Actions.tools_sure_close_yes_no()] });
-    }
     async closeConversation(closedBy) {
-        await this.interaction.deferUpdate();
-        const closedMessage = { embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name)] };
+        if (!this.conversation.staffMemberId?.includes(this.interaction.user.id)
+            && Utils_1.Utils.isHelper(this.interaction.user.id)
+            && !this.interaction.channel?.isDMBased()
+            && !Utils_1.Utils.isAdministrator(this.interaction.user.id)) {
+            await this.interaction.reply({
+                content: "אין לך הרשאות לסגור את הצ'אט",
+                ephemeral: true,
+            });
+            return;
+        }
+        const closedMessage = {
+            embeds: [
+                ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name),
+            ],
+        };
         this.conversation.open = false;
         await this.channel.send(closedMessage);
+        const user = this.client.users.cache.get(this.conversation.userId);
         Promise.all([
-            Logger_1.default.logTicket(this.channel),
+            Logger_1.default.logTicket(this.channel, user),
             this.interaction.message.edit({ components: [] }),
-            this.client.users.cache?.get(this.conversation.userId)?.send(closedMessage) || "",
-        ]).finally(() => this.channel.delete());
+            user?.send(closedMessage) || "",
+        ])
+            .catch((error) => {
+            console.log("Can not send message to this user - This Error is fine");
+            Logger_1.default.logError(error);
+        })
+            .finally(() => this.channel.delete());
     }
     async attachHelper(staffMemberId) {
-        if (!this.conversation.staffMemberId || this.conversation.staffMemberId.length === 0) {
+        if (Utils_1.Utils.getHelperClaimedConversationNumber(staffMemberId) >= 2) {
+            await this.interaction.reply({
+                ephemeral: true,
+                content: "ניתן לשייך עד 2 צ'אטים",
+            });
+            return;
+        }
+        if (!this.conversation.staffMemberId
+            || this.conversation.staffMemberId.length === 0
+            || Utils_1.Utils.isSeniorStaff(this.interaction.user.id)) {
             this.conversation.staffMemberId = [staffMemberId];
             await Promise.all([
                 Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation),
-                this.interaction.reply({ embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())] })
+                this.interaction.reply({
+                    embeds: [
+                        ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString()),
+                    ],
+                }),
             ]);
-            return;
-        }
-        await this.interaction.reply({ ephemeral: true, content: "פסססטט...הצ'אט הזה כבר שויך למישהו" });
-    }
-    async revealUser() {
-        if (!(Config_1.default.config.guild?.members.cache.get(this.interaction.user.id))?.permissions.has("Administrator")) {
-            await this.interaction.reply({ content: "אין לך מספיק הרשאות כדי לבצע פעולה זו", ephemeral: true });
             return;
         }
         await this.interaction.reply({
             ephemeral: true,
-            embeds: [await ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.revealUserMessage(this.conversation.userId)]
+            content: "לא ניתן לבצע שיוך עצמי - הצ'אט כבר משויך לחבר צוות",
+        });
+    }
+    async revealUser() {
+        if (!Config_1.default.config.guild?.members.cache
+            .get(this.interaction.user.id)
+            ?.permissions.has("Administrator")) {
+            await this.interaction.reply({
+                content: "אין לך מספיק הרשאות כדי לבצע פעולה זו",
+                ephemeral: true,
+            });
+            return;
+        }
+        await this.interaction.reply({
+            ephemeral: true,
+            embeds: [
+                await ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.revealUserMessage(this.conversation.userId),
+            ],
         });
     }
     async resetHelpers() {
         this.conversation.staffMemberId = [];
         await Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation);
-        await this.interaction.channel.send({ embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.helpersReseted] });
+        await this.interaction.channel.send({
+            embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.helpersReseted],
+        });
     }
     async changeHelpersMessage() {
-        const helpersList = Config_1.default.config.helperRole?.members.map(m => m);
+        const helpersList = Config_1.default.config.helperRole?.members.map((m) => m);
         if (helpersList?.length) {
             await this.interaction.reply({
                 ephemeral: true,
                 embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.changeHelper],
-                components: [ConversationManage_1.ConversationManageMessageUtils.Actions.changeHelper(helpersList),
-                    ConversationManage_1.ConversationManageMessageUtils.Actions.resetHelpers]
+                components: [
+                    ConversationManage_1.ConversationManageMessageUtils.Actions.changeHelper(helpersList),
+                    ConversationManage_1.ConversationManageMessageUtils.Actions.resetHelpers,
+                ],
             });
         }
         else {
-            await this.interaction.reply({ content: "לא קיים משתמש עם דרגת תומך בשרת", ephemeral: true });
+            await this.interaction.reply({
+                content: "לא קיים משתמש עם דרגת תומך בשרת",
+                ephemeral: true,
+            });
         }
+    }
+    async sendPunishMessage() {
+        await this.interaction.reply({
+            embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.punishMessage],
+            components: [ConversationManage_1.ConversationManageMessageUtils.Actions.punishMenu()],
+            ephemeral: true
+        });
     }
 }
 exports.default = ConversationManageHandler;

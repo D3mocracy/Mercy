@@ -14,17 +14,21 @@ class ConfigHandler {
         errorChannel: {},
         suggestIdeasChannel: {},
         vacationChannel: {},
+        volunteerChannel: {},
+        punishmentChannel: {},
         managerRole: {},
         helperRole: {},
+        supervisorRole: {},
         memberRole: {},
         helperOfTheMonthRole: {},
+        helperitOfTheMonthRole: {},
         guild: {},
         importantChannels: [{ "": "" }],
     };
     async loadConfig(client) {
         const configDocument = (await db_1.default.configCollection.find({}).toArray())[0];
         const guild = client.guilds.cache.get(process.env.GuildID);
-        return ConfigHandler.config = {
+        return (ConfigHandler.config = {
             get guild() {
                 return guild;
             },
@@ -52,11 +56,20 @@ class ConfigHandler {
             get vacationChannel() {
                 return client.channels.cache.get(configDocument.vacationChannelId);
             },
+            get volunteerChannel() {
+                return client.channels.cache.get(configDocument.volunteerChannelId);
+            },
+            get punishmentChannel() {
+                return client.channels.cache.get(configDocument.punishmentChannelId);
+            },
             get managerRole() {
                 return guild.roles.cache.get(configDocument.managerRole);
             },
             get helperRole() {
                 return guild.roles.cache.get(configDocument.helperRole);
+            },
+            get supervisorRole() {
+                return guild.roles.cache.get(configDocument.supervisorRole);
             },
             get memberRole() {
                 return guild.roles.cache.get(configDocument.memberRole);
@@ -64,8 +77,11 @@ class ConfigHandler {
             get helperOfTheMonthRole() {
                 return guild.roles.cache.get(configDocument.helperOfTheMonthRoleId);
             },
-            importantChannels: configDocument.importantChannels
-        };
+            get helperitOfTheMonthRole() {
+                return guild.roles.cache.get(configDocument.helperitOfTheMonthRoleId);
+            },
+            importantChannels: configDocument.importantChannels,
+        });
     }
 }
 exports.default = ConfigHandler;

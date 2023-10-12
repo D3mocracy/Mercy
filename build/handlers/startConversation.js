@@ -4,54 +4,61 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Utils_1 = require("../utils/Utils");
-const discord_js_1 = require("discord.js");
 const db_1 = __importDefault(require("../utils/db"));
-const MessageUtils_1 = require("../utils/MessageUtils");
 const Config_1 = __importDefault(require("./Config"));
-const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
+const UserMU_1 = require("../utils/MessageUtils/UserMU");
 class StartConversation {
     interaction;
+    conversation = {};
     constructor(interaction) {
         this.interaction = interaction;
         this.interaction = interaction;
     }
-    async precondition() {
-        const openConversation = await Utils_1.Utils.getOpenConversation(this.interaction.user.id);
-        openConversation
-            ? await this.interaction.reply({
-                content: "היי, נראה שכבר יש לך צ'אט פתוח",
-                components: [MessageUtils_1.MessageUtils.Actions.linkButton(`https://discord.com/channels/${Config_1.default.config.guild?.id}/${openConversation.channelId}`, "העבר אותי לצ'אט")],
-                ephemeral: true
-            })
-            : this.createConversation();
+    static async createHandler(interaction) {
+        const handler = new StartConversation(interaction);
+        await handler.load();
+        return handler;
     }
-    async createConversation() {
-        const numberOfConversation = await Utils_1.Utils.getNumberOfConversationFromDB() + 1;
-        const convChannel = await Config_1.default.config.guild?.channels.create({
-            name: `צ'אט מספר ${numberOfConversation}`,
-            type: discord_js_1.ChannelType.GuildText,
-            parent: Config_1.default.config.conversationCatagory
-        });
-        if (!convChannel)
-            return;
-        await Promise.all([
-            this.interaction.user.send({
-                embeds: [MessageUtils_1.MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
-                components: [new discord_js_1.ActionRowBuilder().addComponents(ConversationManage_1.ConversationManageMessageUtils.Actions.tools_close)]
-            }),
-            convChannel.send({
-                content: `<@&${Config_1.default.config.helperRole}>`,
-                embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.newChatStaff()],
-                components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supporterTools]
-            }).then(message => message.edit({ content: null })),
-            db_1.default.conversationsCollection.insertOne({
+    async load() {
+        this.conversation = await Utils_1.Utils.getOpenConversation(this.interaction.user.id);
+        return this.conversation;
+    }
+    async handle() {
+        if (!this.conversation || !this.conversation.subject) {
+            await this.sendSelectSubject();
+        }
+        else {
+            await this.interaction.reply({
+                content: "היי, נראה שכבר יש לך צ'אט פתוח",
+                ephemeral: true,
+            });
+        }
+    }
+    async sendSelectSubject() {
+        this.interaction.user.send({
+            embeds: [UserMU_1.UserMessageUtils.CustomEmbedMessages.subjects],
+            components: [UserMU_1.UserMessageUtils.Actions.selectSubject],
+        })
+            .then(async () => {
+            await db_1.default.conversationsCollection.updateOne({
                 userId: this.interaction.user.id,
-                guildId: Config_1.default.config.guild?.id,
-                channelId: convChannel.id,
                 open: true,
-                date: new Date()
-            }),
-        ]);
+            }, {
+                $set: {
+                    userId: this.interaction.user.id,
+                    guildId: Config_1.default.config.guild?.id,
+                    open: true,
+                    date: new Date(),
+                }
+            }, { upsert: true });
+        })
+            .catch(() => {
+            this.interaction.followUp({
+                content: `לא ניתן לפתוח צ’אט - יש לאפשר שליחת הודעות פרטיות בדיסקורד.
+          למידע נוסף ניתן לעיין ב: https://support.discord.com/hc/en-us/articles/360060145013`,
+                ephemeral: true
+            });
+        });
     }
 }
 exports.default = StartConversation;
