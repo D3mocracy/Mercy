@@ -104,7 +104,10 @@ class ModalSubmitHandler {
     async criticalChat() {
         const channel = this.interaction.channel;
         if (channel.name.includes('❗')) {
-            await this.interaction.reply('הפנייה בטיפול על ידי ההנהלה הגבוהה');
+            await this.interaction.reply({
+                content: 'הפנייה בטיפול על ידי ההנהלה הגבוהה',
+                ephemeral: true
+            });
         }
         else {
             channel.setName(channel.name + " ❗");
