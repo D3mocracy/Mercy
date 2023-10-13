@@ -103,13 +103,18 @@ class ModalSubmitHandler {
     }
     async criticalChat() {
         const channel = this.interaction.channel;
-        channel.name.includes('❗') || channel.setName(channel.name + " ❗");
-        (await Config_1.default.config.requestHelperChannel?.send({
-            content: `${Config_1.default.config.memberRole}`,
-            embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.criticalChat(this.interaction)],
-            components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, false), ConversationManage_1.ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild?.id}/${this.interaction.channelId}`)]
-        }))?.edit({ content: null });
-        await this.interaction.reply({ content: "ההפנייה נשלחה בהצלחה להנהלה הגבוהה", ephemeral: true });
+        if (channel.name.includes('❗')) {
+            await this.interaction.reply('הפנייה בטיפול על ידי ההנהלה הגבוהה');
+        }
+        else {
+            channel.setName(channel.name + " ❗");
+            (await Config_1.default.config.requestHelperChannel?.send({
+                content: `${Config_1.default.config.memberRole}`,
+                embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.criticalChat(this.interaction)],
+                components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, false), ConversationManage_1.ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${Config_1.default.config.guild?.id}/${this.interaction.channelId}`)]
+            }))?.edit({ content: null });
+            await this.interaction.reply({ content: "ההפנייה נשלחה בהצלחה להנהלה הגבוהה", ephemeral: true });
+        }
     }
 }
 exports.ModalSubmitHandler = ModalSubmitHandler;
