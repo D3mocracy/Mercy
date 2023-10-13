@@ -15,16 +15,17 @@ var Logger;
             returnType: types_1.ExportReturnType.Attachment,
             filename: `chat log ${ticketChannel.name.replaceAll('-', ' ')}.html`,
         });
-        await Config_1.default.config.conversationLog?.send({ embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.ticketLog(ticketChannel.name.replaceAll('-', ' '))], files: [attachment] });
-        await user?.send({ embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.ticketLog(ticketChannel.name.replaceAll('-', ' '))], files: [attachment] });
+        await Config_1.default.config.conversationLog?.send({ embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.ticketLog(ticketChannel?.name.replaceAll('-', ' '))], files: [attachment] });
+        await user?.send({ embeds: [await MessageUtils_1.MessageUtils.EmbedMessages.ticketLog(ticketChannel?.name.replaceAll('-', ' '))], files: [attachment] });
     }
     Logger.logTicket = logTicket;
     async function logError(error) {
         try {
-            await Config_1.default.config.errorChannel?.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)] });
+            await Config_1.default.config.errorChannel?.send({ content: `${error}`, embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)] });
         }
         catch (error) {
             console.error(error);
+            console.log(error);
         }
     }
     Logger.logError = logError;

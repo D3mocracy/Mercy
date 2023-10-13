@@ -95,7 +95,7 @@ class ConversationManageHandler {
       embeds: [
         ConversationManageMessageUtils.EmbedMessages.chatClosed(
           closedBy,
-          this.channel.name
+          this.channel?.name
         ),
       ],
     };

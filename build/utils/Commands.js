@@ -58,5 +58,5 @@ var Command;
         approveVacation,
         criticalChat
     ];
-})(Command || (exports.Command = Command = {}));
+})(Command = exports.Command || (exports.Command = {}));
 //# sourceMappingURL=Commands.js.map

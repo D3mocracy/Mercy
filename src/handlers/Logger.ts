@@ -12,15 +12,16 @@ namespace Logger {
             returnType: ExportReturnType.Attachment,
             filename: `chat log ${ticketChannel.name.replaceAll('-', ' ')}.html`,
         });
-        await ConfigHandler.config.conversationLog?.send({ embeds: [await MessageUtils.EmbedMessages.ticketLog(ticketChannel.name.replaceAll('-', ' '))], files: [attachment] })
-        await user?.send({ embeds: [await MessageUtils.EmbedMessages.ticketLog(ticketChannel.name.replaceAll('-', ' '))], files: [attachment] })
+        await ConfigHandler.config.conversationLog?.send({ embeds: [await MessageUtils.EmbedMessages.ticketLog(ticketChannel?.name.replaceAll('-', ' '))], files: [attachment] })
+        await user?.send({ embeds: [await MessageUtils.EmbedMessages.ticketLog(ticketChannel?.name.replaceAll('-', ' '))], files: [attachment] })
     }
 
     export async function logError(error: Error) {
         try {
-            await ConfigHandler.config.errorChannel?.send({ embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
+            await ConfigHandler.config.errorChannel?.send({ content: `${error}`, embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
         } catch (error) {
             console.error(error);
+            console.log(error);
         }
     }
 

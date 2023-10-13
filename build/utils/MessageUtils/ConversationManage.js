@@ -380,5 +380,5 @@ var ConversationManageMessageUtils;
             title: "דיווח כצ'אט קריטי",
         }).addComponents(criticalChatReason);
     })(Modals = ConversationManageMessageUtils.Modals || (ConversationManageMessageUtils.Modals = {}));
-})(ConversationManageMessageUtils || (exports.ConversationManageMessageUtils = ConversationManageMessageUtils = {}));
+})(ConversationManageMessageUtils = exports.ConversationManageMessageUtils || (exports.ConversationManageMessageUtils = {}));
 //# sourceMappingURL=ConversationManage.js.map

@@ -79,7 +79,7 @@ class ConversationManageHandler {
         }
         const closedMessage = {
             embeds: [
-                ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.chatClosed(closedBy, this.channel.name),
+                ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.chatClosed(closedBy, this.channel?.name),
             ],
         };
         this.conversation.open = false;
