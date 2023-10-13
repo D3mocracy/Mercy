@@ -103,7 +103,7 @@ class ModalSubmitHandler {
     }
     async criticalChat() {
         const channel = this.interaction.channel;
-        channel.setName(channel.name + " ❗");
+        channel.name.includes('❗') || channel.setName(channel.name + " ❗");
         (await Config_1.default.config.requestHelperChannel?.send({
             content: `${Config_1.default.config.memberRole}`,
             embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.criticalChat(this.interaction)],
