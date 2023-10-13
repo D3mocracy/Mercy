@@ -87,6 +87,19 @@ var ConversationManageMessageUtils;
             ]);
         }
         EmbedMessages.revealUserMessage = revealUserMessage;
+        function findChannel(conversation) {
+            return new discord_js_1.EmbedBuilder({
+                color: colors.pink,
+                title: `מערכת ניהול למנהלים - מידע על צ'אט`,
+                description: `להלן מידע על צ'אט מספר **${conversation.channelNumber}**`,
+            }).addFields([
+                { name: "משתמש", value: `${Utils_1.Utils.getMemberByID(conversation.userId)}` },
+                { name: "נושא", value: conversation.subject },
+                { name: "תומך אחרון", value: `${conversation.staffMemberId ? Utils_1.Utils.getMembersById(...conversation.staffMemberId).map(m => `${m}`) : ""}` },
+                { name: "תאריך פתיחה", value: `${conversation._id?.getTimestamp()}` }
+            ]);
+        }
+        EmbedMessages.findChannel = findChannel;
         EmbedMessages.changeHelper = new discord_js_1.EmbedBuilder({
             color: colors.blue,
             title: "החלפת תומך",
@@ -316,6 +329,18 @@ var ConversationManageMessageUtils;
     })(Actions = ConversationManageMessageUtils.Actions || (ConversationManageMessageUtils.Actions = {}));
     let Modals;
     (function (Modals) {
+        //Channel Info
+        const channelNumber = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
+            customId: "channel_number",
+            label: "מספר הצ'אט",
+            placeholder: "יש להכניס ערך מספרי בלבד!",
+            style: discord_js_1.TextInputStyle.Short,
+            required: true,
+        }));
+        Modals.findChannelModal = new discord_js_1.ModalBuilder({
+            customId: "findChannelModal",
+            title: "קבלת מידע על צ'אט",
+        }).addComponents([channelNumber]);
         //Mute Member Punish
         const muteTime = new discord_js_1.ActionRowBuilder().addComponents(new discord_js_1.TextInputBuilder({
             customId: "punish_mute_time",
@@ -380,5 +405,5 @@ var ConversationManageMessageUtils;
             title: "דיווח כצ'אט קריטי",
         }).addComponents(criticalChatReason);
     })(Modals = ConversationManageMessageUtils.Modals || (ConversationManageMessageUtils.Modals = {}));
-})(ConversationManageMessageUtils = exports.ConversationManageMessageUtils || (exports.ConversationManageMessageUtils = {}));
+})(ConversationManageMessageUtils || (exports.ConversationManageMessageUtils = ConversationManageMessageUtils = {}));
 //# sourceMappingURL=ConversationManage.js.map

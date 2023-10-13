@@ -44,8 +44,10 @@ class CommandHandler {
                 ephemeral: true
             })
         }
+    }
 
-
+    async findChannel() {
+        await this.interaction.showModal(ConversationManageMessageUtils.Modals.findChannelModal);
     }
 
     async makeHelperOfTheMonth(gender: "helper" | "helperit") {

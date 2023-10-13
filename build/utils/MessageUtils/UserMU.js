@@ -35,5 +35,5 @@ var UserMessageUtils;
             options: subjects.map(subject => ({ label: subject, value: subject }))
         }));
     })(Actions = UserMessageUtils.Actions || (UserMessageUtils.Actions = {}));
-})(UserMessageUtils = exports.UserMessageUtils || (exports.UserMessageUtils = {}));
+})(UserMessageUtils || (exports.UserMessageUtils = UserMessageUtils = {}));
 //# sourceMappingURL=UserMU.js.map

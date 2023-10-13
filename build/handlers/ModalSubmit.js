@@ -9,6 +9,7 @@ const db_1 = __importDefault(require("../utils/db"));
 const ImportantLinks_1 = require("../utils/MessageUtils/ImportantLinks");
 const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
 const MessageUtils_1 = require("../utils/MessageUtils");
+const Errors_1 = require("../utils/Errors");
 class ModalSubmitHandler {
     interaction;
     constructor(interaction) {
@@ -58,6 +59,16 @@ class ModalSubmitHandler {
             other
         });
         await this.interaction.reply({ content: `הטופס שמילאתם עבור התנדבות לשרת נשלח בהצלחה למנהלים`, ephemeral: true });
+    }
+    async findChannel() {
+        const channelNumber = this.interaction.fields.getTextInputValue("channel_number");
+        const conversation = await db_1.default.conversationsCollection.findOne({ channelNumber });
+        if (!conversation)
+            throw new Errors_1.CantLoadConversationFromDB;
+        await this.interaction.reply({
+            embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.findChannel(conversation)],
+            ephemeral: true
+        });
     }
     async suggestIdea() {
         const suggestExplain = this.interaction.fields.getTextInputValue("suggest_explain");

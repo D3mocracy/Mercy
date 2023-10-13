@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, GuildMember, ModalBuilder, ModalSubmitInteraction, StringSelectMenuBuilder } from "discord.js";
+import { Conversation } from "../types";
 export declare namespace ConversationManageMessageUtils {
     namespace EmbedMessages {
         function referSupervisor(interaction: ModalSubmitInteraction): EmbedBuilder;
@@ -7,6 +8,7 @@ export declare namespace ConversationManageMessageUtils {
         const ManagerTools: EmbedBuilder;
         function newChatStaff(title: string, description: string): EmbedBuilder;
         function revealUserMessage(userId: string): Promise<EmbedBuilder>;
+        function findChannel(conversation: Conversation): EmbedBuilder;
         const changeHelper: EmbedBuilder;
         const helpersReseted: EmbedBuilder;
         function chatClosed(closedBy: string, chatTitle: string): EmbedBuilder;
@@ -31,6 +33,7 @@ export declare namespace ConversationManageMessageUtils {
         function punishMenu(): ActionRowBuilder<StringSelectMenuBuilder>;
     }
     namespace Modals {
+        const findChannelModal: ModalBuilder;
         const punishMuteModal: ModalBuilder;
         const punishKickModal: ModalBuilder;
         const punishBanModal: ModalBuilder;

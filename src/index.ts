@@ -179,6 +179,9 @@ client.on('interactionCreate', async interaction => {
         ['criticalChatModal', async () => {
             await new ModalSubmitHandler(interaction as ModalSubmitInteraction).criticalChat();
         }],
+        ['findChannelModal', async () => {
+            await new ModalSubmitHandler(interaction as ModalSubmitInteraction).findChannel();
+        }],
         ['helpers_list', async () => {
             await new ChangeHelperHandler(client, interaction as StringSelectMenuInteraction).handle();
         }],
@@ -205,6 +208,9 @@ client.on('interactionCreate', async interaction => {
         }],
         ['sendstaffmessage', async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).sendStaffMessage();
+        }],
+        ['channel-info', async () => {
+            await new CommandHandler(interaction as ChatInputCommandInteraction).findChannel();
         }],
         ['vacation', async () => {
             await (interaction as ChatInputCommandInteraction).showModal(MessageUtils.Modals.vacationModal);

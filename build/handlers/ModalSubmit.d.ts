@@ -5,6 +5,7 @@ export declare class ModalSubmitHandler {
     referManager(): Promise<void>;
     sendVacationMessage(): Promise<void>;
     sendVolunteerMessage(): Promise<void>;
+    findChannel(): Promise<void>;
     suggestIdea(): Promise<void>;
     reportHelper(): Promise<void>;
     criticalChat(): Promise<void>;

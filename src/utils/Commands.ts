@@ -34,6 +34,12 @@ export namespace Command {
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .setDMPermission(false);
 
+  const channelInfo = new SlashCommandBuilder()
+    .setName("channel-info")
+    .setDescription("קבלת מידע על צ'אט")
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false);
+
   const setHelperOfTheMonth = new ContextMenuCommandBuilder()
     .setName("חבר הצוות של החודש")
     .setType(ApplicationCommandType.User)
@@ -67,6 +73,7 @@ export namespace Command {
     sendStaffMessage,
     vacation,
     approveVacation,
-    criticalChat
+    criticalChat,
+    channelInfo
   ];
 }

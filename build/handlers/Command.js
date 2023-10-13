@@ -50,6 +50,9 @@ class CommandHandler {
             });
         }
     }
+    async findChannel() {
+        await this.interaction.showModal(ConversationManage_1.ConversationManageMessageUtils.Modals.findChannelModal);
+    }
     async makeHelperOfTheMonth(gender) {
         const helper = this.interaction.targetMember;
         const helpersOfTheMonth = gender === "helper" ? Config_1.default.config.helperOfTheMonthRole : Config_1.default.config.helperitOfTheMonthRole;

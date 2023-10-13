@@ -1,6 +1,8 @@
 import { CategoryChannelResolvable, TextChannel, Role, Guild } from "discord.js";
+import { ObjectId } from "mongodb";
 
 export type Conversation = {
+    _id?: ObjectId,
     userId: string,
     staffMemberId?: string[],
     guildId: string,
@@ -8,6 +10,7 @@ export type Conversation = {
     open: boolean,
     date: Date,
     subject: string,
+    channelNumber?: number,
 }
 
 export type Punish = {

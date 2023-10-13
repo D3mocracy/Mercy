@@ -177,6 +177,9 @@ client.on('interactionCreate', async (interaction) => {
         ['criticalChatModal', async () => {
                 await new ModalSubmit_1.ModalSubmitHandler(interaction).criticalChat();
             }],
+        ['findChannelModal', async () => {
+                await new ModalSubmit_1.ModalSubmitHandler(interaction).findChannel();
+            }],
         ['helpers_list', async () => {
                 await new ChangeHelper_1.default(client, interaction).handle();
             }],
@@ -203,6 +206,9 @@ client.on('interactionCreate', async (interaction) => {
             }],
         ['sendstaffmessage', async () => {
                 await new Command_1.default(interaction).sendStaffMessage();
+            }],
+        ['channel-info', async () => {
+                await new Command_1.default(interaction).findChannel();
             }],
         ['vacation', async () => {
                 await interaction.showModal(MessageUtils_1.MessageUtils.Modals.vacationModal);

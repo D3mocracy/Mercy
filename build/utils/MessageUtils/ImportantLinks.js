@@ -210,5 +210,5 @@ var ImportantLinksMessageUtils;
             title: "דיווחים ותלונות על חברי צוות"
         }).addComponents([helperName, reportHelperCause]);
     })(Modals = ImportantLinksMessageUtils.Modals || (ImportantLinksMessageUtils.Modals = {}));
-})(ImportantLinksMessageUtils = exports.ImportantLinksMessageUtils || (exports.ImportantLinksMessageUtils = {}));
+})(ImportantLinksMessageUtils || (exports.ImportantLinksMessageUtils = ImportantLinksMessageUtils = {}));
 //# sourceMappingURL=ImportantLinks.js.map

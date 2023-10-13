@@ -89,7 +89,7 @@ class CreateConversationHandler {
         components: [ConversationManageMessageUtils.Actions.supporterTools],
       }).then((message) => message.edit({ content: null })),
 
-      DataBase.conversationsCollection.updateOne({ userId: this.interaction.user.id, open: true }, { $set: { channelId: convChannel.id, subject: subject } }),
+      DataBase.conversationsCollection.updateOne({ userId: this.interaction.user.id, open: true }, { $set: { channelId: convChannel.id, subject: subject, channelNumber: numberOfConversation } }),
 
     ]);
 

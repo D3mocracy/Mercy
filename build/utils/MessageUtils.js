@@ -325,5 +325,5 @@ var MessageUtils;
             moreVolunteer,
         ]);
     })(Modals = MessageUtils.Modals || (MessageUtils.Modals = {}));
-})(MessageUtils = exports.MessageUtils || (exports.MessageUtils = {}));
+})(MessageUtils || (exports.MessageUtils = MessageUtils = {}));
 //# sourceMappingURL=MessageUtils.js.map

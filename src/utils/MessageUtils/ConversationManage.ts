@@ -14,6 +14,7 @@ import {
   User,
 } from "discord.js";
 import { Utils } from "../Utils";
+import { Conversation } from "../types";
 
 export namespace ConversationManageMessageUtils {
   export namespace EmbedMessages {
@@ -99,6 +100,19 @@ export namespace ConversationManageMessageUtils {
         { name: "האם בוט", value: user?.bot ? "כן" : "לא" },
         { name: "תאריך יצירת המשתמש", value: `${user?.createdAt}` },
       ]);
+    }
+
+    export function findChannel(conversation: Conversation) {
+      return new EmbedBuilder({
+        color: colors.pink,
+        title: `מערכת ניהול למנהלים - מידע על צ'אט`,
+        description: `להלן מידע על צ'אט מספר **${conversation.channelNumber}**`,
+      }).addFields([
+        { name: "משתמש", value: `${Utils.getMemberByID(conversation.userId)}` },
+        { name: "נושא", value: conversation.subject },
+        { name: "תומך אחרון", value: `${conversation.staffMemberId ? Utils.getMembersById(...conversation.staffMemberId).map(m => `${m}`) : ""}` },
+        { name: "תאריך פתיחה", value: `${conversation._id?.getTimestamp()}` }
+      ])
     }
 
     export const changeHelper = new EmbedBuilder({
@@ -356,6 +370,24 @@ export namespace ConversationManageMessageUtils {
   }
 
   export namespace Modals {
+
+    //Channel Info
+    const channelNumber = new ActionRowBuilder<TextInputBuilder>().addComponents(
+      new TextInputBuilder({
+        customId: "channel_number",
+        label: "מספר הצ'אט",
+        placeholder: "יש להכניס ערך מספרי בלבד!",
+        style: TextInputStyle.Short,
+        required: true,
+      }),
+    );
+
+    export const findChannelModal = new ModalBuilder({
+      customId: "findChannelModal",
+      title: "קבלת מידע על צ'אט",
+    }).addComponents([channelNumber]);
+
+
     //Mute Member Punish
     const muteTime = new ActionRowBuilder<TextInputBuilder>().addComponents(
       new TextInputBuilder({

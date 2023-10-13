@@ -93,5 +93,5 @@ var Utils;
         return isManager(userId) || isSupervisor(userId) || isAdministrator(userId);
     }
     Utils.isSeniorStaff = isSeniorStaff;
-})(Utils = exports.Utils || (exports.Utils = {}));
+})(Utils || (exports.Utils = Utils = {}));
 //# sourceMappingURL=Utils.js.map

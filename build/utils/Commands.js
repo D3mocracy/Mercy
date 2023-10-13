@@ -27,6 +27,11 @@ var Command;
         .setDescription("שולח הודעה עם רשימה של הצוות")
         .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator)
         .setDMPermission(false);
+    const channelInfo = new discord_js_1.SlashCommandBuilder()
+        .setName("channel-info")
+        .setDescription("קבלת מידע על צ'אט")
+        .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator)
+        .setDMPermission(false);
     const setHelperOfTheMonth = new discord_js_1.ContextMenuCommandBuilder()
         .setName("חבר הצוות של החודש")
         .setType(discord_js_1.ApplicationCommandType.User)
@@ -56,7 +61,8 @@ var Command;
         sendStaffMessage,
         vacation,
         approveVacation,
-        criticalChat
+        criticalChat,
+        channelInfo
     ];
-})(Command = exports.Command || (exports.Command = {}));
+})(Command || (exports.Command = Command = {}));
 //# sourceMappingURL=Commands.js.map

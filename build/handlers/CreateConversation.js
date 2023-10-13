@@ -77,7 +77,7 @@ class CreateConversationHandler {
                 embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.newChatStaff(`צ'אט ${numberOfConversation}`, `משתמש פתח צ'אט בנושא ${subject}, נא להעניק סיוע בהתאם!`)],
                 components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supporterTools],
             }).then((message) => message.edit({ content: null })),
-            db_1.default.conversationsCollection.updateOne({ userId: this.interaction.user.id, open: true }, { $set: { channelId: convChannel.id, subject: subject } }),
+            db_1.default.conversationsCollection.updateOne({ userId: this.interaction.user.id, open: true }, { $set: { channelId: convChannel.id, subject: subject, channelNumber: numberOfConversation } }),
         ]);
         await this.interaction.message.edit({ components: [] });
     }

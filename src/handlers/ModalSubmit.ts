@@ -6,6 +6,7 @@ import { Conversation } from "../utils/types";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 import { MessageUtils } from "../utils/MessageUtils";
+import { CantLoadConversationFromDB } from "../utils/Errors";
 
 export class ModalSubmitHandler {
 
@@ -60,6 +61,17 @@ export class ModalSubmitHandler {
         })
 
         await this.interaction.reply({ content: `הטופס שמילאתם עבור התנדבות לשרת נשלח בהצלחה למנהלים`, ephemeral: true });
+
+    }
+
+    async findChannel() {
+        const channelNumber = this.interaction.fields.getTextInputValue("channel_number");
+        const conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelNumber }) as any;
+        if (!conversation) throw new CantLoadConversationFromDB;
+        await this.interaction.reply({
+            embeds: [ConversationManageMessageUtils.EmbedMessages.findChannel(conversation)],
+            ephemeral: true
+        })
 
     }
 
