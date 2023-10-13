@@ -65,7 +65,7 @@ export class ModalSubmitHandler {
     }
 
     async findChannel() {
-        const channelNumber = this.interaction.fields.getTextInputValue("channel_number");
+        const channelNumber = +(this.interaction.fields.getTextInputValue("channel_number"));
         const conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelNumber }) as any;
         if (!conversation) throw new CantLoadConversationFromDB;
         await this.interaction.reply({

@@ -61,7 +61,7 @@ class ModalSubmitHandler {
         await this.interaction.reply({ content: `הטופס שמילאתם עבור התנדבות לשרת נשלח בהצלחה למנהלים`, ephemeral: true });
     }
     async findChannel() {
-        const channelNumber = this.interaction.fields.getTextInputValue("channel_number");
+        const channelNumber = +(this.interaction.fields.getTextInputValue("channel_number"));
         const conversation = await db_1.default.conversationsCollection.findOne({ channelNumber });
         if (!conversation)
             throw new Errors_1.CantLoadConversationFromDB;
