@@ -67,7 +67,13 @@ export class ModalSubmitHandler {
     async findChannel() {
         const channelNumber = +(this.interaction.fields.getTextInputValue("channel_number"));
         const conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelNumber }) as any;
-        if (!conversation) throw new CantLoadConversationFromDB;
+        if (!conversation) {
+            await this.interaction.reply({
+                content: `לא הצלחתי למצוא את הצ'אט הזה: צ'אט מספר ${channelNumber}`,
+                ephemeral: true
+            });
+            return;
+        }
         await this.interaction.reply({
             embeds: [ConversationManageMessageUtils.EmbedMessages.findChannel(conversation)],
             ephemeral: true
@@ -99,7 +105,6 @@ export class ModalSubmitHandler {
     }
 
     async reportHelper() {
-
         const helperName = this.interaction.fields.getTextInputValue("helperName")
         const reportCause = this.interaction.fields.getTextInputValue('reportHelperCause');
 

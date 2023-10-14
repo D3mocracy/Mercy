@@ -25,7 +25,7 @@ var ConversationManageMessageUtils;
                 title: "התקבלה בקשה להפניית מפקח",
                 description: `**תיאור**\n${interaction.fields.getTextInputValue("referCause")}`,
             }).addFields([
-                { name: "המפנה", value: `${interaction.user.tag}` },
+                { name: "המפנה", value: `${interaction.user}` },
                 { name: "בטיפול של", value: "לא משויך" },
                 { name: "סטטוס טיפול", value: `לא טופל` },
             ]);
@@ -38,7 +38,7 @@ var ConversationManageMessageUtils;
                 description: `**סיבה**\n${interaction.fields.getTextInputValue("critical_chat_reason")}`,
                 timestamp: new Date(),
             }).addFields([
-                { name: "המדווח", value: `${interaction.user.tag}` },
+                { name: "המדווח", value: `${interaction.user}` },
                 { name: "צ'אט", value: `${interaction.channel.name}` },
                 { name: "בטיפול של", value: "לא משויך" },
                 { name: "סטטוס טיפול", value: `לא טופל` },
