@@ -46,6 +46,7 @@ client.once('ready', async () => {
     const config = await new Config_1.default().loadConfig(client);
     await config.guild?.members.fetch();
     console.log(`Logged in as ${client.user?.tag}!`);
+    setInterval(Utils_1.Utils.checkChannels, 1000 * 60 * 60 * 24);
 });
 client.on('messageCreate', async (message) => {
     try {

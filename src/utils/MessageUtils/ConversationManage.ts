@@ -135,7 +135,7 @@ export namespace ConversationManageMessageUtils {
     export function chatClosed(closedBy: string, chatTitle: string) {
       return new EmbedBuilder({
         color: colors.red,
-        title: `${chatTitle.replaceAll("-", " ")} נסגר`,
+        title: `${chatTitle?.replaceAll("-", " ")} נסגר`,
         description: `הצ'אט נסגר על ידי ${closedBy}`,
       });
     }

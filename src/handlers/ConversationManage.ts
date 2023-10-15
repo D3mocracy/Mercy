@@ -116,7 +116,7 @@ class ConversationManageHandler {
   }
 
   async attachHelper(staffMemberId: string): Promise<void> {
-    if (Utils.getHelperClaimedConversationNumber(staffMemberId) >= 2) {
+    if ((Utils.getHelperClaimedConversationNumber(staffMemberId) >= 2) && Utils.isHelper(staffMemberId)) {
       await this.interaction.reply({
         ephemeral: true,
         content: "ניתן לשייך עד 2 צ'אטים",

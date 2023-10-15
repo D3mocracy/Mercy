@@ -116,7 +116,7 @@ var ConversationManageMessageUtils;
         function chatClosed(closedBy, chatTitle) {
             return new discord_js_1.EmbedBuilder({
                 color: colors.red,
-                title: `${chatTitle.replaceAll("-", " ")} נסגר`,
+                title: `${chatTitle?.replaceAll("-", " ")} נסגר`,
                 description: `הצ'אט נסגר על ידי ${closedBy}`,
             });
         }

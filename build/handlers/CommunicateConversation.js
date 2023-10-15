@@ -40,8 +40,6 @@ class CommunicateConversationHandler {
             channel.send(this.message.content);
         }
         else if (this.type === discord_js_1.ChannelType.GuildText) {
-            if (this.message.content.startsWith('!'))
-                return;
             await this.client.users.cache.get(this.conversation.userId)?.dmChannel?.sendTyping();
             this.client.users.send(this.conversation.userId, this.message.content)
                 .catch(() => {

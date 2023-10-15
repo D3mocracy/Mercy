@@ -97,7 +97,7 @@ class ConversationManageHandler {
             .finally(() => this.channel.delete());
     }
     async attachHelper(staffMemberId) {
-        if (Utils_1.Utils.getHelperClaimedConversationNumber(staffMemberId) >= 2) {
+        if ((Utils_1.Utils.getHelperClaimedConversationNumber(staffMemberId) >= 2) && Utils_1.Utils.isHelper(staffMemberId)) {
             await this.interaction.reply({
                 ephemeral: true,
                 content: "ניתן לשייך עד 2 צ'אטים",

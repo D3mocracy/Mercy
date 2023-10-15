@@ -1,7 +1,9 @@
-import { Channel, User, TextChannel, ChannelType, Client, Role, GuildMember, PermissionFlagsBits } from "discord.js";
+import { Channel, User, TextChannel, ChannelType, Client, Role, GuildMember, PermissionFlagsBits, CategoryChannel, Message } from "discord.js";
 import DataBase from "./db";
 import { Conversation } from "./types";
 import ConfigHandler from "../handlers/Config";
+import { ConversationManageMessageUtils } from "./MessageUtils/ConversationManage";
+import Logger from "../handlers/Logger";
 export namespace Utils {
 
     export async function hasOpenConversation(userId: string) {
@@ -87,6 +89,37 @@ export namespace Utils {
 
     export function isSeniorStaff(userId: string) {
         return isManager(userId) || isSupervisor(userId) || isAdministrator(userId);
+    }
+
+    export async function checkChannels() {
+        try {
+            const conversationCategory = ConfigHandler.config.conversationCatagory as CategoryChannel;
+
+            const textChannels = conversationCategory.children.cache.map(c => c as TextChannel);
+
+            for (const channel of textChannels) {
+                const messages = await channel.messages.fetch({ limit: 1 });
+                const lastMessage = messages.first() as Message;
+
+                if (lastMessage) {
+                    if (!lastMessage.author.bot) {
+                        //CLOSE CHANNEL
+                        const conversation = await DataBase.conversationsCollection.findOne({ channelId: channel.id, open: true }) as Conversation;
+                        const closedMessage = { content: `המערכת לא זיהתה הודעה ב-24 השעות האחרונות ולכן הצ'אט נסגר עקב חוסר פעילות. ניתן לפנות אלינו שוב בכל עת על ידי פתיחת צ'אט חדש.`, embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed("הבוט", channel.name)] };
+                        const member = Utils.getMemberByID(conversation.userId) as GuildMember;
+                        await Promise.all([
+                            Utils.getMemberByID(conversation.userId)?.send(closedMessage),
+                            channel.send(closedMessage),
+                            Logger.logTicket(channel, member.user),
+                            DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } }, { upsert: true })
+                        ]);
+                        await channel.delete();
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('An error occurred:', error);
+        }
     }
 
 }
