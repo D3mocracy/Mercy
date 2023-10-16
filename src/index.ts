@@ -45,7 +45,7 @@ client.once('ready', async () => {
     const config = await new ConfigHandler().loadConfig(client);
     await config.guild?.members.fetch();
     console.log(`Logged in as ${client!.user?.tag}!`);
-    setInterval(Utils.checkChannels, 1000 * 60 * 60 * 24);
+    // setInterval(Utils.checkChannels, 1000 * 60 * 60); // NEED TO BE FIXED - TIMEZONE PROBLEMS
 });
 
 client.on('messageCreate', async message => {
@@ -112,17 +112,14 @@ client.on('interactionCreate', async interaction => {
         ['sure_yes', async () => {
             try {
                 const conversationManage = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
-                await (interaction as ButtonInteraction).message.edit({ components: [] });
                 await conversationManage.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
                 await conversationManage.saveConversation();
             } catch (error) {
-                (interaction as ButtonInteraction).message.edit({ components: [] });
                 interaction.channel?.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
             }
         }],
         ['sure_no', async () => {
-            await interaction.channel?.send({ embeds: [ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat] });
-            (interaction as ButtonInteraction).message.edit({ components: [] });
+            await (interaction as ButtonInteraction).reply({ embeds: [ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat], ephemeral: true });
         }],
         ['tools_manager', async () => {
             Utils.isSeniorStaff(interaction.user.id)
@@ -212,6 +209,9 @@ client.on('interactionCreate', async interaction => {
         }],
         ['channel-info', async () => {
             await new CommandHandler(interaction as ChatInputCommandInteraction).findChannel();
+        }],
+        ['reopen', async () => {
+            await new CommandHandler(interaction as ChatInputCommandInteraction).reopenChat(client);
         }],
         ['vacation', async () => {
             await (interaction as ChatInputCommandInteraction).showModal(MessageUtils.Modals.vacationModal);

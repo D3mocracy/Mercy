@@ -1,10 +1,11 @@
-import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember, ActionRowBuilder, ButtonBuilder, ContextMenuCommandInteraction, EmbedBuilder, TextChannel } from "discord.js"
+import { ChatInputCommandInteraction, UserContextMenuCommandInteraction, GuildMember, ActionRowBuilder, ButtonBuilder, ContextMenuCommandInteraction, EmbedBuilder, TextChannel, ChannelType, Client } from "discord.js"
 import { MessageUtils } from "../utils/MessageUtils";
 import ConfigHandler from "./Config";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 import { Utils } from "../utils/Utils";
 import DataBase from "../utils/db";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
+import { Conversation } from "../utils/types";
 
 class CommandHandler {
 
@@ -16,6 +17,62 @@ class CommandHandler {
             components: [MessageUtils.Actions.openChatButton]
         });
         await this.interaction.reply({ content: 'Sent!', ephemeral: true })
+    }
+
+    async reopenChat(client: Client) {
+        const chatNumber = (this.interaction as ChatInputCommandInteraction).options.getNumber('channel-number');
+        let conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelNumber: chatNumber, open: false }) as Conversation;
+        if (!conversation) {
+            await this.interaction.reply({
+                content: "לא מצאתי צ'אט כזה",
+                ephemeral: true
+            })
+            return;
+        }
+        if (!Utils.isMemberInGuild(conversation.userId)) {
+            await this.interaction.reply({
+                content: "המשתמש שפתח את הצ'א הזה כבר לא חלק מהשרת",
+                ephemeral: true
+            })
+            return;
+        }
+        const activeChannel = await DataBase.conversationsCollection.findOne({ userId: conversation.userId, open: true });
+        if (activeChannel) {
+            await this.interaction.reply({
+                content: `המשתמש פתח צ'אט חדש או שהוא בתהליך לפתיחת צ'אט`,
+                ephemeral: true
+            });
+            return;
+        }
+        const convChannel = await ConfigHandler.config.guild?.channels.create({
+            name: `צ'אט ${conversation.channelNumber}`,
+            type: ChannelType.GuildText,
+            parent: ConfigHandler.config.conversationCatagory,
+        });
+        if (!convChannel) return;
+        await DataBase.conversationsCollection.updateOne({ _id: conversation._id }, { $set: { open: true, channelId: convChannel.id } }) as any;
+        conversation.channelId = convChannel.id;
+
+        await Promise.all([
+            convChannel.send({
+                content: `<@&${ConfigHandler.config.memberRole}>`,
+                embeds: [ConversationManageMessageUtils.EmbedMessages.newChatStaff(`צ'אט ${conversation.channelNumber}`, `משתמש פתח צ'אט בנושא ${conversation.subject}, נא להעניק סיוע בהתאם!`)],
+                components: [ConversationManageMessageUtils.Actions.supporterTools],
+            }).then((message) => message.edit({ content: null })),
+            Utils.getMemberByID(conversation.userId)?.send({
+                embeds: [MessageUtils.EmbedMessages.reopenChatUser(+conversation.channelNumber!)],
+                components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
+            }),
+            Utils.updatePermissionToChannel(client, conversation),
+
+        ]);
+
+        await this.interaction.reply({
+            content: `הצ'אט נפתח מחדש בהצלחה!`,
+            ephemeral: true
+        })
+
+
     }
 
     async sendStaffMessage() {

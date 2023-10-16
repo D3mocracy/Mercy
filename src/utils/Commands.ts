@@ -24,6 +24,17 @@ export namespace Command {
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .setDMPermission(false);
 
+  const reopen = new SlashCommandBuilder()
+    .setName("reopen")
+    .setDescription("פתיחת צ'אט מחדש")
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDMPermission(false)
+    .addNumberOption(option =>
+      option.setName(`channel-number`)
+        .setDescription('Number of chat to reopen')
+        .setRequired(true)
+    );
+
   const manageChat = new SlashCommandBuilder()
     .setName("manage")
     .setDescription("כלי הניהול של צ'אט זה");
@@ -74,6 +85,7 @@ export namespace Command {
     vacation,
     approveVacation,
     criticalChat,
-    channelInfo
+    channelInfo,
+    reopen
   ];
 }

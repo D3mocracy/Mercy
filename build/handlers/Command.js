@@ -22,6 +22,57 @@ class CommandHandler {
         });
         await this.interaction.reply({ content: 'Sent!', ephemeral: true });
     }
+    async reopenChat(client) {
+        const chatNumber = this.interaction.options.getNumber('channel-number');
+        let conversation = await db_1.default.conversationsCollection.findOne({ channelNumber: chatNumber, open: false });
+        if (!conversation) {
+            await this.interaction.reply({
+                content: "לא מצאתי צ'אט כזה",
+                ephemeral: true
+            });
+            return;
+        }
+        if (!Utils_1.Utils.isMemberInGuild(conversation.userId)) {
+            await this.interaction.reply({
+                content: "המשתמש שפתח את הצ'א הזה כבר לא חלק מהשרת",
+                ephemeral: true
+            });
+            return;
+        }
+        const activeChannel = await db_1.default.conversationsCollection.findOne({ userId: conversation.userId, open: true });
+        if (activeChannel) {
+            await this.interaction.reply({
+                content: `המשתמש פתח צ'אט חדש או שהוא בתהליך לפתיחת צ'אט`,
+                ephemeral: true
+            });
+            return;
+        }
+        const convChannel = await Config_1.default.config.guild?.channels.create({
+            name: `צ'אט ${conversation.channelNumber}`,
+            type: discord_js_1.ChannelType.GuildText,
+            parent: Config_1.default.config.conversationCatagory,
+        });
+        if (!convChannel)
+            return;
+        await db_1.default.conversationsCollection.updateOne({ _id: conversation._id }, { $set: { open: true, channelId: convChannel.id } });
+        conversation.channelId = convChannel.id;
+        await Promise.all([
+            convChannel.send({
+                content: `<@&${Config_1.default.config.memberRole}>`,
+                embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.newChatStaff(`צ'אט ${conversation.channelNumber}`, `משתמש פתח צ'אט בנושא ${conversation.subject}, נא להעניק סיוע בהתאם!`)],
+                components: [ConversationManage_1.ConversationManageMessageUtils.Actions.supporterTools],
+            }).then((message) => message.edit({ content: null })),
+            Utils_1.Utils.getMemberByID(conversation.userId)?.send({
+                embeds: [MessageUtils_1.MessageUtils.EmbedMessages.reopenChatUser(+conversation.channelNumber)],
+                components: [new discord_js_1.ActionRowBuilder().addComponents(ConversationManage_1.ConversationManageMessageUtils.Actions.tools_close)]
+            }),
+            Utils_1.Utils.updatePermissionToChannel(client, conversation),
+        ]);
+        await this.interaction.reply({
+            content: `הצ'אט נפתח מחדש בהצלחה!`,
+            ephemeral: true
+        });
+    }
     async sendStaffMessage() {
         this.interaction.channel?.send({
             embeds: [MessageUtils_1.MessageUtils.EmbedMessages.staffMembers()]

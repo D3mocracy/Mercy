@@ -84,6 +84,14 @@ var MessageUtils;
             });
         }
         EmbedMessages.newChatUser = newChatUser;
+        function reopenChatUser(numberOfConversation) {
+            return new discord_js_1.EmbedBuilder({
+                color: colors.white,
+                title: `צ'אט ${numberOfConversation}`,
+                description: `הצ'אט נפתח מחדש בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`,
+            });
+        }
+        EmbedMessages.reopenChatUser = reopenChatUser;
         async function ticketLog(channelTitle) {
             return new discord_js_1.EmbedBuilder({
                 color: colors.white,

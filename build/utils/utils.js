@@ -56,7 +56,8 @@ var Utils;
     }
     Utils.getHelperClaimedConversationNumber = getHelperClaimedConversationNumber;
     async function updatePermissionToChannel(client, conversation) {
-        const channel = Utils.getChannelById(client, conversation.channelId);
+        // const channel: TextChannel = Utils.getChannelById(client, conversation.channelId) as TextChannel;
+        const channel = await Config_1.default.config.guild?.channels.fetch(conversation.channelId);
         await channel.lockPermissions();
         if (!conversation.staffMemberId || conversation.staffMemberId.length === 0 || channel === null)
             return;
@@ -95,6 +96,10 @@ var Utils;
         return isManager(userId) || isSupervisor(userId) || isAdministrator(userId);
     }
     Utils.isSeniorStaff = isSeniorStaff;
+    function isMemberInGuild(userId) {
+        return !!Config_1.default.config.guild?.members.cache.get(userId);
+    }
+    Utils.isMemberInGuild = isMemberInGuild;
     async function checkChannels() {
         try {
             const conversationCategory = Config_1.default.config.conversationCatagory;

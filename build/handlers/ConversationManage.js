@@ -50,6 +50,7 @@ class ConversationManageHandler {
             components: [
                 ConversationManage_1.ConversationManageMessageUtils.Actions.tools_sure_close_yes_no(),
             ],
+            ephemeral: true
         });
     }
     async openRefferSupervisorModal() {
@@ -87,7 +88,6 @@ class ConversationManageHandler {
         const user = this.client.users.cache.get(this.conversation.userId);
         Promise.all([
             Logger_1.default.logTicket(this.channel, user),
-            this.interaction.message.edit({ components: [] }),
             user?.send(closedMessage) || "",
         ])
             .catch((error) => {

@@ -46,7 +46,7 @@ client.once('ready', async () => {
     const config = await new Config_1.default().loadConfig(client);
     await config.guild?.members.fetch();
     console.log(`Logged in as ${client.user?.tag}!`);
-    setInterval(Utils_1.Utils.checkChannels, 1000 * 60 * 60 * 24);
+    // setInterval(Utils.checkChannels, 1000 * 60 * 60); // NEED TO BE FIXED - TIMEZONE PROBLEMS
 });
 client.on('messageCreate', async (message) => {
     try {
@@ -109,18 +109,15 @@ client.on('interactionCreate', async (interaction) => {
         ['sure_yes', async () => {
                 try {
                     const conversationManage = await ConversationManage_1.default.createHandler(client, interaction);
-                    await interaction.message.edit({ components: [] });
                     await conversationManage.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
                     await conversationManage.saveConversation();
                 }
                 catch (error) {
-                    interaction.message.edit({ components: [] });
                     interaction.channel?.send({ embeds: [MessageUtils_1.MessageUtils.EmbedMessages.chatIsNotAvailable] });
                 }
             }],
         ['sure_no', async () => {
-                await interaction.channel?.send({ embeds: [ConversationManage_2.ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat] });
-                interaction.message.edit({ components: [] });
+                await interaction.reply({ embeds: [ConversationManage_2.ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat], ephemeral: true });
             }],
         ['tools_manager', async () => {
                 Utils_1.Utils.isSeniorStaff(interaction.user.id)
@@ -210,6 +207,9 @@ client.on('interactionCreate', async (interaction) => {
             }],
         ['channel-info', async () => {
                 await new Command_1.default(interaction).findChannel();
+            }],
+        ['reopen', async () => {
+                await new Command_1.default(interaction).reopenChat(client);
             }],
         ['vacation', async () => {
                 await interaction.showModal(MessageUtils_1.MessageUtils.Modals.vacationModal);

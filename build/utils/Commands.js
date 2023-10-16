@@ -19,6 +19,14 @@ var Command;
         .setDescription("בקשה להיעדרות או להפחתת פעילות")
         .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator)
         .setDMPermission(false);
+    const reopen = new discord_js_1.SlashCommandBuilder()
+        .setName("reopen")
+        .setDescription("פתיחת צ'אט מחדש")
+        .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator)
+        .setDMPermission(false)
+        .addNumberOption(option => option.setName(`channel-number`)
+        .setDescription('Number of chat to reopen')
+        .setRequired(true));
     const manageChat = new discord_js_1.SlashCommandBuilder()
         .setName("manage")
         .setDescription("כלי הניהול של צ'אט זה");
@@ -62,7 +70,8 @@ var Command;
         vacation,
         approveVacation,
         criticalChat,
-        channelInfo
+        channelInfo,
+        reopen
     ];
 })(Command || (exports.Command = Command = {}));
 //# sourceMappingURL=Commands.js.map

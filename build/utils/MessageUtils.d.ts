@@ -6,6 +6,7 @@ export declare namespace MessageUtils {
         function errorLog(error: Error): EmbedBuilder;
         function punishmentLog(punishment: any): EmbedBuilder;
         function newChatUser(numberOfConversation: number): EmbedBuilder;
+        function reopenChatUser(numberOfConversation: number): EmbedBuilder;
         function ticketLog(channelTitle: string): Promise<EmbedBuilder>;
         const openChat: EmbedBuilder;
         const sureMessageToClose: EmbedBuilder;

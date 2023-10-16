@@ -50,7 +50,9 @@ export namespace Utils {
     }
 
     export async function updatePermissionToChannel(client: Client, conversation: Conversation) {
-        const channel: TextChannel = Utils.getChannelById(client, conversation.channelId) as TextChannel;
+        // const channel: TextChannel = Utils.getChannelById(client, conversation.channelId) as TextChannel;
+        const channel = await ConfigHandler.config.guild?.channels.fetch(conversation.channelId) as TextChannel
+
         await channel.lockPermissions();
 
         if (!conversation.staffMemberId || conversation.staffMemberId.length === 0 || channel === null) return;
@@ -89,6 +91,10 @@ export namespace Utils {
 
     export function isSeniorStaff(userId: string) {
         return isManager(userId) || isSupervisor(userId) || isAdministrator(userId);
+    }
+
+    export function isMemberInGuild(userId: string) {
+        return !!ConfigHandler.config.guild?.members.cache.get(userId);
     }
 
     export async function checkChannels() {

@@ -96,6 +96,14 @@ export namespace MessageUtils {
       });
     }
 
+    export function reopenChatUser(numberOfConversation: number) {
+      return new EmbedBuilder({
+        color: colors.white,
+        title: `צ'אט ${numberOfConversation}`,
+        description: `הצ'אט נפתח מחדש בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.`,
+      });
+    }
+
     export async function ticketLog(channelTitle: string) {
       return new EmbedBuilder({
         color: colors.white,
