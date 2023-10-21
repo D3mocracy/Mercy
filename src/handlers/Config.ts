@@ -4,7 +4,7 @@ import { CategoryChannel, TextChannel, Role, Guild, Client } from "discord.js";
 
 class ConfigHandler {
   public static config: Config = {
-    conversationCatagory: "",
+    conversationCatagory: {} as CategoryChannel,
     conversationLog: {} as TextChannel,
     reportChannel: {} as TextChannel,
     requestHelperChannel: {} as TextChannel,

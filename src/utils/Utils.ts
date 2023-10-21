@@ -49,6 +49,12 @@ export namespace Utils {
         }).size;
     }
 
+    export function getGenderByUserId(userId: string) {
+        const member = ConfigHandler.config.guild?.members.cache.get(userId);
+        return member?.roles.cache.find(role =>
+            (role.id === "1148302562009813122" || role.id === "1148302563196805231" || role.id === "1148302566640324639"));
+    }
+
     export async function updatePermissionToChannel(client: Client, conversation: Conversation) {
         // const channel: TextChannel = Utils.getChannelById(client, conversation.channelId) as TextChannel;
         const channel = await ConfigHandler.config.guild?.channels.fetch(conversation.channelId) as TextChannel

@@ -59,13 +59,13 @@ client.on('messageCreate', async (message) => {
             await (await CustomEmbedMessages_1.default.createHandler(client, CustomEmbedMessages_1.default.getKeyFromMessage(message.content), message.channelId))?.sendMessage();
             message.delete();
         }
-        if (message.channel.id === "1148286189925838858" && message.channel instanceof discord_js_1.BaseGuildTextChannel) {
+        if (message.channel.id === "1148286189925838858" && message.channel instanceof discord_js_1.BaseGuildTextChannel) { // ספרו על עצמכם
             message.react("🤍");
-            message.channel.permissionOverwrites.edit(message.author.id, { SendMessages: false });
+            message.member?.roles.add('1164995639743090718');
         }
         const hasOpenConversation = await Utils_1.Utils.hasOpenConversation(message.author.id);
         if ((message.channel.isDMBased() && hasOpenConversation) || Utils_1.Utils.isConversationChannel(message.channel)) {
-            await new CommunicateConversation_1.default(client, message, message.channel.type).handle();
+            await new CommunicateConversation_1.default(client, message).handleSendMessage();
         }
     }
     catch (error) {
@@ -260,6 +260,20 @@ client.on('guildMemberRemove', async (member) => {
     catch (error) {
         await Logger_1.default.logError(error);
     }
+});
+client.on('messageUpdate', async (oldMessage, newMessage) => {
+    if (newMessage.channel.parentId !== Config_1.default.config.conversationCatagory?.id)
+        return;
+    const communicateConversationHandler = new CommunicateConversation_1.default(client, newMessage);
+    await communicateConversationHandler.loadConversation();
+    await communicateConversationHandler.updateMessage(oldMessage, newMessage);
+});
+client.on('messageDelete', async (message) => {
+    if (message.channel.parentId !== Config_1.default.config.conversationCatagory?.id || message.author?.bot)
+        return;
+    const communicateConversationHandler = new CommunicateConversation_1.default(client, message);
+    await communicateConversationHandler.loadConversation();
+    await communicateConversationHandler.deleteMessage(message);
 });
 client.on('guildMemberAdd', async (member) => {
     try {

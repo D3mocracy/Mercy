@@ -81,11 +81,17 @@ class CreateConversationHandler {
     const subject = (this.interaction as StringSelectMenuInteraction).values?.[0];
 
     if (!convChannel) return;
+    const genderRole = Utils.getGenderByUserId(this.interaction.user.id);
 
     await Promise.all([
       convChannel.send({
         content: `<@&${ConfigHandler.config.memberRole}>`,
-        embeds: [ConversationManageMessageUtils.EmbedMessages.newChatStaff(`צ'אט ${numberOfConversation}`, `משתמש פתח צ'אט בנושא ${subject}, נא להעניק סיוע בהתאם!`)],
+        embeds: [
+          ConversationManageMessageUtils.EmbedMessages.newChatStaff(
+            `צ'אט ${numberOfConversation}`, `משתמש פתח צ'אט בנושא ${subject}, נא להעניק סיוע בהתאם!
+            ${genderRole ? `לשון פנייה מועדפת: ${genderRole.name}` : ``}`
+          )
+        ],
         components: [ConversationManageMessageUtils.Actions.supporterTools],
       }).then((message) => message.edit({ content: null })),
 

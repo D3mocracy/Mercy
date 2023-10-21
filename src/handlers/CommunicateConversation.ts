@@ -1,36 +1,60 @@
 import DataBase from "../utils/db";
 import { Conversation } from "../utils/types";
-import { ChannelType, Message, TextChannel, Client, ActionRowBuilder, ButtonBuilder } from "discord.js"
+import { ChannelType, Message, TextChannel, Client, ActionRowBuilder, ButtonBuilder, PartialMessage, DMChannel } from "discord.js"
 import { Utils } from "../utils/Utils";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class CommunicateConversationHandler {
     private conversation: Conversation = {} as any;
-    constructor(private client: Client, private message: Message, private type: ChannelType) { }
+    constructor(private client: Client, private message: Message) { }
 
-    async handle() {
+    async handleSendMessage() {
         await this.loadConversation();
         await this.sendMessage();
     }
 
     async loadConversation(): Promise<void> {
-        if (this.type === ChannelType.DM) {
+        if (this.message.channel.type === ChannelType.DM) {
             this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.message.author.id, open: true }) as any;
-        } else if (this.type === ChannelType.GuildText) {
+        } else if (this.message.channel.type === ChannelType.GuildText) {
             this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.message.channel.id, open: true }) as any;
         } else {
             throw new CantLoadConversationFromDB();
         }
     }
 
+    async updateMessage(oldMessage: Message<boolean> | PartialMessage, newMessage: Message<boolean> | PartialMessage) {
+        if (!oldMessage.content || !newMessage.content || !this.conversation) return;
+        if (this.message.channel.type === ChannelType.DM) {
+            const channel = Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel;
+            const conversationMessage = (await channel.messages.fetch({ limit: 10 })).find(m => (m.content === oldMessage.content && m.author.bot));
+            await conversationMessage?.edit(newMessage.content);
+        } else if (this.message.channel.type === ChannelType.GuildText) {
+            const channel = this.client.users.cache.get(this.conversation.userId)?.dmChannel as DMChannel;
+            const dmMessage = (await channel.messages.fetch({ limit: 10 })).find(m => (m.content === oldMessage.content && m.author.bot));
+            await dmMessage?.edit(newMessage.content);
+        }
+
+    }
+
+    async deleteMessage(message: Message<boolean> | PartialMessage) {
+        if (!message.content || !this.conversation) return;
+        if (this.message.channel.type === ChannelType.GuildText) {
+            const channel = this.client.users.cache.get(this.conversation.userId)?.dmChannel as DMChannel;
+            const dmMessage = (await channel.messages.fetch({ limit: 10 })).find(m => (m.content === message.content && m.author.bot));
+            await dmMessage?.delete();
+        }
+
+    }
+
     async sendMessage() {
-        if (this.type === ChannelType.DM) {
+        if (this.message.channel.type === ChannelType.DM) {
             const channel = (Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel);
             await channel.sendTyping();
             channel.send(this.message.content);
 
-        } else if (this.type === ChannelType.GuildText) {
+        } else if (this.message.channel.type === ChannelType.GuildText) {
             await this.client.users.cache.get(this.conversation.userId)?.dmChannel?.sendTyping();
             this.client.users.send(this.conversation.userId, this.message.content)
                 .catch(() => {

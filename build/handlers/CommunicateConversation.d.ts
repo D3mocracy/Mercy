@@ -1,12 +1,13 @@
-import { ChannelType, Message, Client } from "discord.js";
+import { Message, Client, PartialMessage } from "discord.js";
 declare class CommunicateConversationHandler {
     private client;
     private message;
-    private type;
     private conversation;
-    constructor(client: Client, message: Message, type: ChannelType);
-    handle(): Promise<void>;
+    constructor(client: Client, message: Message);
+    handleSendMessage(): Promise<void>;
     loadConversation(): Promise<void>;
+    updateMessage(oldMessage: Message<boolean> | PartialMessage, newMessage: Message<boolean> | PartialMessage): Promise<void>;
+    deleteMessage(message: Message<boolean> | PartialMessage): Promise<void>;
     sendMessage(): Promise<void>;
 }
 export default CommunicateConversationHandler;

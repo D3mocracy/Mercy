@@ -113,7 +113,7 @@ class ConversationManageHandler {
 
       })
       .finally(() => this.channel.delete());
-  }
+  };
 
   async attachHelper(staffMemberId: string): Promise<void> {
     if ((Utils.getHelperClaimedConversationNumber(staffMemberId) >= 2) && Utils.isHelper(staffMemberId)) {

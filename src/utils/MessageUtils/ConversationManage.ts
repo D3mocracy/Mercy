@@ -166,7 +166,7 @@ export namespace ConversationManageMessageUtils {
       title: 'הפעולה בוטלה',
       description: "הצ'אט נשאר פתוח כרגיל",
       color: colors.red,
-    })
+    });
 
     export function punishmentHistoryMessage(punishments: any[]) {
       return new EmbedBuilder({

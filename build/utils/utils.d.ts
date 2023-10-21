@@ -10,6 +10,7 @@ export declare namespace Utils {
     function getMemberByID(userId: string): GuildMember | undefined;
     function getMembersWithRole(role: Role): Promise<GuildMember[]>;
     function getHelperClaimedConversationNumber(helperId: string): any;
+    function getGenderByUserId(userId: string): Role | undefined;
     function updatePermissionToChannel(client: Client, conversation: Conversation): Promise<{
         usernames: (GuildMember | undefined)[];
         conversation: Conversation;

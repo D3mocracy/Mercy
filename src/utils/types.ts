@@ -1,4 +1,4 @@
-import { CategoryChannelResolvable, TextChannel, Role, Guild } from "discord.js";
+import { CategoryChannelResolvable, TextChannel, Role, Guild, CategoryChannel } from "discord.js";
 import { ObjectId } from "mongodb";
 
 export type Conversation = {
@@ -43,7 +43,7 @@ export type ConfigDocument = {
 }
 
 export type Config = Partial<{
-    conversationCatagory: CategoryChannelResolvable,
+    conversationCatagory: CategoryChannel,
     conversationLog: TextChannel,
     reportChannel: TextChannel,
     requestHelperChannel: TextChannel,

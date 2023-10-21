@@ -11,35 +11,56 @@ const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage")
 class CommunicateConversationHandler {
     client;
     message;
-    type;
     conversation = {};
-    constructor(client, message, type) {
+    constructor(client, message) {
         this.client = client;
         this.message = message;
-        this.type = type;
     }
-    async handle() {
+    async handleSendMessage() {
         await this.loadConversation();
         await this.sendMessage();
     }
     async loadConversation() {
-        if (this.type === discord_js_1.ChannelType.DM) {
+        if (this.message.channel.type === discord_js_1.ChannelType.DM) {
             this.conversation = await db_1.default.conversationsCollection.findOne({ userId: this.message.author.id, open: true });
         }
-        else if (this.type === discord_js_1.ChannelType.GuildText) {
+        else if (this.message.channel.type === discord_js_1.ChannelType.GuildText) {
             this.conversation = await db_1.default.conversationsCollection.findOne({ channelId: this.message.channel.id, open: true });
         }
         else {
             throw new Errors_1.CantLoadConversationFromDB();
         }
     }
+    async updateMessage(oldMessage, newMessage) {
+        if (!oldMessage.content || !newMessage.content || !this.conversation)
+            return;
+        if (this.message.channel.type === discord_js_1.ChannelType.DM) {
+            const channel = Utils_1.Utils.getChannelById(this.client, this.conversation.channelId);
+            const conversationMessage = (await channel.messages.fetch({ limit: 10 })).find(m => (m.content === oldMessage.content && m.author.bot));
+            await conversationMessage?.edit(newMessage.content);
+        }
+        else if (this.message.channel.type === discord_js_1.ChannelType.GuildText) {
+            const channel = this.client.users.cache.get(this.conversation.userId)?.dmChannel;
+            const dmMessage = (await channel.messages.fetch({ limit: 10 })).find(m => (m.content === oldMessage.content && m.author.bot));
+            await dmMessage?.edit(newMessage.content);
+        }
+    }
+    async deleteMessage(message) {
+        if (!message.content || !this.conversation)
+            return;
+        if (this.message.channel.type === discord_js_1.ChannelType.GuildText) {
+            const channel = this.client.users.cache.get(this.conversation.userId)?.dmChannel;
+            const dmMessage = (await channel.messages.fetch({ limit: 10 })).find(m => (m.content === message.content && m.author.bot));
+            await dmMessage?.delete();
+        }
+    }
     async sendMessage() {
-        if (this.type === discord_js_1.ChannelType.DM) {
+        if (this.message.channel.type === discord_js_1.ChannelType.DM) {
             const channel = Utils_1.Utils.getChannelById(this.client, this.conversation.channelId);
             await channel.sendTyping();
             channel.send(this.message.content);
         }
-        else if (this.type === discord_js_1.ChannelType.GuildText) {
+        else if (this.message.channel.type === discord_js_1.ChannelType.GuildText) {
             await this.client.users.cache.get(this.conversation.userId)?.dmChannel?.sendTyping();
             this.client.users.send(this.conversation.userId, this.message.content)
                 .catch(() => {

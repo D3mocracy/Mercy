@@ -55,6 +55,11 @@ var Utils;
         }).size;
     }
     Utils.getHelperClaimedConversationNumber = getHelperClaimedConversationNumber;
+    function getGenderByUserId(userId) {
+        const member = Config_1.default.config.guild?.members.cache.get(userId);
+        return member?.roles.cache.find(role => (role.id === "1148302562009813122" || role.id === "1148302563196805231" || role.id === "1148302566640324639"));
+    }
+    Utils.getGenderByUserId = getGenderByUserId;
     async function updatePermissionToChannel(client, conversation) {
         // const channel: TextChannel = Utils.getChannelById(client, conversation.channelId) as TextChannel;
         const channel = await Config_1.default.config.guild?.channels.fetch(conversation.channelId);

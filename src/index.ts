@@ -1,5 +1,5 @@
 require("dotenv").config();
-import { ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, ButtonInteraction, IntentsBitField, ActivityFlags, ActivityType, ContextMenuCommandInteraction, Guild, BaseGuildTextChannel } from "discord.js";
+import { ChatInputCommandInteraction, ModalSubmitInteraction, StringSelectMenuInteraction, Client, Partials, ButtonInteraction, IntentsBitField, ActivityFlags, ActivityType, ContextMenuCommandInteraction, Guild, BaseGuildTextChannel, Message, TextChannel } from "discord.js";
 import ChangeHelperHandler from "./handlers/ChangeHelper";
 import CommandHandler from "./handlers/Command";
 import CommunicateConversationHandler from "./handlers/CommunicateConversation";
@@ -60,14 +60,14 @@ client.on('messageCreate', async message => {
             message.delete();
         }
 
-        if (message.channel.id === "1148286189925838858" && message.channel instanceof BaseGuildTextChannel) {
+        if (message.channel.id === "1148286189925838858" && message.channel instanceof BaseGuildTextChannel) { // ספרו על עצמכם
             message.react("🤍");
-            message.channel.permissionOverwrites.edit(message.author.id, { SendMessages: false });
+            message.member?.roles.add('1164995639743090718');
         }
 
         const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
         if ((message.channel.isDMBased() && hasOpenConversation) || Utils.isConversationChannel(message.channel)) {
-            await new CommunicateConversationHandler(client, message, message.channel.type).handle();
+            await new CommunicateConversationHandler(client, message).handleSendMessage();
         }
 
     } catch (error: any) {
@@ -264,6 +264,21 @@ client.on('guildMemberRemove', async member => {
     } catch (error: any) {
         await Logger.logError(error);
     }
+});
+
+client.on('messageUpdate', async (oldMessage, newMessage) => {
+    if ((newMessage.channel as TextChannel).parentId !== ConfigHandler.config.conversationCatagory?.id) return;
+    const communicateConversationHandler = new CommunicateConversationHandler(client, newMessage as Message);
+    await communicateConversationHandler.loadConversation();
+    await communicateConversationHandler.updateMessage(oldMessage, newMessage);
+
+});
+
+client.on('messageDelete', async (message) => {
+    if ((message.channel as TextChannel).parentId !== ConfigHandler.config.conversationCatagory?.id || message.author?.bot) return;
+    const communicateConversationHandler = new CommunicateConversationHandler(client, message as Message);
+    await communicateConversationHandler.loadConversation();
+    await communicateConversationHandler.deleteMessage(message);
 });
 
 client.on('guildMemberAdd', async member => {
