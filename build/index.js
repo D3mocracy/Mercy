@@ -49,6 +49,7 @@ client.once('ready', async () => {
     // setInterval(Utils.checkChannels, 1000 * 60 * 60); // NEED TO BE FIXED - TIMEZONE PROBLEMS
 });
 client.on('messageCreate', async (message) => {
+    console.log(message.createdTimestamp);
     try {
         if (message.author.bot
             || message.attachments.size > 0

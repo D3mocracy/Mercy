@@ -49,6 +49,8 @@ client.once('ready', async () => {
 });
 
 client.on('messageCreate', async message => {
+    console.log(message.createdTimestamp);
+
     try {
         if (message.author.bot
             || message.attachments.size > 0

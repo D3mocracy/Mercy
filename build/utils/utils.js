@@ -119,7 +119,7 @@ var Utils;
                         const closedMessage = { content: `המערכת לא זיהתה הודעה ב-24 השעות האחרונות ולכן הצ'אט נסגר עקב חוסר פעילות. ניתן לפנות אלינו שוב בכל עת על ידי פתיחת צ'אט חדש.`, embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.chatClosed("הבוט", channel.name)] };
                         const member = Utils.getMemberByID(conversation.userId);
                         await Promise.all([
-                            Utils.getMemberByID(conversation.userId)?.send(closedMessage),
+                            member.send(closedMessage),
                             channel.send(closedMessage),
                             Logger_1.default.logTicket(channel, member.user),
                             db_1.default.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } }, { upsert: true })
