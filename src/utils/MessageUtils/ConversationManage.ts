@@ -80,6 +80,15 @@ export namespace ConversationManageMessageUtils {
       });
     }
 
+    export function unActiveChannels(channels: TextChannel[]) {
+      return new EmbedBuilder({
+        color: colors.pink,
+        title: `צ'אטים לא פעילים`,
+        description: `רשימת צ'אטים לא פעילים(לא נכתבה הודעה מצד המשתמש ב24 שעות האחרונות)
+        ${channels.map(c => `${c}`).join('\n')}`
+      })
+    }
+
     export async function revealUserMessage(userId: string) {
       const user = Utils.getMemberByID(userId)?.user;
       return new EmbedBuilder({

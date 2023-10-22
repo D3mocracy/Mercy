@@ -109,26 +109,37 @@ export namespace Utils {
 
             const textChannels = conversationCategory.children.cache.map(c => c as TextChannel);
 
+            const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+            const unActiveChannels: TextChannel[] = [];
+
             for (const channel of textChannels) {
                 const messages = await channel.messages.fetch({ limit: 1 });
                 const lastMessage = messages.first() as Message;
 
-                if (lastMessage) {
-                    if (!lastMessage.author.bot) {
-                        //CLOSE CHANNEL
-                        const conversation = await DataBase.conversationsCollection.findOne({ channelId: channel.id, open: true }) as Conversation;
-                        const closedMessage = { content: `המערכת לא זיהתה הודעה ב-24 השעות האחרונות ולכן הצ'אט נסגר עקב חוסר פעילות. ניתן לפנות אלינו שוב בכל עת על ידי פתיחת צ'אט חדש.`, embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed("הבוט", channel.name)] };
-                        const member = Utils.getMemberByID(conversation.userId) as GuildMember;
-                        await Promise.all([
-                            member.send(closedMessage),
-                            channel.send(closedMessage),
-                            Logger.logTicket(channel, member.user),
-                            DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } }, { upsert: true })
-                        ]);
-                        await channel.delete();
-                    }
+                if (lastMessage && !lastMessage.author.bot && lastMessage.createdTimestamp < twentyFourHoursAgo.getTime()) {
+                    unActiveChannels.push(channel);
+
+                    //CLOSE CHANNEL
+                    /*const conversation = await DataBase.conversationsCollection.findOne({ channelId: channel.id, open: true }) as Conversation;
+                    const closedMessage = { content: `המערכת לא זיהתה הודעה ב-24 השעות האחרונות ולכן הצ'אט נסגר עקב חוסר פעילות. ניתן לפנות אלינו שוב בכל עת על ידי פתיחת צ'אט חדש.`, embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed("הבוט", channel.name)] };
+                    const member = Utils.getMemberByID(conversation.userId) as GuildMember;
+                    await Promise.all([
+                        member.send(closedMessage),
+                        channel.send(closedMessage),
+                        Logger.logTicket(channel, member.user),
+                        DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } }, { upsert: true })
+                    ]);
+                    await channel.delete();*/
                 }
             }
+
+            // SEND NOTIFICATION MESSAGE TO MANAGERS
+            if (unActiveChannels.length === 0) return;
+            (await (Utils.getChannelByIdNoClient('1148287013699735592') as TextChannel).send({
+                content: `${ConfigHandler.config.memberRole}`,
+                embeds: [ConversationManageMessageUtils.EmbedMessages.unActiveChannels(unActiveChannels)]
+            })).edit({ content: null })
         } catch (error) {
             console.error('An error occurred:', error);
         }

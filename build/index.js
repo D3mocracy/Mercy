@@ -46,10 +46,9 @@ client.once('ready', async () => {
     const config = await new Config_1.default().loadConfig(client);
     await config.guild?.members.fetch();
     console.log(`Logged in as ${client.user?.tag}! Current Date: ${new Date()}`);
-    // setInterval(Utils.checkChannels, 1000 * 60 * 60); // NEED TO BE FIXED - TIMEZONE PROBLEMS
+    setInterval(Utils_1.Utils.checkChannels, 1000 * 60 * 60); // NEED TO BE FIXED - TIMEZONE PROBLEMS
 });
 client.on('messageCreate', async (message) => {
-    console.log(message.createdTimestamp);
     try {
         if (message.author.bot
             || message.attachments.size > 0

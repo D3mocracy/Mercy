@@ -66,6 +66,15 @@ var ConversationManageMessageUtils;
             });
         }
         EmbedMessages.newChatStaff = newChatStaff;
+        function unActiveChannels(channels) {
+            return new discord_js_1.EmbedBuilder({
+                color: colors.pink,
+                title: `צ'אטים לא פעילים`,
+                description: `רשימת צ'אטים לא פעילים(לא נכתבה הודעה מצד המשתמש ב24 שעות האחרונות)
+        ${channels.map(c => `${c}`).join('\n')}`
+            });
+        }
+        EmbedMessages.unActiveChannels = unActiveChannels;
         async function revealUserMessage(userId) {
             const user = Utils_1.Utils.getMemberByID(userId)?.user;
             return new discord_js_1.EmbedBuilder({

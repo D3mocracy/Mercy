@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, GuildMember, ModalBuilder, ModalSubmitInteraction, StringSelectMenuBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, GuildMember, ModalBuilder, ModalSubmitInteraction, StringSelectMenuBuilder, TextChannel } from "discord.js";
 import { Conversation } from "../types";
 export declare namespace ConversationManageMessageUtils {
     namespace EmbedMessages {
@@ -7,6 +7,7 @@ export declare namespace ConversationManageMessageUtils {
         function staffMemberAttached(staffMemberUsername: string): EmbedBuilder;
         const ManagerTools: EmbedBuilder;
         function newChatStaff(title: string, description: string): EmbedBuilder;
+        function unActiveChannels(channels: TextChannel[]): EmbedBuilder;
         function revealUserMessage(userId: string): Promise<EmbedBuilder>;
         function findChannel(conversation: Conversation): EmbedBuilder;
         const changeHelper: EmbedBuilder;
