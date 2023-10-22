@@ -44,7 +44,7 @@ DataBase.client.connect().then(async () => {
 client.once('ready', async () => {
     const config = await new ConfigHandler().loadConfig(client);
     await config.guild?.members.fetch();
-    console.log(`Logged in as ${client!.user?.tag}!`);
+    console.log(`Logged in as ${client!.user?.tag}! Current Date: ${new Date()}`);
     // setInterval(Utils.checkChannels, 1000 * 60 * 60); // NEED TO BE FIXED - TIMEZONE PROBLEMS
 });
 
