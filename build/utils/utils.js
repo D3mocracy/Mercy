@@ -131,7 +131,7 @@ var Utils;
             // SEND NOTIFICATION MESSAGE TO MANAGERS
             if (unActiveChannels.length === 0)
                 return;
-            (await Utils.getChannelByIdNoClient('1148287013699735592').send({
+            (await Utils.getChannelByIdNoClient('1160678867485331546').send({
                 content: `${Config_1.default.config.memberRole}`,
                 embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.unActiveChannels(unActiveChannels)]
             })).edit({ content: null });
