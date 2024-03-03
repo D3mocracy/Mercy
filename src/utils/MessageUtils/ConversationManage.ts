@@ -82,11 +82,14 @@ export namespace ConversationManageMessageUtils {
 
     export function unActiveChannels(channels: TextChannel[]) {
       return new EmbedBuilder({
-        color: colors.pink,
+        color: colors.red,
         title: `צ'אטים לא פעילים`,
-        description: `רשימת צ'אטים לא פעילים(לא נכתבה הודעה מצד המשתמש ב24 שעות האחרונות)
-        ${channels.map(c => `${c}`).join('\n')}`
-      })
+        description: `רשימת צ'אטים לא פעילים (לא נכתבה הודעה מצד המשתמש ב24 שעות האחרונות)
+        ${channels.map(c => `${c}`).join('\n')}
+        
+        נוסח להודעה לפני סגירה:
+        המערכת לא זיהתה הודעה ב-24 השעות האחרונות ולכן הצ'אט נסגר עקב חוסר פעילות. ניתן לפנות אלינו שוב בכל עת על ידי פתיחת צ'אט חדש.`
+      }).setTimestamp();
     }
 
     export async function revealUserMessage(userId: string) {
