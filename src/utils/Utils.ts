@@ -131,9 +131,9 @@ export namespace Utils {
                     await Promise.all([
                         member.send(closedMessage),
                         channel.send(closedMessage),
-                        Logger.logTicket(channel, member.user),
                         DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } }, { upsert: true })
                     ]);
+                    await Logger.logTicket(channel, member.user),
                     await channel.delete();
                 }
             }

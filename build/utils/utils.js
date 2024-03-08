@@ -127,10 +127,10 @@ var Utils;
                     await Promise.all([
                         member.send(closedMessage),
                         channel.send(closedMessage),
-                        Logger_1.default.logTicket(channel, member.user),
                         db_1.default.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } }, { upsert: true })
                     ]);
-                    await channel.delete();
+                    await Logger_1.default.logTicket(channel, member.user),
+                        await channel.delete();
                 }
             }
             // SEND NOTIFICATION MESSAGE TO MANAGERS
