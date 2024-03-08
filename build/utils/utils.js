@@ -8,6 +8,7 @@ const discord_js_1 = require("discord.js");
 const db_1 = __importDefault(require("./db"));
 const Config_1 = __importDefault(require("../handlers/Config"));
 const ConversationManage_1 = require("./MessageUtils/ConversationManage");
+const Logger_1 = __importDefault(require("../handlers/Logger"));
 var Utils;
 (function (Utils) {
     async function hasOpenConversation(userId) {
@@ -100,6 +101,10 @@ var Utils;
         return isManager(userId) || isSupervisor(userId) || isAdministrator(userId);
     }
     Utils.isSeniorStaff = isSeniorStaff;
+    function isStaff(userId) {
+        return isManager(userId) || isSupervisor(userId) || isAdministrator(userId) || isHelper(userId);
+    }
+    Utils.isStaff = isStaff;
     function isMemberInGuild(userId) {
         return !!Config_1.default.config.guild?.members.cache.get(userId);
     }
@@ -113,28 +118,27 @@ var Utils;
             for (const channel of textChannels) {
                 const messages = await channel.messages.fetch({ limit: 1 });
                 const lastMessage = messages.first();
-                if (lastMessage && !lastMessage.author.bot && lastMessage.createdTimestamp < twentyFourHoursAgo.getTime()) {
+                if (lastMessage && !lastMessage.author.bot && lastMessage.createdTimestamp < twentyFourHoursAgo.getTime() && isStaff(lastMessage.author.id)) {
                     unActiveChannels.push(channel);
                     //CLOSE CHANNEL
-                    /*const conversation = await DataBase.conversationsCollection.findOne({ channelId: channel.id, open: true }) as Conversation;
-                    const closedMessage = { content: `המערכת לא זיהתה הודעה ב-24 השעות האחרונות ולכן הצ'אט נסגר עקב חוסר פעילות. ניתן לפנות אלינו שוב בכל עת על ידי פתיחת צ'אט חדש.`, embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed("הבוט", channel.name)] };
-                    const member = Utils.getMemberByID(conversation.userId) as GuildMember;
+                    const conversation = await db_1.default.conversationsCollection.findOne({ channelId: channel.id, open: true });
+                    const closedMessage = { content: `המערכת לא זיהתה הודעה ב-24 השעות האחרונות ולכן הצ'אט נסגר עקב חוסר פעילות. ניתן לפנות אלינו שוב בכל עת על ידי פתיחת צ'אט חדש.`, embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.chatClosed("הבוט", channel.name)] };
+                    const member = Utils.getMemberByID(conversation.userId);
                     await Promise.all([
                         member.send(closedMessage),
                         channel.send(closedMessage),
-                        Logger.logTicket(channel, member.user),
-                        DataBase.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } }, { upsert: true })
+                        Logger_1.default.logTicket(channel, member.user),
+                        db_1.default.conversationsCollection.updateOne({ channelId: channel.id }, { $set: { open: false } }, { upsert: true })
                     ]);
-                    await channel.delete();*/
+                    await channel.delete();
                 }
             }
             // SEND NOTIFICATION MESSAGE TO MANAGERS
-            if (unActiveChannels.length === 0)
-                return;
-            (await Utils.getChannelByIdNoClient('1160678867485331546').send({
-                content: `${Config_1.default.config.memberRole}`,
-                embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.unActiveChannels(unActiveChannels)]
-            })).edit({ content: null });
+            /*if (unActiveChannels.length === 0) return;
+            (await (Utils.getChannelByIdNoClient('1160678867485331546') as TextChannel).send({
+                content: `${ConfigHandler.config.memberRole}`,
+                embeds: [ConversationManageMessageUtils.EmbedMessages.unActiveChannels(unActiveChannels)]
+            })).edit({ content: null })*/
         }
         catch (error) {
             console.error('An error occurred:', error);

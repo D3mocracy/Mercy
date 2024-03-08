@@ -23,6 +23,7 @@ export declare namespace Utils {
     function isSupervisor(userId: string): Role | undefined;
     function isHelper(userId: string): Role | undefined;
     function isSeniorStaff(userId: string): boolean | Role | undefined;
+    function isStaff(userId: string): true | Role | undefined;
     function isMemberInGuild(userId: string): boolean;
     function checkChannels(): Promise<void>;
 }
