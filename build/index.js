@@ -24,6 +24,7 @@ const ConversationManage_2 = require("./utils/MessageUtils/ConversationManage");
 const CreateConversation_1 = __importDefault(require("./handlers/CreateConversation"));
 const OpenModal_1 = __importDefault(require("./handlers/OpenModal"));
 const PunishMember_1 = __importDefault(require("./handlers/PunishMember"));
+const UnactiveConversation_1 = __importDefault(require("./handlers/UnactiveConversation"));
 //4194303
 const client = new discord_js_1.Client({
     intents: [
@@ -46,7 +47,8 @@ client.once('ready', async () => {
     const config = await new Config_1.default().loadConfig(client);
     await config.guild?.members.fetch();
     console.log(`Logged in as ${client.user?.tag}! Current Date: ${new Date()}`);
-    setInterval(Utils_1.Utils.checkChannels, 1000 * 60 * 60); // NEED TO BE FIXED - TIMEZONE PROBLEMS
+    const unactiveConversationHandler = new UnactiveConversation_1.default();
+    setInterval(() => unactiveConversationHandler.checkChannels(), 1000 * 60 * 60);
 });
 client.on('messageCreate', async (message) => {
     try {
@@ -179,7 +181,7 @@ client.on('interactionCreate', async (interaction) => {
                 await new ModalSubmit_1.ModalSubmitHandler(interaction).findChannel();
             }],
         ['helpers_list', async () => {
-                await new ChangeHelper_1.default(client, interaction).handle();
+                await new ChangeHelper_1.default(interaction).handle();
             }],
         ['openchat', async () => {
                 await new Command_1.default(interaction).openChat();
@@ -209,7 +211,7 @@ client.on('interactionCreate', async (interaction) => {
                 await new Command_1.default(interaction).findChannel();
             }],
         ['reopen', async () => {
-                await new Command_1.default(interaction).reopenChat(client);
+                await new Command_1.default(interaction).reopenChat();
             }],
         ['vacation', async () => {
                 await interaction.showModal(MessageUtils_1.MessageUtils.Modals.vacationModal);
@@ -231,6 +233,14 @@ client.on('interactionCreate', async (interaction) => {
         ['punishMuteModal', async () => {
                 const handler = (await PunishMember_1.default.createHandler(interaction));
                 await handler.timeout();
+            }],
+        ['unactive_continue_chat', async () => {
+                const handler = new UnactiveConversation_1.default();
+                await handler.continueConversation(interaction);
+            }],
+        ['unactive_close_chat', async () => {
+                const handler = new UnactiveConversation_1.default();
+                await handler.stopConversation(interaction);
             }],
     ]);
     try {

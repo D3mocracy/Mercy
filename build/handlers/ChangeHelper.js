@@ -7,11 +7,9 @@ const db_1 = __importDefault(require("../utils/db"));
 const Utils_1 = require("../utils/Utils");
 const ConversationManage_1 = require("../utils/MessageUtils/ConversationManage");
 class ChangeHelperHandler {
-    client;
     interaction;
     conversation = {};
-    constructor(client, interaction) {
-        this.client = client;
+    constructor(interaction) {
         this.interaction = interaction;
     }
     async loadConversation() {
@@ -26,7 +24,7 @@ class ChangeHelperHandler {
             this.conversation.staffMemberId = (this.interaction.values || "");
         }
         await this.saveConversation();
-        const newPermission = await Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation); //Can't import messageUtils from Utils
+        const newPermission = await Utils_1.Utils.updatePermissionToChannel(this.conversation); //Can't import messageUtils from Utils
         if (!newPermission)
             return;
         await newPermission.channel.send({ embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(newPermission.usernames.join(', '))] });

@@ -22,7 +22,7 @@ class CommandHandler {
         });
         await this.interaction.reply({ content: 'Sent!', ephemeral: true });
     }
-    async reopenChat(client) {
+    async reopenChat() {
         const chatNumber = this.interaction.options.getNumber('channel-number');
         let conversation = await db_1.default.conversationsCollection.findOne({ channelNumber: chatNumber, open: false });
         if (!conversation) {
@@ -66,7 +66,7 @@ class CommandHandler {
                 embeds: [MessageUtils_1.MessageUtils.EmbedMessages.reopenChatUser(+conversation.channelNumber)],
                 components: [new discord_js_1.ActionRowBuilder().addComponents(ConversationManage_1.ConversationManageMessageUtils.Actions.tools_close)]
             }),
-            Utils_1.Utils.updatePermissionToChannel(client, conversation),
+            Utils_1.Utils.updatePermissionToChannel(conversation),
         ]);
         await this.interaction.reply({
             content: `הצ'אט נפתח מחדש בהצלחה!`,

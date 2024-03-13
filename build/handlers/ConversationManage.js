@@ -110,7 +110,7 @@ class ConversationManageHandler {
             || Utils_1.Utils.isSeniorStaff(this.interaction.user.id)) {
             this.conversation.staffMemberId = [staffMemberId];
             await Promise.all([
-                Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation),
+                Utils_1.Utils.updatePermissionToChannel(this.conversation),
                 this.interaction.reply({
                     embeds: [
                         ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString()),
@@ -143,7 +143,7 @@ class ConversationManageHandler {
     }
     async resetHelpers() {
         this.conversation.staffMemberId = [];
-        await Utils_1.Utils.updatePermissionToChannel(this.client, this.conversation);
+        await Utils_1.Utils.updatePermissionToChannel(this.conversation);
         await this.interaction.channel.send({
             embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.helpersReseted],
         });

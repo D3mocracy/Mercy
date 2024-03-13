@@ -19,7 +19,7 @@ class CommandHandler {
         await this.interaction.reply({ content: 'Sent!', ephemeral: true })
     }
 
-    async reopenChat(client: Client) {
+    async reopenChat() {
         const chatNumber = (this.interaction as ChatInputCommandInteraction).options.getNumber('channel-number');
         let conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelNumber: chatNumber, open: false }) as Conversation;
         if (!conversation) {
@@ -63,7 +63,7 @@ class CommandHandler {
                 embeds: [MessageUtils.EmbedMessages.reopenChatUser(+conversation.channelNumber!)],
                 components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
             }),
-            Utils.updatePermissionToChannel(client, conversation),
+            Utils.updatePermissionToChannel(conversation),
 
         ]);
 

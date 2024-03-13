@@ -7,7 +7,7 @@ import { ConversationManageMessageUtils } from "../utils/MessageUtils/Conversati
 
 class ChangeHelperHandler {
     private conversation: Conversation = {} as any;
-    constructor(private client: Client, private interaction: StringSelectMenuInteraction) { }
+    constructor(private interaction: StringSelectMenuInteraction) { }
 
     async loadConversation(): Promise<void> {
         this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId, open: true }) as any;
@@ -23,7 +23,7 @@ class ChangeHelperHandler {
             this.conversation.staffMemberId = (this.interaction.values || "") as any;
         }
         await this.saveConversation();
-        const newPermission = await Utils.updatePermissionToChannel(this.client, this.conversation); //Can't import messageUtils from Utils
+        const newPermission = await Utils.updatePermissionToChannel(this.conversation); //Can't import messageUtils from Utils
         if (!newPermission) return;
         await newPermission.channel.send({ embeds: [ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(newPermission.usernames.join(', '))] });
         await this.interaction.deferUpdate();

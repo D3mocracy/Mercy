@@ -1,9 +1,9 @@
-import { ChatInputCommandInteraction, ContextMenuCommandInteraction, Client } from "discord.js";
+import { ChatInputCommandInteraction, ContextMenuCommandInteraction } from "discord.js";
 declare class CommandHandler {
     private interaction;
     constructor(interaction: ChatInputCommandInteraction | ContextMenuCommandInteraction);
     openChat(): Promise<void>;
-    reopenChat(client: Client): Promise<void>;
+    reopenChat(): Promise<void>;
     sendStaffMessage(): Promise<void>;
     criticalChat(): Promise<void>;
     findChannel(): Promise<void>;

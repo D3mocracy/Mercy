@@ -11,7 +11,7 @@ export declare namespace Utils {
     function getMembersWithRole(role: Role): Promise<GuildMember[]>;
     function getHelperClaimedConversationNumber(helperId: string): any;
     function getGenderByUserId(userId: string): Role | undefined;
-    function updatePermissionToChannel(client: Client, conversation: Conversation): Promise<{
+    function updatePermissionToChannel(conversation: Conversation): Promise<{
         usernames: (GuildMember | undefined)[];
         conversation: Conversation;
         channel: TextChannel;
@@ -25,6 +25,5 @@ export declare namespace Utils {
     function isSeniorStaff(userId: string): boolean | Role | undefined;
     function isStaff(userId: string): true | Role | undefined;
     function isMemberInGuild(userId: string): boolean;
-    function checkChannels(): Promise<void>;
 }
 //# sourceMappingURL=Utils.d.ts.map

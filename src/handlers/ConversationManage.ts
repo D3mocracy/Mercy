@@ -2,7 +2,6 @@ import {
   ButtonInteraction,
   Client,
   TextChannel,
-  ChatInputCommandInteraction,
 } from "discord.js";
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
@@ -11,7 +10,6 @@ import { Utils } from "../utils/Utils";
 import Logger from "./Logger";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import ConfigHandler from "./Config";
-import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 
 class ConversationManageHandler {
@@ -130,7 +128,7 @@ class ConversationManageHandler {
     ) {
       this.conversation.staffMemberId = [staffMemberId];
       await Promise.all([
-        Utils.updatePermissionToChannel(this.client, this.conversation),
+        Utils.updatePermissionToChannel(this.conversation),
         this.interaction.reply({
           embeds: [
             ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(
@@ -171,7 +169,7 @@ class ConversationManageHandler {
 
   async resetHelpers() {
     this.conversation.staffMemberId = [];
-    await Utils.updatePermissionToChannel(this.client, this.conversation);
+    await Utils.updatePermissionToChannel(this.conversation);
     await (this.interaction.channel as TextChannel).send({
       embeds: [ConversationManageMessageUtils.EmbedMessages.helpersReseted],
     });
