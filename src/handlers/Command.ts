@@ -130,7 +130,7 @@ class CommandHandler {
             });
             await this.interaction.reply({ content: "הבקשה אושרה", ephemeral: true });
         } else {
-            await this.interaction.reply({ content: "ניתן להשתמש בפקודה זו רק בצ'אנל היעדרות והפחתה", ephemeral: true });
+            await this.interaction.reply({ content: "ניתן להשתמש בפקודה זו רק בצ'אנל היעדרויות", ephemeral: true });
         }
     }
 
