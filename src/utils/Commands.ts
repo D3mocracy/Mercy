@@ -66,13 +66,13 @@ export namespace Command {
   const approveVacation = new ContextMenuCommandBuilder()
     .setName("אשר חופשה")
     .setType(ApplicationCommandType.Message)
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
     .setDMPermission(false);
 
   const criticalChat = new ContextMenuCommandBuilder()
     .setName("דיווח כצ'אט קריטי")
     .setType(ApplicationCommandType.Message)
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
     .setDMPermission(false);
 
   export const commands = [

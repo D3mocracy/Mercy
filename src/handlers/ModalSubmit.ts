@@ -30,7 +30,7 @@ export class ModalSubmitHandler {
         ]
         await this.interaction.reply({ content: `בקשה להיעדרות או להפחתת פעילות נשלחה בהצלחה למנהלים`, ephemeral: true });
         (await ConfigHandler.config.vacationChannel?.send({
-            content: `${ConfigHandler.config.managerRole}`,
+            content: `${ConfigHandler.config.managerRole} ${ConfigHandler.config.supervisorRole}`,
             embeds: [MessageUtils.EmbedMessages.vacation(this.interaction.member as GuildMember, type, dateOne, dateTwo, cause)],
             components: [MessageUtils.Actions.disabledGreyButton(`סטטוס: בטיפול`)]
         }))?.edit({ content: null });

@@ -83,7 +83,7 @@ export namespace ImportantLinksMessageUtils {
             moreVolunteer: string
         ) {
             return new EmbedBuilder({
-                color: colors.blue,
+                color: colors.white,
                 title: "התקבל טופס התנדבות בשרת",
                 fields: [
                     { name: "משתמש", value: `${user}`, inline: false },
