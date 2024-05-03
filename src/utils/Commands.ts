@@ -72,7 +72,7 @@ export namespace Command {
   const criticalChat = new ContextMenuCommandBuilder()
     .setName("דיווח כצ'אט קריטי")
     .setType(ApplicationCommandType.Message)
-    .setDefaultMemberPermissions(PermissionsBitField.Flags.BanMembers)
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
     .setDMPermission(false);
 
   export const commands = [
