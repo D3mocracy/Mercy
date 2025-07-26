@@ -39,7 +39,10 @@ const client: Client = new Client({
 
 const interactionRouter = new InteractionRouter(client);
 
-DataBase.client.connect().then(async () => {
+DataBase.connect().then(async () => {
+    // Create database indexes for better performance
+    await DataBase.createIndexes();
+    
     await client.login(process.env.TOKEN);
     client.user?.setActivity({ type: ActivityType.Listening, name: CONSTANTS.BOT.ACTIVITY_NAME })
     await client.application?.commands.set(Command.commands);

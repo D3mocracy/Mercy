@@ -15,7 +15,8 @@ class LeaveGuildHandler {
     }
 
     async saveConversation() {
-        await DataBase.conversationsCollection.updateOne({ channelId: this.conversation.channelId }, { $set: this.conversation }, { upsert: true })
+        const { _id, ...updateData } = this.conversation;
+        await DataBase.conversationsCollection.updateOne({ channelId: this.conversation.channelId }, { $set: updateData }, { upsert: true })
     }
 
     async closeConversation() {

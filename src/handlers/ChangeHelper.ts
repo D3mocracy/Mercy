@@ -14,7 +14,8 @@ class ChangeHelperHandler {
     }
 
     async saveConversation() {
-        await DataBase.conversationsCollection.updateOne({ channelId: this.interaction.channelId, open: true }, { $set: this.conversation }, { upsert: true })
+        const { _id, ...updateData } = this.conversation;
+        await DataBase.conversationsCollection.updateOne({ channelId: this.interaction.channelId, open: true }, { $set: updateData }, { upsert: true })
     }
 
     async handle() {

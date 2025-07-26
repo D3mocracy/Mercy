@@ -20,6 +20,9 @@ class PunishMemberHandler {
     }
 
     private async load() {
+        if (!this.interaction.channelId) {
+            throw new Error("Channel ID is required");
+        }
         this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId }) as any;
     }
 
@@ -42,6 +45,9 @@ class PunishMemberHandler {
     }
 
     static async sendPunishmentHistory(interaction: StringSelectMenuInteraction) {
+        if (!interaction.channelId) {
+            throw new Error("Channel ID is required");
+        }
 
         const conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelId: interaction.channelId }) as any;
         const member = Utils.getMemberByID(conversation.userId);
@@ -152,10 +158,11 @@ class PunishMemberHandler {
         const channel: TextChannel = Utils.getChannelByIdNoClient(this.conversation.channelId) as any;
         const closedMessage = { embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed("משתמש שיצא", channel.name)] };
         this.conversation.open = false;
+        const { _id, ...updateData } = this.conversation;
         await Promise.all([
             channel.send(closedMessage),
             Logger.logTicket(channel),
-            DataBase.conversationsCollection.updateOne({ channelId: this.conversation.channelId }, { $set: this.conversation }, { upsert: true })
+            DataBase.conversationsCollection.updateOne({ channelId: this.conversation.channelId }, { $set: updateData }, { upsert: true })
         ]);
         await channel.delete();
     }

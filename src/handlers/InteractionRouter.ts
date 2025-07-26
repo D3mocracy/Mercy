@@ -4,7 +4,8 @@ import {
     StringSelectMenuInteraction, 
     Client, 
     ButtonInteraction, 
-    ContextMenuCommandInteraction 
+    UserContextMenuCommandInteraction,
+    MessageContextMenuCommandInteraction 
 } from "discord.js";
 import ChangeHelperHandler from "./ChangeHelper";
 import CommandHandler from "./Command";
@@ -97,15 +98,32 @@ export class InteractionRouter {
     async handleInteraction(interaction: any): Promise<void> {
         const action = interaction.isCommand() ? interaction.commandName : interaction.customId;
         console.log('InteractionRouter handling action:', action);
+        
         const handler = this.actionHandlers.get(action);
-
-        if (handler) {
-            console.log('Found handler for action:', action);
-            this.setCurrentInteraction(interaction);
-            await handler();
-        } else {
+        if (!handler) {
             console.log('No handler found for action:', action);
+            return;
         }
+
+        // For most slash commands, defer immediately to prevent timeout
+        // Some commands like vacation need special handling (showModal)
+        const commandsWithModal = ['vacation'];
+        if (interaction.isCommand() && !commandsWithModal.includes(action) && !interaction.replied && !interaction.deferred) {
+            try {
+                await interaction.deferReply({ ephemeral: true });
+                console.log('Successfully deferred interaction in router for:', action);
+            } catch (deferError: any) {
+                console.log('Failed to defer in router:', deferError.message);
+                if (deferError.code === 10062 || deferError.code === 40060) {
+                    console.log('Interaction invalid or already handled, skipping');
+                    return;
+                }
+            }
+        }
+        
+        console.log('Found handler for action:', action);
+        this.setCurrentInteraction(interaction);
+        await handler();
     }
 
     private currentInteraction: any;
@@ -227,27 +245,27 @@ export class InteractionRouter {
 
     // Modal Submissions
     private async handleReportHelperModal(): Promise<void> {
-        await new ModalSubmitHandler(this.currentInteraction as ModalSubmitInteraction).reportHelper();
+        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).reportHelper();
     }
 
     private async handleReferManagerModal(): Promise<void> {
-        await new ModalSubmitHandler(this.currentInteraction as ModalSubmitInteraction).referManager();
+        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).referManager();
     }
 
     private async handleVolunteerModal(): Promise<void> {
-        await new ModalSubmitHandler(this.currentInteraction as ModalSubmitInteraction).sendVolunteerMessage();
+        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).sendVolunteerMessage();
     }
 
     private async handleSuggestIdeaModal(): Promise<void> {
-        await new ModalSubmitHandler(this.currentInteraction as ModalSubmitInteraction).suggestIdea();
+        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).suggestIdea();
     }
 
     private async handleVacationModal(): Promise<void> {
-        await new ModalSubmitHandler(this.currentInteraction as ModalSubmitInteraction).sendVacationMessage();
+        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).sendVacationMessage();
     }
 
     private async handleCriticalChatModal(): Promise<void> {
-        await new ModalSubmitHandler(this.currentInteraction as ModalSubmitInteraction).criticalChat();
+        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).criticalChat();
     }
 
 
@@ -293,43 +311,44 @@ export class InteractionRouter {
 
     // Commands
     private async handleOpenChatCommand(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ChatInputCommandInteraction).openChat();
+        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).openChat();
     }
 
     private async handleHelperOfTheMonthMale(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ContextMenuCommandInteraction).makeHelperOfTheMonth("helper");
+        await new CommandHandler(this.client, this.currentInteraction as UserContextMenuCommandInteraction).makeHelperOfTheMonth("helper");
     }
 
     private async handleHelperOfTheMonthFemale(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ContextMenuCommandInteraction).makeHelperOfTheMonth("helperit");
+        await new CommandHandler(this.client, this.currentInteraction as UserContextMenuCommandInteraction).makeHelperOfTheMonth("helperit");
     }
 
     private async handleApproveVacation(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ContextMenuCommandInteraction).approveVacation();
+        await new CommandHandler(this.client, this.currentInteraction as MessageContextMenuCommandInteraction).approveVacation();
     }
 
     private async handleCriticalChat(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ContextMenuCommandInteraction).criticalChat();
+        await new CommandHandler(this.client, this.currentInteraction as UserContextMenuCommandInteraction).criticalChat();
     }
 
     private async handleManageCommand(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ChatInputCommandInteraction).sendManageTools();
+        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).sendManageTools();
     }
 
     private async handleImportantLinksCommand(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ChatInputCommandInteraction).importantLinks();
+        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).importantLinks();
     }
 
     private async handleSendStaffMessageCommand(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ChatInputCommandInteraction).sendStaffMessage();
+        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).sendStaffMessage();
     }
 
     private async handleChannelInfoCommand(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ChatInputCommandInteraction).findChannel();
+        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).findChannel();
+        console.log('CommandHandler.findChannel completed');
     }
 
     private async handleReopenCommand(): Promise<void> {
-        await new CommandHandler(this.currentInteraction as ChatInputCommandInteraction).reopenChat();
+        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).reopenChat();
     }
 
     private async handleVacationCommand(): Promise<void> {

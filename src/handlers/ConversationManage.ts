@@ -48,9 +48,10 @@ class ConversationManageHandler {
   }
 
   async saveConversation() {
+    const { _id, ...updateData } = this.conversation;
     await DataBase.conversationsCollection.updateOne(
       { channelId: this.conversation.channelId },
-      { $set: this.conversation },
+      { $set: updateData },
       { upsert: true }
     );
   }

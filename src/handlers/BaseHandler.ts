@@ -4,6 +4,8 @@ import { Conversation } from "../utils/types";
 import DataBase from "../utils/db";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import { Utils } from "../utils/Utils";
+import { ResponseHandler, SafeInteraction } from "../utils/ResponseHandler";
+import { ErrorHandler } from "../utils/ErrorHandler";
 
 export abstract class BaseHandler<T extends Interaction = Interaction> {
     protected conversation?: Conversation;
@@ -79,9 +81,10 @@ export abstract class BaseHandler<T extends Interaction = Interaction> {
         }
 
         try {
+            const { _id, ...updateData } = this.conversation;
             await DataBase.conversationsCollection.updateOne(
-                { _id: this.conversation._id },
-                { $set: this.conversation }
+                { _id: _id },
+                { $set: updateData }
             );
         } catch (error: unknown) {
             await Logger.logError(error as Error);
@@ -108,19 +111,35 @@ export abstract class BaseHandler<T extends Interaction = Interaction> {
     }
 
     protected async respondSafely(content: any): Promise<void> {
-        try {
-            if ('deferred' in this.interaction && 'replied' in this.interaction) {
-                const repliableInteraction = this.interaction as RepliableInteraction;
-                if (repliableInteraction.deferred || repliableInteraction.replied) {
-                    return;
-                }
-                
-                if ('reply' in repliableInteraction) {
-                    await repliableInteraction.reply(content);
-                }
-            }
-        } catch (error: unknown) {
-            await Logger.logError(error as Error);
+        if (this.interaction.isRepliable()) {
+            await ResponseHandler.respond(this.interaction as SafeInteraction, content);
         }
+    }
+
+    protected async deferSafely(options?: { ephemeral?: boolean }): Promise<boolean> {
+        if (this.interaction.isRepliable()) {
+            return await ResponseHandler.deferSafely(this.interaction as SafeInteraction, options);
+        }
+        return false;
+    }
+
+    protected async editDeferredReply(content: any): Promise<void> {
+        if (this.interaction.isRepliable()) {
+            await ResponseHandler.editDeferredReply(this.interaction as SafeInteraction, content);
+        }
+    }
+
+    protected canRespond(): boolean {
+        if (this.interaction.isRepliable()) {
+            return ResponseHandler.canRespond(this.interaction as SafeInteraction);
+        }
+        return false;
+    }
+
+    protected getInteractionState(): string {
+        if (this.interaction.isRepliable()) {
+            return ResponseHandler.getInteractionState(this.interaction as SafeInteraction);
+        }
+        return 'not-repliable';
     }
 }

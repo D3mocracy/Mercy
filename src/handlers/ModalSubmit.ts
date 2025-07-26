@@ -1,4 +1,4 @@
-import { GuildMember, ModalSubmitInteraction, TextChannel } from "discord.js"
+import { GuildMember, ModalSubmitInteraction, TextChannel, Client } from "discord.js"
 import ConfigHandler from "./Config";
 import { Utils } from "../utils/Utils";
 import DataBase from "../utils/db";
@@ -7,10 +7,13 @@ import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 import { MessageUtils } from "../utils/MessageUtils";
 import { CantLoadConversationFromDB } from "../utils/Errors";
+import { BaseHandler } from "./BaseHandler";
 
-export class ModalSubmitHandler {
+export class ModalSubmitHandler extends BaseHandler<ModalSubmitInteraction> {
 
-    constructor(protected interaction: ModalSubmitInteraction) { }
+    constructor(client: Client, interaction: ModalSubmitInteraction) { 
+        super(client, interaction);
+    }
 
     async referManager() {
         (await ConfigHandler.config.requestHelperChannel?.send({
@@ -18,7 +21,7 @@ export class ModalSubmitHandler {
             embeds: [ConversationManageMessageUtils.EmbedMessages.referSupervisor(this.interaction)],
             components: [ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.interaction.channelId}`)]
         }))?.edit({ content: null })
-        await this.interaction.reply({ content: "ההפנייה נשלחה בהצלחה למפקחים", ephemeral: true });
+        await this.respondSafely({ content: "ההפנייה נשלחה בהצלחה למפקחים", ephemeral: true });
     }
 
     async sendVacationMessage() {
@@ -28,7 +31,7 @@ export class ModalSubmitHandler {
             this.interaction.fields.getTextInputValue('vacation_date_two'),
             this.interaction.fields.getTextInputValue('vacation_cause'),
         ]
-        await this.interaction.reply({ content: `בקשה להיעדרות או להפחתת פעילות נשלחה בהצלחה למנהלים`, ephemeral: true });
+        await this.respondSafely({ content: `בקשה להיעדרות או להפחתת פעילות נשלחה בהצלחה למנהלים`, ephemeral: true });
         (await ConfigHandler.config.vacationChannel?.send({
             content: `${ConfigHandler.config.managerRole} ${ConfigHandler.config.supervisorRole}`,
             embeds: [MessageUtils.EmbedMessages.vacation(this.interaction.member as GuildMember, type, dateOne, dateTwo, cause)],
@@ -60,7 +63,7 @@ export class ModalSubmitHandler {
             other
         })
 
-        await this.interaction.reply({ content: `הטופס שמילאתם עבור התנדבות לשרת נשלח בהצלחה למנהלים`, ephemeral: true });
+        await this.respondSafely({ content: `הטופס שמילאתם עבור התנדבות לשרת נשלח בהצלחה למנהלים`, ephemeral: true });
 
     }
 
@@ -85,7 +88,7 @@ export class ModalSubmitHandler {
             suggestComments
         })
 
-        await this.interaction.reply({ content: "הטופס שמילאתם עבור פידבקים, הצעות ודיווחי באגים נשלח בהצלחה למנהלים", ephemeral: true });
+        await this.respondSafely({ content: "הטופס שמילאתם עבור פידבקים, הצעות ודיווחי באגים נשלח בהצלחה למנהלים", ephemeral: true });
     }
 
     async reportHelper() {
@@ -105,13 +108,13 @@ export class ModalSubmitHandler {
             reportCause,
         })
 
-        await this.interaction.reply({ content: "הטופס שמילאתם עבור דיווחים ותלונות על חברי צוות נשלח בהצלחה למנהלים", ephemeral: true });
+        await this.respondSafely({ content: "הטופס שמילאתם עבור דיווחים ותלונות על חברי צוות נשלח בהצלחה למנהלים", ephemeral: true });
     }
 
     async criticalChat() {
         const channel = (this.interaction.channel as TextChannel);
         if (channel.name.includes('❗')) {
-            await this.interaction.reply({
+            await this.respondSafely({
                 content: 'הפנייה בטיפול על ידי ההנהלה הגבוהה',
                 ephemeral: true
             })
@@ -122,7 +125,7 @@ export class ModalSubmitHandler {
                 embeds: [ConversationManageMessageUtils.EmbedMessages.criticalChat(this.interaction)],
                 components: [ConversationManageMessageUtils.Actions.supervisorRefferedTools(true, false), ConversationManageMessageUtils.Actions.tools_report_link(`https://discord.com/channels/${ConfigHandler.config.guild?.id}/${this.interaction.channelId}`)]
             }))?.edit({ content: null });
-            await this.interaction.reply({ content: "ההפנייה נשלחה בהצלחה להנהלה הגבוהה", ephemeral: true });
+            await this.respondSafely({ content: "ההפנייה נשלחה בהצלחה להנהלה הגבוהה", ephemeral: true });
         }
 
     }
