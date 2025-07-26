@@ -420,21 +420,6 @@ export namespace ConversationManageMessageUtils {
 
   export namespace Modals {
 
-    //Channel Info
-    const channelNumber = new ActionRowBuilder<TextInputBuilder>().addComponents(
-      new TextInputBuilder({
-        customId: "channel_number",
-        label: "מספר הצ'אט",
-        placeholder: "יש להכניס ערך מספרי בלבד!",
-        style: TextInputStyle.Short,
-        required: true,
-      }),
-    );
-
-    export const findChannelModal = new ModalBuilder({
-      customId: "findChannelModal",
-      title: "קבלת מידע על צ'אט",
-    }).addComponents([channelNumber]);
 
 
     //Mute Member Punish

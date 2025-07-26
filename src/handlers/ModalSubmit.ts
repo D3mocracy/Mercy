@@ -64,32 +64,6 @@ export class ModalSubmitHandler {
 
     }
 
-    async findChannel() {
-        const channelNumber = +(this.interaction.fields.getTextInputValue("channel_number"));
-        const conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelNumber }) as any;
-        if (!conversation) {
-            await this.interaction.reply({
-                content: `לא הצלחתי למצוא את הצ'אט הזה: צ'אט מספר ${channelNumber}`,
-                ephemeral: true
-            });
-            return;
-        }
-        
-        try {
-            const embed = ConversationManageMessageUtils.EmbedMessages.findChannel(conversation);
-            await this.interaction.reply({
-                embeds: [embed],
-                ephemeral: true
-            });
-        } catch (error) {
-            console.error('Error creating findChannel embed:', error);
-            console.error('Conversation data:', JSON.stringify(conversation, null, 2));
-            await this.interaction.reply({
-                content: `שגיאה בהצגת מידע הצ'אט. נסה שוב מאוחר יותר.`,
-                ephemeral: true
-            });
-        }
-    }
 
     async suggestIdea() {
         const suggestExplain = this.interaction.fields.getTextInputValue("suggest_explain");

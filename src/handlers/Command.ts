@@ -104,7 +104,40 @@ class CommandHandler {
     }
 
     async findChannel() {
-        await this.interaction.showModal(ConversationManageMessageUtils.Modals.findChannelModal);
+        console.log('findChannel method called - using direct parameter approach');
+        const channelNumber = (this.interaction as ChatInputCommandInteraction).options.getNumber('channel-number');
+        console.log('Channel number received:', channelNumber);
+        if (!channelNumber) {
+            await this.interaction.reply({
+                content: "יש לציין מספר צ'אט תקין",
+                ephemeral: true
+            });
+            return;
+        }
+
+        try {
+            // Search for conversation regardless of open/closed status for admin info purposes
+            const conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelNumber }) as Conversation;
+            if (!conversation) {
+                await this.interaction.reply({
+                    content: `לא הצלחתי למצוא את הצ'אט הזה: צ'אט מספר ${channelNumber}`,
+                    ephemeral: true
+                });
+                return;
+            }
+            
+            const embed = ConversationManageMessageUtils.EmbedMessages.findChannel(conversation);
+            await this.interaction.reply({
+                embeds: [embed],
+                ephemeral: true
+            });
+        } catch (error) {
+            console.error('Error in findChannel command:', error);
+            await this.interaction.reply({
+                content: `שגיאה בהצגת מידע הצ'אט. נסה שוב מאוחר יותר.`,
+                ephemeral: true
+            });
+        }
     }
 
     async makeHelperOfTheMonth(gender: "helper" | "helperit") {

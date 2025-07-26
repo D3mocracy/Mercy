@@ -97,10 +97,6 @@ client.on('interactionCreate', async interaction => {
     try {
         if (interaction.isButton() || interaction.isModalSubmit() || interaction.isStringSelectMenu() || interaction.isCommand()) {
             await interactionRouter.handleInteraction(interaction);
-            
-            if (!(interaction.deferred || interaction.replied)) {
-                interaction.isCommand() ? await interaction.deferReply() : await interaction.deferUpdate();
-            }
         }
     } catch (error: any) {
         await ErrorHandler.handleInteractionError(interaction, error);

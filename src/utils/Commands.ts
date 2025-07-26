@@ -46,10 +46,15 @@ export namespace Command {
     .setDMPermission(false);
 
   const channelInfo = new SlashCommandBuilder()
-    .setName("channel-info")
+    .setName("chat-info")
     .setDescription("קבלת מידע על צ'אט")
     .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-    .setDMPermission(false);
+    .setDMPermission(false)
+    .addNumberOption(option =>
+      option.setName(`channel-number`)
+        .setDescription('Number of chat to get info about')
+        .setRequired(true)
+    );
 
   const setHelperOfTheMonth = new ContextMenuCommandBuilder()
     .setName("חבר הצוות של החודש")

@@ -64,7 +64,6 @@ export class InteractionRouter {
             ['suggestIdea', () => this.handleSuggestIdeaModal()],
             ['vacationModal', () => this.handleVacationModal()],
             ['criticalChatModal', () => this.handleCriticalChatModal()],
-            ['findChannelModal', () => this.handleFindChannelModal()],
             
             // Select Menu Actions
             ['helpers_list', () => this.handleHelpersList()],
@@ -89,7 +88,7 @@ export class InteractionRouter {
             ['manage', () => this.handleManageCommand()],
             ['importantlinks', () => this.handleImportantLinksCommand()],
             ['sendstaffmessage', () => this.handleSendStaffMessageCommand()],
-            ['channel-info', () => this.handleChannelInfoCommand()],
+            ['chat-info', () => this.handleChannelInfoCommand()],
             ['reopen', () => this.handleReopenCommand()],
             ['vacation', () => this.handleVacationCommand()],
         ]);
@@ -97,11 +96,15 @@ export class InteractionRouter {
 
     async handleInteraction(interaction: any): Promise<void> {
         const action = interaction.isCommand() ? interaction.commandName : interaction.customId;
+        console.log('InteractionRouter handling action:', action);
         const handler = this.actionHandlers.get(action);
 
         if (handler) {
+            console.log('Found handler for action:', action);
             this.setCurrentInteraction(interaction);
             await handler();
+        } else {
+            console.log('No handler found for action:', action);
         }
     }
 
@@ -247,9 +250,6 @@ export class InteractionRouter {
         await new ModalSubmitHandler(this.currentInteraction as ModalSubmitInteraction).criticalChat();
     }
 
-    private async handleFindChannelModal(): Promise<void> {
-        await new ModalSubmitHandler(this.currentInteraction as ModalSubmitInteraction).findChannel();
-    }
 
     // Select Menu Actions
     private async handleHelpersList(): Promise<void> {

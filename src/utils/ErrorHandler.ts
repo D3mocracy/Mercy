@@ -7,16 +7,28 @@ export class ErrorHandler {
         await Logger.logError(error);
 
         try {
-            if (interaction.isRepliable() && !interaction.replied && !interaction.deferred) {
-                await interaction.reply({
-                    embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable],
-                    ephemeral: true
-                });
-            } else if (interaction.isRepliable() && (interaction.replied || interaction.deferred)) {
-                await interaction.followUp({
-                    embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable],
-                    ephemeral: true
-                });
+            if (interaction.isRepliable()) {
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({
+                        embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable],
+                        ephemeral: true
+                    });
+                } else if (interaction.deferred && !interaction.replied) {
+                    await interaction.editReply({
+                        embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable]
+                    });
+                } else if (interaction.replied) {
+                    // Try to send a follow-up, but don't fail if it doesn't work
+                    try {
+                        await interaction.followUp({
+                            embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable],
+                            ephemeral: true
+                        });
+                    } catch (followUpError) {
+                        // Silently ignore follow-up errors since the interaction was already handled
+                        console.warn('Could not send error follow-up message:', followUpError);
+                    }
+                }
             }
         } catch (followUpError) {
             await Logger.logError(followUpError as Error);
