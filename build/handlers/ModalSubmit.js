@@ -31,7 +31,7 @@ class ModalSubmitHandler {
         ];
         await this.interaction.reply({ content: `בקשה להיעדרות או להפחתת פעילות נשלחה בהצלחה למנהלים`, ephemeral: true });
         (await Config_1.default.config.vacationChannel?.send({
-            content: `${Config_1.default.config.managerRole}`,
+            content: `${Config_1.default.config.managerRole} ${Config_1.default.config.supervisorRole}`,
             embeds: [MessageUtils_1.MessageUtils.EmbedMessages.vacation(this.interaction.member, type, dateOne, dateTwo, cause)],
             components: [MessageUtils_1.MessageUtils.Actions.disabledGreyButton(`סטטוס: בטיפול`)]
         }))?.edit({ content: null });
@@ -69,10 +69,21 @@ class ModalSubmitHandler {
             });
             return;
         }
-        await this.interaction.reply({
-            embeds: [ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.findChannel(conversation)],
-            ephemeral: true
-        });
+        try {
+            const embed = ConversationManage_1.ConversationManageMessageUtils.EmbedMessages.findChannel(conversation);
+            await this.interaction.reply({
+                embeds: [embed],
+                ephemeral: true
+            });
+        }
+        catch (error) {
+            console.error('Error creating findChannel embed:', error);
+            console.error('Conversation data:', JSON.stringify(conversation, null, 2));
+            await this.interaction.reply({
+                content: `שגיאה בהצגת מידע הצ'אט. נסה שוב מאוחר יותר.`,
+                ephemeral: true
+            });
+        }
     }
     async suggestIdea() {
         const suggestExplain = this.interaction.fields.getTextInputValue("suggest_explain");

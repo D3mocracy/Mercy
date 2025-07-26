@@ -107,5 +107,5 @@ var Utils;
         return !!Config_1.default.config.guild?.members.cache.get(userId);
     }
     Utils.isMemberInGuild = isMemberInGuild;
-})(Utils || (exports.Utils = Utils = {}));
+})(Utils = exports.Utils || (exports.Utils = {}));
 //# sourceMappingURL=Utils.js.map

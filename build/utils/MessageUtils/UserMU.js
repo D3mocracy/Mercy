@@ -67,5 +67,5 @@ var UserMessageUtils;
         }
         Actions.unActiveChannelButtons = unActiveChannelButtons;
     })(Actions = UserMessageUtils.Actions || (UserMessageUtils.Actions = {}));
-})(UserMessageUtils || (exports.UserMessageUtils = UserMessageUtils = {}));
+})(UserMessageUtils = exports.UserMessageUtils || (exports.UserMessageUtils = {}));
 //# sourceMappingURL=UserMU.js.map

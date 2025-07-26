@@ -21,13 +21,20 @@ var Logger;
     Logger.logTicket = logTicket;
     async function logError(error) {
         try {
-            await Config_1.default.config.errorChannel?.send({ content: `${error}`, embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)] });
+            // Always log to console first
             console.error(error);
             console.log(error);
+            // Only try to send to Discord if config is loaded and errorChannel exists
+            if (Config_1.default.config.errorChannel && typeof Config_1.default.config.errorChannel.send === 'function') {
+                await Config_1.default.config.errorChannel.send({
+                    content: `${error}`,
+                    embeds: [MessageUtils_1.MessageUtils.EmbedMessages.errorLog(error)]
+                });
+            }
         }
-        catch (error) {
-            console.error(error);
-            console.log(error);
+        catch (logError) {
+            console.error('Failed to log error:', logError);
+            console.log('Original error:', error);
         }
     }
     Logger.logError = logError;

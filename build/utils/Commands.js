@@ -53,7 +53,7 @@ var Command;
     const approveVacation = new discord_js_1.ContextMenuCommandBuilder()
         .setName("אשר חופשה")
         .setType(discord_js_1.ApplicationCommandType.Message)
-        .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.Administrator)
+        .setDefaultMemberPermissions(discord_js_1.PermissionsBitField.Flags.BanMembers)
         .setDMPermission(false);
     const criticalChat = new discord_js_1.ContextMenuCommandBuilder()
         .setName("דיווח כצ'אט קריטי")
@@ -73,5 +73,5 @@ var Command;
         channelInfo,
         reopen
     ];
-})(Command || (exports.Command = Command = {}));
+})(Command = exports.Command || (exports.Command = {}));
 //# sourceMappingURL=Commands.js.map

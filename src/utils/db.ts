@@ -1,21 +1,18 @@
 import { MongoClient } from "mongodb";
+import { CONSTANTS } from "./Constants";
 require("dotenv").config();
+
 namespace DataBase {
     export const client: MongoClient = new MongoClient(process.env.MongoURL!);
+    const database = client.db(CONSTANTS.DATABASE.NAME);
 
-    export const conversationsCollection = DataBase.client.db("Angel").collection("Conversations");
-
-    export const configCollection = DataBase.client.db("Angel").collection("Config");
-
-    export const embedMessagesCollection = DataBase.client.db("Angel").collection("EmbedMessages");
-
-    export const volunteerCollection = DataBase.client.db("Angel").collection("Volunteer");
-
-    export const reportCollection = DataBase.client.db("Angel").collection("Reports");
-
-    export const suggestionCollection = DataBase.client.db("Angel").collection("Suggestions");
-
-    export const punishmentsCollection = DataBase.client.db("Angel").collection("Punishments");
+    export const conversationsCollection = database.collection(CONSTANTS.DATABASE.COLLECTIONS.CONVERSATIONS);
+    export const configCollection = database.collection(CONSTANTS.DATABASE.COLLECTIONS.CONFIG);
+    export const embedMessagesCollection = database.collection(CONSTANTS.DATABASE.COLLECTIONS.EMBED_MESSAGES);
+    export const volunteerCollection = database.collection(CONSTANTS.DATABASE.COLLECTIONS.VOLUNTEER);
+    export const reportCollection = database.collection(CONSTANTS.DATABASE.COLLECTIONS.REPORTS);
+    export const suggestionCollection = database.collection(CONSTANTS.DATABASE.COLLECTIONS.SUGGESTIONS);
+    export const punishmentsCollection = database.collection(CONSTANTS.DATABASE.COLLECTIONS.PUNISHMENTS);
 }
 
 export default DataBase;

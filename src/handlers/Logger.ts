@@ -18,12 +18,20 @@ namespace Logger {
 
     export async function logError(error: Error) {
         try {
-            await ConfigHandler.config.errorChannel?.send({ content: `${error}`, embeds: [MessageUtils.EmbedMessages.errorLog(error)] });
+            // Always log to console first
             console.error(error);
             console.log(error);
-        } catch (error) {
-            console.error(error);
-            console.log(error);
+            
+            // Only try to send to Discord if config is loaded and errorChannel exists
+            if (ConfigHandler.config.errorChannel && typeof ConfigHandler.config.errorChannel.send === 'function') {
+                await ConfigHandler.config.errorChannel.send({ 
+                    content: `${error}`, 
+                    embeds: [MessageUtils.EmbedMessages.errorLog(error)] 
+                });
+            }
+        } catch (logError) {
+            console.error('Failed to log error:', logError);
+            console.log('Original error:', error);
         }
     }
 

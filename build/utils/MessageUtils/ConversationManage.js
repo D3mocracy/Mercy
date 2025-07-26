@@ -88,27 +88,60 @@ var ConversationManageMessageUtils;
                     text: "מומלץ להנחות את אחד התומכים להמשיך לדבר עם המשתמש עד לסיום העברת המידע לגורמים הרלוונטים",
                 },
             }).addFields([
-                { name: "שם", value: `${user?.username}` },
-                { name: "טאג", value: `${user?.tag}` },
-                { name: "תיוג", value: `${user}` },
-                { name: "מספר משתמש/ID", value: userId },
+                { name: "שם", value: user?.username || "לא זמין" },
+                { name: "טאג", value: user?.tag || "לא זמין" },
+                { name: "תיוג", value: `${user}` || "לא זמין" },
+                { name: "מספר משתמש/ID", value: userId || "לא זמין" },
                 { name: "קישור לתמונת הפרופיל", value: user?.avatarURL() || "לא זמין" },
                 { name: "קישור לבאנר הפרופיל", value: user?.bannerURL() || "לא זמין" },
                 { name: "האם בוט", value: user?.bot ? "כן" : "לא" },
-                { name: "תאריך יצירת המשתמש", value: `${user?.createdAt}` },
+                { name: "תאריך יצירת המשתמש", value: user?.createdAt?.toString() || "לא זמין" },
             ]);
         }
         EmbedMessages.revealUserMessage = revealUserMessage;
         function findChannel(conversation) {
+            // Handle staff members safely
+            let lastSupporter = "לא משויך";
+            if (conversation.staffMemberId && conversation.staffMemberId.length > 0) {
+                const staffMembers = Utils_1.Utils.getMembersById(...conversation.staffMemberId)
+                    .filter(member => member !== undefined && member !== null)
+                    .map(member => `${member}`)
+                    .filter(str => str && str.trim() && str !== "undefined");
+                lastSupporter = staffMembers.length > 0 ? staffMembers.join(", ") : "לא משויך";
+            }
+            // Handle user safely
+            const userInfo = Utils_1.Utils.getMemberByID(conversation.userId);
+            let userValue = "לא נמצא";
+            if (userInfo) {
+                const userStr = `${userInfo}`;
+                if (userStr && userStr.trim() && userStr !== "undefined") {
+                    userValue = userStr;
+                }
+            }
+            // Handle subject safely
+            const subjectValue = (conversation.subject && conversation.subject.trim()) ? conversation.subject.trim() : "לא צוין";
+            // Handle timestamp safely
+            let timestampValue = "לא זמין";
+            if (conversation._id?.getTimestamp) {
+                try {
+                    const timestamp = conversation._id.getTimestamp();
+                    if (timestamp) {
+                        timestampValue = `${timestamp}`;
+                    }
+                }
+                catch (error) {
+                    timestampValue = "לא זמין";
+                }
+            }
             return new discord_js_1.EmbedBuilder({
                 color: colors.pink,
                 title: `מערכת ניהול למנהלים - מידע על צ'אט`,
-                description: `להלן מידע על צ'אט מספר **${conversation.channelNumber}**`,
+                description: `להלן מידע על צ'אט מספר **${conversation.channelNumber || "לא ידוע"}**`,
             }).addFields([
-                { name: "משתמש", value: `${Utils_1.Utils.getMemberByID(conversation.userId)}` },
-                { name: "נושא", value: conversation.subject },
-                { name: "תומך אחרון", value: `${conversation.staffMemberId ? Utils_1.Utils.getMembersById(...conversation.staffMemberId).map(m => `${m}`) : ""}` },
-                { name: "תאריך פתיחה", value: `${conversation._id?.getTimestamp()}` }
+                { name: "משתמש", value: userValue },
+                { name: "נושא", value: subjectValue },
+                { name: "תומך אחרון", value: lastSupporter },
+                { name: "תאריך פתיחה", value: timestampValue }
             ]);
         }
         EmbedMessages.findChannel = findChannel;
@@ -417,5 +450,5 @@ var ConversationManageMessageUtils;
             title: "דיווח כצ'אט קריטי",
         }).addComponents(criticalChatReason);
     })(Modals = ConversationManageMessageUtils.Modals || (ConversationManageMessageUtils.Modals = {}));
-})(ConversationManageMessageUtils || (exports.ConversationManageMessageUtils = ConversationManageMessageUtils = {}));
+})(ConversationManageMessageUtils = exports.ConversationManageMessageUtils || (exports.ConversationManageMessageUtils = {}));
 //# sourceMappingURL=ConversationManage.js.map

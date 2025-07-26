@@ -34,10 +34,10 @@ var ImportantLinksMessageUtils;
             return new discord_js_1.EmbedBuilder({
                 title: "התקבל טופס פידבקים, הצעות ודיווחי באגים",
                 description: `**תיאור**
-                ${expain}
+                ${expain || "לא צוין"}
 
                 **הערות נוספות**
-                ${comments}`,
+                ${comments || "לא צוין"}`,
                 timestamp: new Date(),
                 color: colors.green
             });
@@ -48,10 +48,10 @@ var ImportantLinksMessageUtils;
                 color: colors.red,
                 title: `התקבל טופס תלונה או דיווח על חבר צוות`,
                 description: `**סיבת הדיווח**
-                ${reportCause},
+                ${reportCause || "לא צוין"},
                 `, timestamp: new Date(),
             }).addFields([
-                { name: "שם התומך על פי המשתמש", value: `${helperName}`, inline: true },
+                { name: "שם התומך על פי המשתמש", value: helperName || "לא צוין", inline: true },
                 { name: "מנהל מטפל", value: `!לא שויך מנהל!` },
             ]);
         }
@@ -79,15 +79,15 @@ var ImportantLinksMessageUtils;
         });
         function volunteer(user, dateVolunteer, aboutYourselfVolunteer, whyVolunteer, freqVolunteer, moreVolunteer) {
             return new discord_js_1.EmbedBuilder({
-                color: colors.blue,
+                color: colors.white,
                 title: "התקבל טופס התנדבות בשרת",
                 fields: [
-                    { name: "משתמש", value: `${user}`, inline: false },
-                    { name: "שנת לידה", value: dateVolunteer, inline: false },
-                    { name: "ספרו לנו קצת על עצמכם", value: aboutYourselfVolunteer, inline: false },
-                    { name: "מדוע אתם רוצים להתנדב בשרת?", value: whyVolunteer, inline: false },
-                    { name: "מהי תדירות הפעילות הכללית שלכם בדיסקורד?", value: freqVolunteer, inline: false },
-                    { name: "דברים נוספים שברצונכם לציין", value: moreVolunteer, inline: false },
+                    { name: "משתמש", value: `${user}` || "לא זמין", inline: false },
+                    { name: "שנת לידה", value: dateVolunteer || "לא צוין", inline: false },
+                    { name: "ספרו לנו קצת על עצמכם", value: aboutYourselfVolunteer || "לא צוין", inline: false },
+                    { name: "מדוע אתם רוצים להתנדב בשרת?", value: whyVolunteer || "לא צוין", inline: false },
+                    { name: "מהי תדירות הפעילות הכללית שלכם בדיסקורד?", value: freqVolunteer || "לא צוין", inline: false },
+                    { name: "דברים נוספים שברצונכם לציין", value: moreVolunteer || "לא צוין", inline: false },
                 ],
                 timestamp: new Date(),
             });
@@ -210,5 +210,5 @@ var ImportantLinksMessageUtils;
             title: "דיווחים ותלונות על חברי צוות"
         }).addComponents([helperName, reportHelperCause]);
     })(Modals = ImportantLinksMessageUtils.Modals || (ImportantLinksMessageUtils.Modals = {}));
-})(ImportantLinksMessageUtils || (exports.ImportantLinksMessageUtils = ImportantLinksMessageUtils = {}));
+})(ImportantLinksMessageUtils = exports.ImportantLinksMessageUtils || (exports.ImportantLinksMessageUtils = {}));
 //# sourceMappingURL=ImportantLinks.js.map
