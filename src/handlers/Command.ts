@@ -15,10 +15,12 @@ class CommandHandler extends BaseHandler<ChatInputCommandInteraction | UserConte
     }
 
     async openChat() {
-        this.interaction.channel?.send({
-            embeds: [MessageUtils.EmbedMessages.openChat],
-            components: [MessageUtils.Actions.openChatButton]
-        });
+        if (this.interaction.channel && 'send' in this.interaction.channel) {
+            await this.interaction.channel.send({
+                embeds: [MessageUtils.EmbedMessages.openChat],
+                components: [MessageUtils.Actions.openChatButton]
+            });
+        }
         
         await this.respondSafely({ content: 'Sent!', ephemeral: true });
     }
@@ -88,9 +90,11 @@ class CommandHandler extends BaseHandler<ChatInputCommandInteraction | UserConte
     }
 
     async sendStaffMessage() {
-        this.interaction.channel?.send({
-            embeds: [MessageUtils.EmbedMessages.staffMembers()]
-        });
+        if (this.interaction.channel && 'send' in this.interaction.channel) {
+            await this.interaction.channel.send({
+                embeds: [MessageUtils.EmbedMessages.staffMembers()]
+            });
+        }
         
         await this.respondSafely({ content: 'Sent!', ephemeral: true });
     }
@@ -253,7 +257,11 @@ class CommandHandler extends BaseHandler<ChatInputCommandInteraction | UserConte
                 ])]
             }
         ]
-        messages.forEach(message => this.interaction.channel?.send(message));
+        if (this.interaction.channel && 'send' in this.interaction.channel) {
+            for (const message of messages) {
+                await this.interaction.channel.send(message);
+            }
+        }
         
         await this.respondSafely({ content: "Sent", ephemeral: true });
     }

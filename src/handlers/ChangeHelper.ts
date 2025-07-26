@@ -19,6 +19,7 @@ class ChangeHelperHandler {
     }
 
     async handle() {
+        await this.interaction.deferUpdate();
         await this.loadConversation();
         if (this.interaction.customId === "helpers_list") {
             this.conversation.staffMemberId = (this.interaction.values || "") as any;
@@ -27,7 +28,6 @@ class ChangeHelperHandler {
         const newPermission = await Utils.updatePermissionToChannel(this.conversation); //Can't import messageUtils from Utils
         if (!newPermission) return;
         await newPermission.channel.send({ embeds: [ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(newPermission.usernames.join(', '))] });
-        await this.interaction.deferUpdate();
     }
 }
 

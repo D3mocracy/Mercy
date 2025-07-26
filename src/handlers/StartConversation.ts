@@ -38,6 +38,7 @@ class StartConversation {
 
   async handle() {
     if (!this.conversation || !this.conversation.subject) {
+      await this.interaction.deferReply({ ephemeral: true });
       await this.sendSelectSubject();
     } else {
       await this.interaction.reply({
@@ -48,34 +49,37 @@ class StartConversation {
   }
 
   private async sendSelectSubject() {
-    this.interaction.user.send({
-      embeds: [UserMessageUtils.CustomEmbedMessages.subjects],
-      components: [UserMessageUtils.Actions.selectSubject],
-    })
-      .then(async () => {
-        await DataBase.conversationsCollection.updateOne(
-          {
-            userId: this.interaction.user.id,
-            open: true,
-          },
-          {
-            $set: {
-              userId: this.interaction.user.id,
-              guildId: ConfigHandler.config.guild?.id,
-              open: true,
-              date: new Date(),
-            }
-          },
-          { upsert: true });
-      })
-      .catch(() => {
-        this.interaction.followUp({
-          content: `לא ניתן לפתוח צ’אט - יש לאפשר שליחת הודעות פרטיות בדיסקורד.
-          למידע נוסף ניתן לעיין ב: https://support.discord.com/hc/en-us/articles/360060145013`,
-          ephemeral: true
-        })
+    try {
+      await this.interaction.user.send({
+        embeds: [UserMessageUtils.CustomEmbedMessages.subjects],
+        components: [UserMessageUtils.Actions.selectSubject],
       });
-
+      
+      await DataBase.conversationsCollection.updateOne(
+        {
+          userId: this.interaction.user.id,
+          open: true,
+        },
+        {
+          $set: {
+            userId: this.interaction.user.id,
+            guildId: ConfigHandler.config.guild?.id,
+            open: true,
+            date: new Date(),
+          }
+        },
+        { upsert: true }
+      );
+      
+      await this.interaction.editReply({
+        content: "נשלחה אליך הודעה פרטית לבחירת נושא הצ'אט!"
+      });
+    } catch (error) {
+      await this.interaction.editReply({
+        content: `לא ניתן לפתוח צ'אט - יש לאפשר שליחת הודעות פרטיות בדיסקורד.
+        למידע נוסף ניתן לעיין ב: https://support.discord.com/hc/en-us/articles/360060145013`
+      });
+    }
   }
 }
 

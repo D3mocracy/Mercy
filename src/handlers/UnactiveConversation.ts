@@ -88,6 +88,7 @@ class UnactiveConversationHandler {
     }
 
     async continueConversation(interaction: ButtonInteraction) {
+        await interaction.deferUpdate();
         const conversation = await DataBase.conversationsCollection.findOne({ userId: interaction.user.id, open: true }) as Conversation;
         if (!conversation || !conversation.channelId) {
             Utils.getMemberByID(interaction.user.id)?.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
@@ -114,6 +115,7 @@ class UnactiveConversationHandler {
 
     // Optimized for error handling within `stopConversation`
     async stopConversation(interaction: ButtonInteraction) {
+        await interaction.deferUpdate();
         try {
             const conversation = await this.loadConversationByUserId(interaction.user.id); // Use separate function for clarity
             if (!conversation || !conversation.channelId) {

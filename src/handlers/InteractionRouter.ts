@@ -120,6 +120,32 @@ export class InteractionRouter {
                 }
             }
         }
+
+        // For button interactions that need deferUpdate, defer early
+        // Some buttons use reply/showModal and handle their own acknowledgment
+        const buttonsWithReply = [
+            'openChatButton', 'sure_no', 'tools_manager', 'tools_close',
+            'user_report_helper', 'user_volunteer', 'user_suggest',
+            'punish_timeout', 'punish_kick', 'punish_ban',
+            'unactive_continue_chat', 'unactive_close_chat', 'helpers_list',
+            'tools_refer_manager', 'tools_attach', 'tools_manager_reveal',
+            'tools_manager_change_supporter', 'tools_manager_punish',
+            'manager_attach_report', 'manager_mark_as_done', 'manager_in_progress',
+            'select_subject', 'punish_menu', 'punish_history'
+        ];
+        
+        if (interaction.isButton() && !buttonsWithReply.includes(action) && !interaction.replied && !interaction.deferred) {
+            try {
+                await interaction.deferUpdate();
+                console.log('Successfully deferred button update for:', action);
+            } catch (deferError: any) {
+                console.log('Failed to defer button update:', deferError.message);
+                if (deferError.code === 10062 || deferError.code === 40060) {
+                    console.log('Button interaction invalid or already handled, skipping');
+                    return;
+                }
+            }
+        }
         
         console.log('Found handler for action:', action);
         this.setCurrentInteraction(interaction);
@@ -168,7 +194,9 @@ export class InteractionRouter {
             await conversationManage.sendSureMessageToClose();
         } catch (error) {
             (this.currentInteraction as ButtonInteraction).message.edit({ components: [] });
-            this.currentInteraction.channel?.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
+            if (this.currentInteraction.channel && 'send' in this.currentInteraction.channel) {
+                await this.currentInteraction.channel.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
+            }
         }
     }
 
@@ -178,7 +206,9 @@ export class InteractionRouter {
             await conversationManage.closeConversation(this.currentInteraction.channel?.isDMBased() ? "משתמש" : "איש צוות");
             await conversationManage.saveConversation();
         } catch (error) {
-            this.currentInteraction.channel?.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
+            if (this.currentInteraction.channel && 'send' in this.currentInteraction.channel) {
+                await this.currentInteraction.channel.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
+            }
         }
     }
 
