@@ -315,6 +315,13 @@ export namespace ConversationManageMessageUtils {
       style: ButtonStyle.Danger,
     });
 
+    export const tools_close_with_id = (conversationId: string) => new ButtonBuilder({
+      customId: `tools_close_${conversationId}`,
+      label: "סגירת הצ'אט",
+      emoji: "✖️",
+      style: ButtonStyle.Danger,
+    });
+
     export const tools_report = new ButtonBuilder({
       customId: "tools_refer_manager",
       label: "הפניית מפקח",

@@ -75,7 +75,7 @@ class CommandHandler extends BaseHandler<ChatInputCommandInteraction | UserConte
             }).then((message) => message.edit({ content: null })),
             Utils.getMemberByID(conversation.userId)?.send({
                 embeds: [MessageUtils.EmbedMessages.reopenChatUser(+conversation.channelNumber!)],
-                components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
+                components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close_with_id(conversation._id!.toString()))]
             }),
             Utils.updatePermissionToChannel(conversation),
 

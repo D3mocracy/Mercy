@@ -96,8 +96,17 @@ export class InteractionRouter {
     }
 
     async handleInteraction(interaction: any): Promise<void> {
-        const action = interaction.isCommand() ? interaction.commandName : interaction.customId;
-        console.log('InteractionRouter handling action:', action);
+        const rawAction = interaction.isCommand() ? interaction.commandName : interaction.customId;
+        
+        // Handle conversation-specific close buttons
+        let action = rawAction;
+        let conversationId = null;
+        if (rawAction.startsWith('tools_close_')) {
+            action = 'tools_close';
+            conversationId = rawAction.replace('tools_close_', '');
+        }
+        
+        console.log('InteractionRouter handling action:', action, conversationId ? `with conversation ID: ${conversationId}` : '');
         
         const handler = this.actionHandlers.get(action);
         if (!handler) {
@@ -148,13 +157,16 @@ export class InteractionRouter {
         }
         
         console.log('Found handler for action:', action);
-        this.setCurrentInteraction(interaction);
+        this.setCurrentInteraction(interaction, conversationId);
         await handler();
     }
 
     private currentInteraction: any;
-    private setCurrentInteraction(interaction: any) {
+    private currentConversationId: string | null = null;
+    
+    private setCurrentInteraction(interaction: any, conversationId: string | null = null) {
         this.currentInteraction = interaction;
+        this.currentConversationId = conversationId;
     }
 
     // Conversation Actions
@@ -190,19 +202,33 @@ export class InteractionRouter {
 
     private async handleToolsClose(): Promise<void> {
         try {
-            const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
+            const conversationManage = this.currentConversationId 
+                ? await ConversationManageHandler.createHandlerWithId(this.client, this.currentInteraction as ButtonInteraction, this.currentConversationId)
+                : await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
+            
+            // Check if conversation is already closed before showing confirmation
+            if (!conversationManage.conversation.open) {
+                await (this.currentInteraction as ButtonInteraction).reply({
+                    content: "הצ'אט הזה כבר נסגר. לא ניתן לבצע פעולות על צ'אטים סגורים.",
+                    ephemeral: true
+                });
+                return;
+            }
+            
             await conversationManage.sendSureMessageToClose();
         } catch (error) {
-            (this.currentInteraction as ButtonInteraction).message.edit({ components: [] });
-            if (this.currentInteraction.channel && 'send' in this.currentInteraction.channel) {
-                await this.currentInteraction.channel.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
-            }
+            await (this.currentInteraction as ButtonInteraction).reply({
+                content: "הצ'אט הזה לא זמין עוד. לא ניתן לבצע פעולות על צ'אטים שנסגרו.",
+                ephemeral: true
+            });
         }
     }
 
     private async handleSureYes(): Promise<void> {
         try {
-            const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
+            const conversationManage = this.currentConversationId 
+                ? await ConversationManageHandler.createHandlerWithId(this.client, this.currentInteraction as ButtonInteraction, this.currentConversationId)
+                : await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
             await conversationManage.closeConversation(this.currentInteraction.channel?.isDMBased() ? "משתמש" : "איש צוות");
             await conversationManage.saveConversation();
         } catch (error) {
@@ -213,10 +239,29 @@ export class InteractionRouter {
     }
 
     private async handleSureNo(): Promise<void> {
-        await (this.currentInteraction as ButtonInteraction).reply({ 
-            embeds: [ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat], 
-            ephemeral: true 
-        });
+        try {
+            // Try to load conversation to check if it's still valid
+            const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
+            
+            // Check if conversation is already closed
+            if (!conversationManage.conversation.open) {
+                await (this.currentInteraction as ButtonInteraction).reply({
+                    content: "הצ'אט הזה כבר נסגר. הפעולה לא רלוונטית עוד.",
+                    ephemeral: true
+                });
+                return;
+            }
+            
+            await (this.currentInteraction as ButtonInteraction).reply({ 
+                embeds: [ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat], 
+                ephemeral: true 
+            });
+        } catch (error) {
+            await (this.currentInteraction as ButtonInteraction).reply({
+                content: "הצ'אט הזה לא זמין עוד. לא ניתן לבצע פעולות על צ'אטים שנסגרו.",
+                ephemeral: true
+            });
+        }
     }
 
     private async handleToolsManager(): Promise<void> {

@@ -3,6 +3,7 @@ import {
   Client,
   TextChannel,
 } from "discord.js";
+import { ObjectId } from "mongodb";
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
 import { Conversation } from "../utils/types";
@@ -27,22 +28,56 @@ class ConversationManageHandler {
     return handler;
   }
 
+  static async createHandlerWithId(client: Client, interaction: ButtonInteraction, conversationId: string) {
+    const handler = new ConversationManageHandler(client, interaction);
+    await handler.loadConversationById(conversationId);
+    return handler;
+  }
+
   async loadConversation(): Promise<void> {
-    this.interaction.channel?.isDMBased()
-      ? (this.conversation = (await DataBase.conversationsCollection.findOne({
+    if (this.interaction.channel?.isDMBased()) {
+      // In DMs, first try to find the open conversation
+      this.conversation = (await DataBase.conversationsCollection.findOne({
         userId: this.interaction.user.id,
         open: true,
-      })) as any)
-      : (this.conversation = (await DataBase.conversationsCollection.findOne({
+      })) as any;
+      
+      // If no open conversation found, this means they're clicking on an old message
+      if (!this.conversation) {
+        throw new CantLoadConversationFromDB();
+      }
+    } else {
+      // In guild channels, load by channel ID (can be closed or open)
+      this.conversation = (await DataBase.conversationsCollection.findOne({
         channelId: this.interaction.channelId,
-        open: true,
-      })) as any);
+      })) as any;
+    }
+    
     if (this.conversation) {
       this.channel = Utils.getChannelById(
         this.client,
         this.conversation.channelId
       ) as TextChannel;
     } else {
+      throw new CantLoadConversationFromDB();
+    }
+  }
+
+  async loadConversationById(conversationId: string): Promise<void> {
+    try {
+      this.conversation = (await DataBase.conversationsCollection.findOne({
+        _id: new ObjectId(conversationId)
+      })) as any;
+      
+      if (this.conversation) {
+        this.channel = Utils.getChannelById(
+          this.client,
+          this.conversation.channelId
+        ) as TextChannel;
+      } else {
+        throw new CantLoadConversationFromDB();
+      }
+    } catch (error) {
       throw new CantLoadConversationFromDB();
     }
   }
@@ -81,6 +116,15 @@ class ConversationManageHandler {
   }
 
   async closeConversation(closedBy: string) {
+    // Check if conversation is already closed
+    if (!this.conversation.open) {
+      await this.interaction.reply({
+        content: "הצ'אט הזה כבר נסגר. לא ניתן לסגור צ'אט שכבר סגור.",
+        ephemeral: true
+      });
+      return;
+    }
+    
     if (!this.conversation.staffMemberId?.includes(this.interaction.user.id)
       && Utils.isHelper(this.interaction.user.id)
       && !this.interaction.channel?.isDMBased()

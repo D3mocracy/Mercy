@@ -69,7 +69,7 @@ class CreateConversationHandler {
 
     await this.interaction.user.send({
       embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
-      components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
+      components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close_with_id(this.conversation._id!.toString()))]
     });
 
     const convChannel = await ConfigHandler.config.guild?.channels.create({
