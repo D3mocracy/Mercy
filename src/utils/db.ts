@@ -7,7 +7,8 @@ import {
     Volunteer, 
     Report, 
     Suggestion, 
-    Punish 
+    Punish,
+    WhatsAppUser
 } from "./types";
 require("dotenv").config();
 
@@ -104,6 +105,10 @@ class DatabaseManager {
         return this.database.collection<Punish>(CONSTANTS.DATABASE.COLLECTIONS.PUNISHMENTS);
     }
 
+    get whatsappUsersCollection(): Collection<WhatsAppUser> {
+        return this.database.collection<WhatsAppUser>('WhatsAppUsers');
+    }
+
     // Health check method
     async healthCheck(): Promise<boolean> {
         try {
@@ -138,6 +143,10 @@ class DatabaseManager {
             // Punishments indexes
             await this.punishmentsCollection.createIndex({ userId: 1 });
             await this.punishmentsCollection.createIndex({ punishDate: -1 });
+
+            // WhatsApp Users indexes
+            await this.whatsappUsersCollection.createIndex({ phoneNumber: 1 }, { unique: true });
+            await this.whatsappUsersCollection.createIndex({ isBanned: 1 });
 
             console.log('Database indexes created successfully');
         } catch (error) {

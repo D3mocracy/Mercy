@@ -11,6 +11,8 @@ export interface Conversation {
     date: Date;
     subject: string;
     channelNumber?: number;
+    source: 'discord' | 'whatsapp';
+    whatsappNumber?: string;
 }
 
 export interface DatabaseDocument {
@@ -41,7 +43,7 @@ export interface Volunteer extends DatabaseDocument {
 }
 
 export type Punish = {
-    punishType: "kick" | "timeout" | "ban",
+    punishType: "timeout" | "ban",
     reason: string,
     punisherId: string,
     channelName: string,
@@ -88,6 +90,17 @@ export interface Config {
     helperitOfTheMonthRole?: Role;
     guild?: Guild;
     importantChannels?: Record<string, string>[];
+}
+
+export interface WhatsAppUser extends DatabaseDocument {
+    phoneNumber: string;
+    hasAcceptedTerms: boolean;
+    pronouns?: 'את' | 'אתה' | 'אתם' | 'לא משנה לי';
+    isBanned: boolean;
+    bannedReason?: string;
+    bannedDate?: Date;
+    pendingCloseRequest?: boolean;
+    pendingCloseTimestamp?: Date;
 }
 
 export interface CustomMessage {

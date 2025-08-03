@@ -66,11 +66,21 @@ export namespace MessageUtils {
         timeout: "טיים אאוט"
       }
       const punishType = punishment.punishType;
+      
+      // Handle WhatsApp vs Discord users
+      let punishedUserInfo: string;
+      if (punishment.source === 'whatsapp' && punishment.whatsappNumber) {
+        punishedUserInfo = `${punishment.whatsappNumber} (וואטסאפ)`;
+      } else {
+        const discordMember = Utils.getMemberByID(punishment.userId);
+        punishedUserInfo = discordMember ? `${discordMember}` : punishment.userId || 'לא זמין';
+      }
+      
       return new EmbedBuilder({
         title: "התקבלה ענישה חדשה",
         description: `
           **המוענש**
-          ${Utils.getMemberByID(punishment.userId)}
+          ${punishedUserInfo}
 
           **המעניש**
           ${Utils.getMemberByID(punishment.punisherId)}

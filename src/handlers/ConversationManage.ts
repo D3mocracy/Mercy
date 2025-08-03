@@ -145,18 +145,47 @@ class ConversationManageHandler {
     };
     this.conversation.open = false;
     await this.channel.send(closedMessage);
-    const user = this.client.users.cache.get(this.conversation.userId);
-    Promise.all([
-      Logger.logTicket(this.channel, user),
-      user?.send(closedMessage) || "",
-    ])
-      .catch((error) => {
-        console.log("Can not send message to this user - This Error is fine");
-        Logger.logError(error);
-
-      })
-      .finally(() => this.channel.delete());
+    
+    // Check if this is a WhatsApp conversation
+    if (this.conversation.source === 'whatsapp' && this.conversation.whatsappNumber) {
+      // Send WhatsApp notification to user
+      try {
+        await this.sendWhatsAppNotification(this.conversation.whatsappNumber, "השיחה נסגרה על ידי איש צוות");
+      } catch (error) {
+        console.error('Failed to send WhatsApp closure notification:', error);
+      }
+    } else {
+      // Send Discord DM notification (original behavior)
+      const user = this.client.users.cache.get(this.conversation.userId);
+      Promise.all([
+        Logger.logTicket(this.channel, user),
+        user?.send(closedMessage) || "",
+      ])
+        .catch((error) => {
+          console.log("Can not send message to this user - This Error is fine");
+          Logger.logError(error);
+        });
+    }
+    
+    // Always log the ticket and delete the channel
+    await Logger.logTicket(this.channel);
+    await this.channel.delete();
   };
+
+  private async sendWhatsAppNotification(phoneNumber: string, message: string): Promise<void> {
+    // This is a placeholder - we need to access the global WhatsApp client
+    // For now, let's create a database record that can be picked up by a WhatsApp service
+    // or find another way to access the WhatsApp client
+    
+    try {
+      // Import the WhatsApp service/client here
+      const { sendWhatsAppMessage } = await import('../utils/WhatsAppUtils');
+      await sendWhatsAppMessage(phoneNumber, message);
+    } catch (error) {
+      console.error('WhatsApp notification failed:', error);
+      // Silently fail - this is not critical to the core functionality
+    }
+  }
 
   async attachHelper(staffMemberId: string): Promise<void> {
     if ((Utils.getHelperClaimedConversationNumber(staffMemberId) >= 2) && Utils.isHelper(staffMemberId)) {
@@ -206,7 +235,8 @@ class ConversationManageHandler {
       ephemeral: true,
       embeds: [
         await ConversationManageMessageUtils.EmbedMessages.revealUserMessage(
-          this.conversation.userId
+          this.conversation.userId,
+          this.conversation
         ),
       ],
     });
@@ -241,9 +271,10 @@ class ConversationManageHandler {
   }
 
   async sendPunishMessage() {
+    const isWhatsAppConversation = this.conversation.source === 'whatsapp';
     await this.interaction.reply({
       embeds: [ConversationManageMessageUtils.EmbedMessages.punishMessage],
-      components: [ConversationManageMessageUtils.Actions.punishMenu()],
+      components: [ConversationManageMessageUtils.Actions.punishMenu(isWhatsAppConversation)],
       ephemeral: true
     });
 

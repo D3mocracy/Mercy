@@ -24,6 +24,8 @@ import UnactiveConversationHandler from "./handlers/UnactiveConversation";
 import { InteractionRouter } from "./handlers/InteractionRouter";
 import { ErrorHandler } from "./utils/ErrorHandler";
 import { CONSTANTS } from "./utils/Constants";
+import WhatsAppClient from "./services/WhatsAppClient";
+import { setWhatsAppClient } from "./utils/WhatsAppUtils";
 
 //4194303
 const client: Client = new Client({
@@ -38,6 +40,7 @@ const client: Client = new Client({
 });
 
 const interactionRouter = new InteractionRouter(client);
+let whatsappClient: WhatsAppClient;
 
 DataBase.connect().then(async () => {
     // Create database indexes for better performance
@@ -57,6 +60,22 @@ client.once('ready', async () => {
         const config = await new ConfigHandler().loadConfig(client);
         await config.guild?.members.fetch();
         console.log(`Configuration loaded successfully! Current Date: ${new Date()}`);
+        
+        // Initialize WhatsApp Client
+        try {
+            whatsappClient = new WhatsAppClient();
+            // Get the message handler from the WhatsApp client and set Discord client
+            const handler = (whatsappClient as any).messageHandler;
+            if (handler && typeof handler.setDiscordClient === 'function') {
+                handler.setDiscordClient(client);
+            }
+            await whatsappClient.initialize();
+            setWhatsAppClient(whatsappClient);
+            console.log('WhatsApp Client initialized successfully!');
+        } catch (error) {
+            console.error('Failed to initialize WhatsApp Client:', error);
+            console.log('Continuing without WhatsApp integration...');
+        }
         
         const unactiveConversationHandler = new UnactiveConversationHandler();
         setInterval(() => unactiveConversationHandler.checkChannels(), CONSTANTS.TIMERS.UNACTIVE_CHECK_INTERVAL);
@@ -88,7 +107,7 @@ client.on('messageCreate', async message => {
 
         const hasOpenConversation = await Utils.hasOpenConversation(message.author.id);
         if ((message.channel.isDMBased() && hasOpenConversation) || Utils.isConversationChannel(message.channel)) {
-            await new CommunicateConversationHandler(client, message).handleSendMessage();
+            await new CommunicateConversationHandler(client, message, whatsappClient).handleSendMessage();
         }
 
     } catch (error: any) {
@@ -115,14 +134,14 @@ client.on('guildMemberRemove', ErrorHandler.wrapAsync(async member => {
 
 client.on('messageUpdate', ErrorHandler.wrapAsync(async (oldMessage, newMessage) => {
     if ((newMessage.channel as TextChannel).parentId !== ConfigHandler.config.conversationCatagory?.id) return;
-    const communicateConversationHandler = new CommunicateConversationHandler(client, newMessage as Message);
+    const communicateConversationHandler = new CommunicateConversationHandler(client, newMessage as Message, whatsappClient);
     await communicateConversationHandler.loadConversation();
     await communicateConversationHandler.updateMessage(oldMessage, newMessage);
 }));
 
 client.on('messageDelete', ErrorHandler.wrapAsync(async (message) => {
     if ((message.channel as TextChannel).parentId !== ConfigHandler.config.conversationCatagory?.id || message.author?.bot) return;
-    const communicateConversationHandler = new CommunicateConversationHandler(client, message as Message);
+    const communicateConversationHandler = new CommunicateConversationHandler(client, message as Message, whatsappClient);
     await communicateConversationHandler.loadConversation();
     await communicateConversationHandler.deleteMessage(message);
 }));

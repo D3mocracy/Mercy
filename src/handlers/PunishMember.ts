@@ -8,8 +8,9 @@ import { ObjectId } from "mongodb";
 
 class PunishMemberHandler {
     conversation: Conversation = {} as any;
-    punish: "kick" | "ban" | "timeout" = "" as any;
+    punish: "ban" | "timeout" = "" as any;
     reason: string = "";
+    timeoutDays?: number;
 
     constructor(private interaction: ModalSubmitInteraction) { }
 
@@ -35,6 +36,7 @@ class PunishMemberHandler {
             punisherId: this.interaction.user.id,
             channelName: (Utils.getChannelByIdNoClient(this.conversation.channelId) as TextChannel).name,
             punishDate: new Date(),
+            timeoutDays: this.timeoutDays, // Store the actual timeout duration
         }
 
         await DataBase.punishmentsCollection.insertOne({
@@ -91,6 +93,7 @@ class PunishMemberHandler {
 
         this.punish = "timeout";
         this.reason = reason;
+        this.timeoutDays = +time;
 
         await Promise.all([
             this.sendDMMessage(),
@@ -110,26 +113,6 @@ class PunishMemberHandler {
 
     }
 
-    async kick() {
-        const reason = this.interaction.fields.getTextInputValue('punish_kick_reason');
-
-        this.punish = "kick";
-        this.reason = reason;
-
-        await Promise.all([
-            this.sendDMMessage(),
-
-            this.interaction.reply({
-                content: "הפעולה בוצעה בהצלחה, המשתמש הוסר מהשרת ונשלחה אליו הודעת הסבר",
-                ephemeral: true
-            }),
-
-            this.savePunish()
-        ])
-
-        await Utils.getMemberByID(this.conversation.userId)?.kick(reason);
-
-    }
 
     async ban() {
         const reason = this.interaction.fields.getTextInputValue('punish_ban_reason');

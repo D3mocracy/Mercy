@@ -92,26 +92,50 @@ export namespace ConversationManageMessageUtils {
       }).setTimestamp();
     }
 
-    export async function revealUserMessage(userId: string) {
-      const user = Utils.getMemberByID(userId)?.user;
-      return new EmbedBuilder({
-        color: colors.white,
-        title: "פרטי המשתמש",
-        description:
-          "מנהל יקר, שים לב כי בחרת להפר את מדיניות האנונימיות - עקב כך הפרטים בהודעה בהמשך גלויים אך ורק לך",
-        footer: {
-          text: "מומלץ להנחות את אחד התומכים להמשיך לדבר עם המשתמש עד לסיום העברת המידע לגורמים הרלוונטים",
-        },
-      }).addFields([
-        { name: "שם", value: user?.username || "לא זמין" },
-        { name: "טאג", value: user?.tag || "לא זמין" },
-        { name: "תיוג", value: `${user}` || "לא זמין" },
-        { name: "מספר משתמש/ID", value: userId || "לא זמין" },
-        { name: "קישור לתמונת הפרופיל", value: user?.avatarURL() || "לא זמין" },
-        { name: "קישור לבאנר הפרופיל", value: user?.bannerURL() || "לא זמין" },
-        { name: "האם בוט", value: user?.bot ? "כן" : "לא" },
-        { name: "תאריך יצירת המשתמש", value: user?.createdAt?.toString() || "לא זמין" },
-      ]);
+    export async function revealUserMessage(userId: string, conversation?: any) {
+      // Check if this is a WhatsApp conversation
+      const isWhatsApp = conversation?.source === 'whatsapp';
+      
+      if (isWhatsApp) {
+        // For WhatsApp conversations, show phone number and contact info
+        const phoneNumber = conversation.whatsappNumber || "לא זמין";
+        
+        return new EmbedBuilder({
+          color: 0x25D366, // WhatsApp green
+          title: "פרטי המשתמש - וואטסאפ 📱",
+          description:
+            "מנהל יקר, שים לב כי בחרת להפר את מדיניות האנונימיות - עקב כך הפרטים בהודעה בהמשך גלויים אך ורק לך",
+          footer: {
+            text: "מומלץ להנחות את אחד התומכים להמשיך לדבר עם המשתמש עד לסיום העברת המידע לגורמים הרלוונטים",
+          },
+        }).addFields([
+          { name: "מספר טלפון", value: phoneNumber },
+          { name: "מזהה משתמש פנימי", value: userId || "לא זמין" },
+          { name: "תאריך פתיחת השיחה", value: conversation?.date ? new Date(conversation.date).toLocaleString('he-IL') : "לא זמין" },
+          { name: "נושא השיחה", value: conversation?.subject || "לא צוין" }
+        ]);
+      } else {
+        // For Discord conversations, show Discord user info
+        const user = Utils.getMemberByID(userId)?.user;
+        return new EmbedBuilder({
+          color: colors.white,
+          title: "פרטי המשתמש - דיסקורד",
+          description:
+            "מנהל יקר, שים לב כי בחרת להפר את מדיניות האנונימיות - עקב כך הפרטים בהודעה בהמשך גלויים אך ורק לך",
+          footer: {
+            text: "מומלץ להנחות את אחד התומכים להמשיך לדבר עם המשתמש עד לסיום העברת המידע לגורמים הרלוונטים",
+          },
+        }).addFields([
+          { name: "שם", value: user?.username || "לא זמין" },
+          { name: "טאג", value: user?.tag || "לא זמין" },
+          { name: "תיוג", value: `${user}` || "לא זמין" },
+          { name: "מספר משתמש/ID", value: userId || "לא זמין" },
+          { name: "קישור לתמונת הפרופיל", value: user?.avatarURL() || "לא זמין" },
+          { name: "קישור לבאנר הפרופיל", value: user?.bannerURL() || "לא זמין" },
+          { name: "האם בוט", value: user?.bot ? "כן" : "לא" },
+          { name: "תאריך יצירת המשתמש", value: user?.createdAt?.toString() || "לא זמין" },
+        ]);
+      }
     }
 
     export function findChannel(conversation: Conversation) {
@@ -195,9 +219,8 @@ export namespace ConversationManageMessageUtils {
       color: colors.red
     });
 
-    export function punishDMMessage(punish: "kick" | "ban" | "timeout", reason: string, mayUser: GuildMember) {
+    export function punishDMMessage(punish: "ban" | "timeout", reason: string, mayUser: GuildMember) {
       const punishConvert = {
-        kick: "קיק (Kick)",
         ban: "חסימה (Ban)",
         timeout: "השתקה (Timeout)"
       }
@@ -359,6 +382,28 @@ export namespace ConversationManageMessageUtils {
         }),
       ]);
 
+    export const whatsappManagerTools =
+      new ActionRowBuilder<ButtonBuilder>().addComponents([
+        new ButtonBuilder({
+          customId: "tools_whatsapp_ban",
+          label: "חסימת מספר WhatsApp",
+          emoji: "🚫",
+          style: ButtonStyle.Danger
+        }),
+        new ButtonBuilder({
+          customId: "tools_manager_change_supporter",
+          label: "החלפת תומך",
+          emoji: "🔄",
+          style: ButtonStyle.Primary,
+        }),
+        new ButtonBuilder({
+          customId: "tools_whatsapp_reveal",
+          label: "חשיפת מספר טלפון",
+          emoji: "👁️",
+          style: ButtonStyle.Danger,
+        }),
+      ]);
+
     export function changeHelper(helpers: any[]) {
       const selectMenu = new StringSelectMenuBuilder({
         customId: "helpers_list",
@@ -387,23 +432,18 @@ export namespace ConversationManageMessageUtils {
         })
       );
 
-    export function punishMenu() {
+    export function punishMenu(isWhatsAppConversation: boolean = false) {
       const selectMenu = new StringSelectMenuBuilder({
         customId: "punish_menu",
         placeholder: "יש לבחור את הפעולה הרצויה",
       });
-      selectMenu.addOptions([
+      
+      const options = [
         {
           label: "השתקת משתמש",
           description: "משתיק את המשתמש לזמן מוגדר (Timeout)",
           value: "punish_timeout",
           emoji: "⏳"
-        },
-        {
-          label: "הסרת משתמש מהשרת",
-          description: "מעניק קיק למשתמש",
-          value: "punish_kick",
-          emoji: "🦵"
         },
         {
           label: "חסימת משתמש מהשרת לצמיתות",
@@ -416,9 +456,20 @@ export namespace ConversationManageMessageUtils {
           description: "מציג את הענישות הקודמות של המשתמש",
           value: "punish_history",
           emoji: "📜"
-        },
+        }
+      ];
 
-      ]);
+      // Add kick option only for Discord conversations (not WhatsApp)
+      if (!isWhatsAppConversation) {
+        options.splice(2, 0, {
+          label: "הסרת משתמש מהשרת",
+          description: "מוציא את המשתמש מהשרת (Kick)",
+          value: "punish_kick",
+          emoji: "👢"
+        });
+      }
+
+      selectMenu.addOptions(options);
 
       return new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(selectMenu);
     }
@@ -504,5 +555,21 @@ export namespace ConversationManageMessageUtils {
       customId: "criticalChatModal",
       title: "דיווח כצ'אט קריטי",
     }).addComponents(criticalChatReason);
+
+    //WhatsApp Ban Modal
+    const whatsappBanReason = new ActionRowBuilder<TextInputBuilder>().addComponents([
+      new TextInputBuilder({
+        customId: "whatsapp_ban_reason",
+        label: "סיבת חסימת מספר WhatsApp",
+        placeholder: "יש לציין סיבה ברורה לחסימת המספר",
+        style: TextInputStyle.Paragraph,
+        required: true,
+      }),
+    ]);
+
+    export const whatsappBanModal = new ModalBuilder({
+      customId: "whatsappBanModal",
+      title: "חסימת מספר WhatsApp",
+    }).addComponents(whatsappBanReason);
   }
 }

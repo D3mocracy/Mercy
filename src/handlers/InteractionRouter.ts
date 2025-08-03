@@ -20,6 +20,7 @@ import UnactiveConversationHandler from "./UnactiveConversation";
 import { MessageUtils } from "../utils/MessageUtils";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 import { Utils } from "../utils/Utils";
+import PunishmentManager from "./PunishmentManager";
 
 type InteractionHandler = () => Promise<void>;
 
@@ -72,7 +73,6 @@ export class InteractionRouter {
             ['punish_history', () => this.handlePunishHistory()],
             
             // Punishment Modals
-            ['punishKickModal', () => this.handlePunishKickModal()],
             ['punishBanModal', () => this.handlePunishBanModal()],
             ['punishMuteModal', () => this.handlePunishMuteModal()],
             
@@ -92,6 +92,7 @@ export class InteractionRouter {
             ['chat-info', () => this.handleChannelInfoCommand()],
             ['reopen', () => this.handleReopenCommand()],
             ['vacation', () => this.handleVacationCommand()],
+            ['punishment', () => this.handlePunishmentCommand()],
         ]);
     }
 
@@ -135,7 +136,7 @@ export class InteractionRouter {
         const buttonsWithReply = [
             'openChatButton', 'sure_no', 'tools_manager', 'tools_close',
             'user_report_helper', 'user_volunteer', 'user_suggest',
-            'punish_timeout', 'punish_kick', 'punish_ban',
+            'punish_timeout', 'punish_ban',
             'unactive_continue_chat', 'unactive_close_chat', 'helpers_list',
             'tools_refer_manager', 'tools_attach', 'tools_manager_reveal',
             'tools_manager_change_supporter', 'tools_manager_punish',
@@ -358,11 +359,6 @@ export class InteractionRouter {
     }
 
     // Punishment Modals
-    private async handlePunishKickModal(): Promise<void> {
-        const handler = await PunishMemberHandler.createHandler(this.currentInteraction as ModalSubmitInteraction);
-        await handler.kick();
-    }
-
     private async handlePunishBanModal(): Promise<void> {
         const handler = await PunishMemberHandler.createHandler(this.currentInteraction as ModalSubmitInteraction);
         await handler.ban();
@@ -428,5 +424,10 @@ export class InteractionRouter {
 
     private async handleVacationCommand(): Promise<void> {
         await (this.currentInteraction as ChatInputCommandInteraction).showModal(MessageUtils.Modals.vacationModal);
+    }
+
+    private async handlePunishmentCommand(): Promise<void> {
+        const punishmentManager = new PunishmentManager(this.currentInteraction as ChatInputCommandInteraction);
+        await punishmentManager.handleCommand();
     }
 }

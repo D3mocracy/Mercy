@@ -4,6 +4,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   StringSelectMenuInteraction,
+  EmbedBuilder,
 } from "discord.js";
 import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
@@ -86,12 +87,7 @@ class CreateConversationHandler {
     await Promise.all([
       convChannel.send({
         content: `<@&${ConfigHandler.config.memberRole}>`,
-        embeds: [
-          ConversationManageMessageUtils.EmbedMessages.newChatStaff(
-            `צ'אט ${numberOfConversation}`, `משתמש פתח צ'אט בנושא ${subject}, נא להעניק סיוע בהתאם!
-            ${genderRole ? `לשון פנייה מועדפת: ${genderRole.name}` : ``}`
-          )
-        ],
+        embeds: [this.createDiscordConversationEmbed(numberOfConversation, subject, genderRole?.name)],
         components: [ConversationManageMessageUtils.Actions.supporterTools],
       }).then((message) => message.edit({ content: null })),
 
@@ -100,6 +96,25 @@ class CreateConversationHandler {
     ]);
 
     await this.interaction.message.edit({ components: [] })
+  }
+
+  private createDiscordConversationEmbed(conversationNumber: number, subject: string, pronouns?: string): EmbedBuilder {
+    let pronounsText = '';
+    if (pronouns) {
+      pronounsText = `לשון פנייה מועדפת: ${pronouns}`;
+    }
+
+    const description = `משתמש פתח צ'אט דרך דיסקורד בנושא ${subject}, נא להעניק סיוע בהתאם!\n${pronounsText}`;
+
+    return new EmbedBuilder({
+      title: `צ'אט ${conversationNumber}`,
+      description: description,
+      fields: [
+        { name: 'נושא', value: subject || 'לא צוין', inline: true }
+      ],
+      color: 0x5865F2, // Discord blue
+      timestamp: new Date().toISOString()
+    });
   }
 }
 
