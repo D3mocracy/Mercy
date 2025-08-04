@@ -135,6 +135,9 @@ class PunishMemberHandler {
         await Utils.getMemberByID(this.conversation.userId)?.ban({
             reason: reason
         });
+
+        await this.closeConversation();
+
     }
 
     async closeConversation() {

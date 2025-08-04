@@ -259,21 +259,18 @@ export class WhatsAppMessageHandler {
     }
 
     private formatPhoneNumber(number: string): string {
-        // Remove any non-digit characters and ensure it starts with country code
-        const cleaned = number.replace(/\D/g, '');
-        
-        // If it starts with 0, replace with 972 (Israel country code)
-        if (cleaned.startsWith('0')) {
-            return '972' + cleaned.substring(1);
-        }
-        
-        // If it doesn't start with 972, add it
-        if (!cleaned.startsWith('972')) {
-            return '972' + cleaned;
-        }
-        
+    // Remove all non-digit characters
+    const cleaned = number.replace(/\D/g, '');
+
+    // If it starts with a country code (like 1, 44, 358, 972...), just return it
+    if (!cleaned.startsWith('0')) {
         return cleaned;
     }
+
+    // Otherwise, assume it's a local Israeli number starting with 0
+    return '972' + cleaned.substring(1);
+}
+
 
     private async getTopicPrompt(): Promise<string> {
         return `אנא בחרו את נושא הפנייה:

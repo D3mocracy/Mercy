@@ -46,7 +46,6 @@ export class PunishmentManager {
     }
 
     private async listAllPunishments(): Promise<void> {
-        await this.interaction.deferReply({ ephemeral: true });
 
         try {
             const punishments = await DataBase.punishmentsCollection
@@ -76,7 +75,6 @@ export class PunishmentManager {
 
     private async listUserPunishments(): Promise<void> {
         const userId = this.interaction.options.getString("user_id", true);
-        await this.interaction.deferReply({ ephemeral: true });
 
         try {
             // Handle both Discord users and WhatsApp users
@@ -116,7 +114,6 @@ export class PunishmentManager {
 
     private async removePunishment(): Promise<void> {
         const punishmentId = this.interaction.options.getString("punishment_id", true);
-        await this.interaction.deferReply({ ephemeral: true });
 
         try {
             // Validate punishment ID format
@@ -173,8 +170,6 @@ export class PunishmentManager {
         const type = this.interaction.options.getString("type", true) as 'timeout' | 'ban';
         const reason = this.interaction.options.getString("reason", true);
         const days = this.interaction.options.getInteger("days");
-
-        await this.interaction.deferReply({ ephemeral: true });
 
         try {
             // Validate timeout days
@@ -319,7 +314,7 @@ export class PunishmentManager {
         }
 
         embed.setDescription(description);
-        embed.setFooter({ text: `סה״ב ${punishments.length} ענישות` });
+        embed.setFooter({ text: `סה״כ ${punishments.length} ענישות` });
 
         return embed;
     }

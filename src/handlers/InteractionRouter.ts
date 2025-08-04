@@ -117,7 +117,7 @@ export class InteractionRouter {
 
         // For most slash commands, defer immediately to prevent timeout
         // Some commands like vacation need special handling (showModal)
-        const commandsWithModal = ['vacation'];
+        const commandsWithModal = ['vacation', 'דיווח כצ\'אט קריטי'];
         if (interaction.isCommand() && !commandsWithModal.includes(action) && !interaction.replied && !interaction.deferred) {
             try {
                 await interaction.deferReply({ ephemeral: true });
