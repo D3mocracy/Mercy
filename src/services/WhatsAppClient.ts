@@ -1,8 +1,16 @@
-import { Client, LocalAuth, Message, Buttons, List } from 'whatsapp-web.js';
+declare module 'qrcode-terminal' {
+    interface QROptions {
+        small?: boolean;
+    }
+    function generate(text: string, options?: QROptions): void;
+}
+
+import { Client, LocalAuth, RemoteAuth, Message, Buttons, List } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import { WhatsAppMessageHandler } from '../handlers/WhatsAppMessageHandler';
 import { ErrorHandler } from '../utils/ErrorHandler';
 import DataBase from '../utils/db';
+import { WhatsAppMongoStore } from './WhatsAppMongoStore';
 
 export class WhatsAppClient {
     private client: Client;
@@ -10,10 +18,11 @@ export class WhatsAppClient {
     private isReady: boolean = false;
 
     constructor() {
+        const store = new WhatsAppMongoStore("mercy-bot-whatsapp");
         this.client = new Client({
-            authStrategy: new LocalAuth({
-                clientId: "mercy-bot-whatsapp",
-                dataPath: "./whatsapp_auth"
+            authStrategy: new RemoteAuth({
+                store: store,
+                backupSyncIntervalMs: 300000 // 5 minutes
             }),
             puppeteer: {
                 headless: true,

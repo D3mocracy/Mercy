@@ -109,6 +109,10 @@ class DatabaseManager {
         return this.database.collection<WhatsAppUser>('WhatsAppUsers');
     }
 
+    get whatsappSessionsCollection(): Collection<any> {
+        return this.database.collection('WhatsAppSessions');
+    }
+
     // Health check method
     async healthCheck(): Promise<boolean> {
         try {
@@ -147,6 +151,9 @@ class DatabaseManager {
             // WhatsApp Users indexes
             await this.whatsappUsersCollection.createIndex({ phoneNumber: 1 }, { unique: true });
             await this.whatsappUsersCollection.createIndex({ isBanned: 1 });
+
+            // WhatsApp Sessions indexes
+            await this.whatsappSessionsCollection.createIndex({ sessionId: 1 }, { unique: true });
 
             console.log('Database indexes created successfully');
         } catch (error) {
