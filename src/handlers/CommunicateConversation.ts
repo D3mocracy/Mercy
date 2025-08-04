@@ -69,11 +69,6 @@ class CommunicateConversationHandler {
                             components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
                         });
                     }
-                } else {
-                    await this.message.reply({
-                        content: "❌ WhatsApp לא מחובר",
-                        components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
-                    });
                 }
             } else {
                 // Send to Discord DM (original behavior)

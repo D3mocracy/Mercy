@@ -130,7 +130,7 @@ export class WhatsAppClient {
     }
 
     isClientReady(): boolean {
-        return this.isReady;
+        return this.isReady && this.client.info !== undefined;
     }
 
     async destroy(): Promise<void> {
