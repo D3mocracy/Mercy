@@ -35,8 +35,10 @@ export class WhatsAppClient {
     private setupEventHandlers(): void {
         this.client.on('qr', (qr: string) => {
             console.log('📱 WhatsApp QR Code:');
-            qrcode.generate(qr, { small: true });
-            console.log('Scan this QR code with WhatsApp on phone number: +972529772722');
+            console.log('RAW QR CODE TEXT:');
+            console.log(qr);
+            console.log('Copy the text above and paste it into: https://qr-code-generator.com');
+            console.log('Then scan the generated QR with WhatsApp on phone number: +972529772722');
         });
 
         this.client.on('ready', () => {
