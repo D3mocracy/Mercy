@@ -2,6 +2,7 @@ import { Client, LocalAuth, Message, Buttons, List } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import { WhatsAppMessageHandler } from '../handlers/WhatsAppMessageHandler';
 import { ErrorHandler } from '../utils/ErrorHandler';
+import DataBase from '../utils/db';
 
 export class WhatsAppClient {
     private client: Client;
@@ -11,7 +12,8 @@ export class WhatsAppClient {
     constructor() {
         this.client = new Client({
             authStrategy: new LocalAuth({
-                clientId: "mercy-bot-whatsapp"
+                clientId: "mercy-bot-whatsapp",
+                dataPath: "./whatsapp_auth"
             }),
             puppeteer: {
                 headless: true,
