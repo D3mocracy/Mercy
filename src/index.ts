@@ -64,10 +64,15 @@ client.once('ready', async () => {
         // Initialize WhatsApp Client
         try {
             whatsappClient = new WhatsAppClient();
-            // Get the message handler from the WhatsApp client and set Discord client
+            // Get the message handler from the WhatsApp client and set up clients
             const handler = (whatsappClient as any).messageHandler;
-            if (handler && typeof handler.setDiscordClient === 'function') {
-                handler.setDiscordClient(client);
+            if (handler) {
+                if (typeof handler.setDiscordClient === 'function') {
+                    handler.setDiscordClient(client);
+                }
+                if (typeof handler.setWhatsAppClient === 'function') {
+                    handler.setWhatsAppClient(whatsappClient);
+                }
             }
             await whatsappClient.initialize();
             setWhatsAppClient(whatsappClient);

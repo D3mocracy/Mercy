@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@types/uuid": "^9.0.6",
+    "@wppconnect-team/wppconnect": "^1.37.3",
     "axios": "^1.5.1",
     "discord-html-transcripts": "^3.1.2",
     "discord.js": "^14.21.0",
@@ -8,8 +9,7 @@
     "mongodb": "^4.11.0",
     "nodemon": "^2.0.20",
     "qrcode-terminal": "^0.12.0",
-    "uuid": "^9.0.1",
-    "whatsapp-web.js": "^1.31.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.1.2",

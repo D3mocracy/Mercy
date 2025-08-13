@@ -1,4 +1,3 @@
-import { Client as WhatsAppClient, Message as WhatsAppMessage, Contact } from 'whatsapp-web.js';
 import { Client as DiscordClient, TextChannel, ChannelType } from 'discord.js';
 import DataBase from '../utils/db';
 import { Conversation } from '../utils/types';
@@ -12,7 +11,7 @@ export class WhatsAppMessageHandler {
     private discordClient?: DiscordClient;
     private userFlow: WhatsAppUserFlow;
 
-    constructor(private whatsappClient: WhatsAppClient) {
+    constructor() {
         this.userFlow = new WhatsAppUserFlow();
     }
 
@@ -20,15 +19,15 @@ export class WhatsAppMessageHandler {
         this.discordClient = discordClient;
     }
 
-    async handleIncomingMessage(message: WhatsAppMessage): Promise<void> {
+    async handleIncomingMessage(message: any): Promise<void> {
         if (!this.discordClient) {
             console.error('Discord client not set for WhatsApp handler');
             return;
         }
 
         try {
-            const contact = await message.getContact();
-            const phoneNumber = this.formatPhoneNumber(contact.number);
+            // Extract phone number from wppconnect message format
+            const phoneNumber = this.formatPhoneNumber(message.from.replace('@c.us', ''));
             const whatsappUserId = `whatsapp_${phoneNumber}`;
 
             // First, check if conversation already exists
@@ -60,16 +59,16 @@ export class WhatsAppMessageHandler {
                 await this.clearPendingCloseRequest(phoneNumber);
                 
                 // Chat is already open, just forward the message
-                await this.forwardToDiscord(conversation.channelId, message, contact);
+                await this.forwardToDiscord(conversation.channelId, message);
                 return;
             }
 
-            // Check if this is a button or list response
+            // Check if this is a button or list response (wppconnect format)
             let buttonId: string | undefined;
-            if ((message as any).selectedButtonId) {
-                buttonId = (message as any).selectedButtonId;
-            } else if ((message as any).selectedRowId) {
-                buttonId = (message as any).selectedRowId;
+            if (message.selectedButtonId) {
+                buttonId = message.selectedButtonId;
+            } else if (message.selectedRowId) {
+                buttonId = message.selectedRowId;
             }
 
             // No open conversation - handle user flow (terms, pronouns, topic selection)
@@ -120,7 +119,7 @@ export class WhatsAppMessageHandler {
             
             if (selectedTopic) {
                 // Create conversation with selected topic
-                conversation = await this.createWhatsAppConversation(whatsappUserId, phoneNumber, contact, selectedTopic);
+                conversation = await this.createWhatsAppConversation(whatsappUserId, phoneNumber, selectedTopic);
                 
                 // Send confirmation message to user
                 await this.sendToWhatsApp(phoneNumber, 'צוות המתנדבים קיבל את הודעתכם בהצלחה! כל הודעה שתשלחו כאן תגיע באופן אנונימי לצוות.\n\nניתן לסגור את הצ\'אט בכל עת על ידי כתיבת "סיים שיחה".');
@@ -137,7 +136,7 @@ export class WhatsAppMessageHandler {
         }
     }
 
-    private async createWhatsAppConversation(userId: string, phoneNumber: string, contact: Contact, topic?: string): Promise<Conversation> {
+    private async createWhatsAppConversation(userId: string, phoneNumber: string, topic?: string): Promise<Conversation> {
         // Get next conversation number (same as Discord conversations)
         const numberOfConversation = (await Utils.getNumberOfConversationFromDB()) + 1;
 
@@ -155,7 +154,7 @@ export class WhatsAppMessageHandler {
         };
 
         // Create Discord channel
-        const channel = await this.createDiscordChannel(contact, phoneNumber);
+        const channel = await this.createDiscordChannel(phoneNumber);
         conversation.channelId = channel.id;
 
         // Save to database
@@ -168,7 +167,7 @@ export class WhatsAppMessageHandler {
         return conversation;
     }
 
-    private async createDiscordChannel(contact: Contact, phoneNumber: string): Promise<TextChannel> {
+    private async createDiscordChannel(phoneNumber: string): Promise<TextChannel> {
         const guild = ConfigHandler.config.guild;
         const category = ConfigHandler.config.conversationCatagory;
 
@@ -219,7 +218,7 @@ export class WhatsAppMessageHandler {
         }).then((message) => message.edit({ content: null }));
     }
 
-    private async forwardToDiscord(channelId: string, message: WhatsAppMessage, contact: Contact): Promise<void> {
+    private async forwardToDiscord(channelId: string, message: any): Promise<void> {
         const channel = Utils.getChannelById(this.discordClient!, channelId) as TextChannel;
         
         if (!channel) {
@@ -227,31 +226,39 @@ export class WhatsAppMessageHandler {
             return;
         }
 
-        let messageContent = message.body;
+        let messageContent = message.body || message.text || '';
 
-        // Handle media messages
-        if (message.hasMedia) {
-            try {
-                const media = await message.downloadMedia();
-                messageContent += `\n📎 Media: ${message.type} (${media.mimetype})`;
-                
-                // For images, we could potentially upload them to Discord
-                if (media.mimetype?.startsWith('image/')) {
-                    messageContent += '\n*[Image content - download media to view]*';
-                }
-            } catch (error) {
-                console.error('Error downloading WhatsApp media:', error);
-                messageContent += '\n❌ Failed to download media';
+        // Handle media messages (wppconnect format)
+        if (message.type !== 'chat') {
+            messageContent += `\n📎 Media: ${message.type}`;
+            
+            // For images, we could potentially upload them to Discord
+            if (message.type === 'image') {
+                messageContent += '\n*[Image content - media handling not implemented yet]*';
+            } else if (message.type === 'document') {
+                messageContent += '\n*[Document content]*';
+            } else if (message.type === 'audio') {
+                messageContent += '\n*[Audio content]*';
             }
         }
 
         await channel.send(messageContent);
     }
 
+    private whatsappClient: any = null;
+
+    setWhatsAppClient(client: any): void {
+        this.whatsappClient = client;
+    }
+
     async sendToWhatsApp(phoneNumber: string, message: string): Promise<void> {
+        if (!this.whatsappClient) {
+            console.error('WhatsApp client not set for message handler');
+            return;
+        }
+
         try {
-            const formattedNumber = this.formatPhoneNumber(phoneNumber) + '@c.us';
-            await this.whatsappClient.sendMessage(formattedNumber, message);
+            await this.whatsappClient.sendMessage(phoneNumber, message);
         } catch (error) {
             console.error('Failed to send message to WhatsApp:', error);
             throw error;
