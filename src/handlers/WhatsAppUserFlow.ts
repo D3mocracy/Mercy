@@ -148,7 +148,7 @@ export class WhatsAppUserFlow {
         } else {
             // Fallback for text responses  
             const normalizedText = messageText.trim().toLowerCase();
-            if (normalizedText === 'מאשר' || normalizedText === '1') {
+            if (normalizedText === 'מאשר') {
                 await DataBase.whatsappUsersCollection.updateOne(
                     { phoneNumber },
                     { 
