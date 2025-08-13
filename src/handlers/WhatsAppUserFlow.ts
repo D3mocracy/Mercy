@@ -39,17 +39,68 @@ export class WhatsAppUserFlow {
             await this.createNewUser(phoneNumber);
             return {
                 shouldCreateChannel: false,
-                needsInteractive: 'buttons'
+                response: 'לפני שמתחילים, חשוב שתקראו ותאשרו את תנאי השימוש:\n1. השימוש בבוט הוא לא תחלופה לעזרה מקצועית.\n2. הצוות מורשה לסגור צ\'אטים בכל עת, ואף להשעות משתמשים משימוש בבוט לפי שיקול דעתו.\n3. במקרים חריגים מאוד הנהלת השרת תעביר מידע ושיחות לגורמים חיצוניים.\n4. הבוט נועד לספק תמיכה בלבד. אין להשתמש בו לשיחות חולין, בדיחות או ניהול שיחות לא רציניות עם הצוות.\n5. לשמירה על בטיחותכם, אין לשתף פרטים מזהים כמו שם מלא, כתובת, מספר טלפון, או כל פרט אישי אחר בצ\'אטים.\n6. לא מובטח מענה להודעות בכל שעות היממה.'
+            };
+        }
+
+        // Check if terms were just sent, now ask for confirmation
+        if (user?.termsStep === 'sent') {
+            await DataBase.whatsappUsersCollection.updateOne(
+                { phoneNumber },
+                { 
+                    $set: { 
+                        termsStep: 'waiting_for_response',
+                        updatedAt: new Date()
+                    }
+                }
+            );
+            return {
+                shouldCreateChannel: false,
+                response: 'כתבו: "מאשר" או "לא מאשר".'
             };
         }
 
         // If user hasn't accepted terms, handle terms response
-        if (!user.hasAcceptedTerms) {
+        if (!user.hasAcceptedTerms || user.termsStep === 'waiting_for_response') {
             return await this.handleTermsResponse(phoneNumber, messageText, buttonId);
         }
 
+        // If user accepted terms but needs pronouns prompt
+        if (user.hasAcceptedTerms && user.termsStep === 'accepted' && !user.pronounsStep) {
+            await DataBase.whatsappUsersCollection.updateOne(
+                { phoneNumber },
+                { 
+                    $set: { 
+                        pronounsStep: 'sent',
+                        updatedAt: new Date()
+                    }
+                }
+            );
+            return {
+                shouldCreateChannel: false,
+                response: 'תודה על הסכמתכם לתנאי השימוש!\n\nאיך תרצו שנפנה אליכם?\n1. את - לשון נקבה\n2. אתה - לשון זכר\n3. אתם - לשון רבים\n4. לא משנה לי - ללא העדפה'
+            };
+        }
+
+        // If pronouns prompt was sent, ask for response
+        if (user?.pronounsStep === 'sent') {
+            await DataBase.whatsappUsersCollection.updateOne(
+                { phoneNumber },
+                { 
+                    $set: { 
+                        pronounsStep: 'waiting_for_response',
+                        updatedAt: new Date()
+                    }
+                }
+            );
+            return {
+                shouldCreateChannel: false,
+                response: 'השיבו עם המספר (1-4) או הטקסט המלא.'
+            };
+        }
+
         // If user doesn't have pronouns set, handle pronouns selection
-        if (!user.pronouns) {
+        if (!user.pronouns || user.pronounsStep === 'waiting_for_response') {
             return await this.handlePronounsResponse(phoneNumber, messageText, buttonId);
         }
 
@@ -61,6 +112,7 @@ export class WhatsAppUserFlow {
         const user: Omit<WhatsAppUser, '_id'> = {
             phoneNumber,
             hasAcceptedTerms: false,
+            termsStep: 'sent',
             isBanned: false,
             createdAt: new Date(),
             updatedAt: new Date()
@@ -68,26 +120,6 @@ export class WhatsAppUserFlow {
 
         const result = await DataBase.whatsappUsersCollection.insertOne(user as WhatsAppUser);
         return { ...user, _id: result.insertedId };
-    }
-
-    private async getTermsMessage(): Promise<string> {
-        return `ברוכים הבאים לשירות התמיכה שלנו! 📱
-
-לפני שנתחיל, אנחנו חייבים לקבל את הסכמתכם לתנאי השימוש:
-
-השימוש בבוט הוא לא תחלופה לעזרה מקצועית.
-הנהלת השרת מורשית לסגור צ'אטים בכל עת, ואף להשעות משתמשים משימוש בבוט ו/או מהשרת לפי שיקול דעתה.
-במקרים חריגים מאוד הנהלת השרת תעביר מידע ושיחות לגורמים חיצוניים.
-הבוט נועד לספק תמיכה בלבד. אין להשתמש בו לשיחות חולין, בדיחות או ניהול שיחות לא רציניות עם הצוות.
-לשמירה על בטיחותכם, אין לשתף פרטים מזהים כמו שם מלא, כתובת, מספר טלפון, או כל פרט אישי אחר בצ'אטים.
-לא מובטח מענה להודעות בכל שעות היממה.
-
-אנא בחרו מהאפשרויות הבאות:
-
-1️⃣ מאשר - להסכמה לתנאים
-2️⃣ לא מאשר - לביטול השירות
-
-השיבו עם המספר (1 או 2) או הטקסט המלא.`;
     }
 
     private async handleTermsResponse(phoneNumber: string, messageText: string, buttonId?: string): Promise<{ shouldCreateChannel: boolean, response?: string, needsInteractive?: 'buttons' | 'pronouns_list' | 'topics_list' }> {
@@ -98,6 +130,7 @@ export class WhatsAppUserFlow {
                 { 
                     $set: { 
                         hasAcceptedTerms: true,
+                        termsStep: 'accepted',
                         updatedAt: new Date()
                     }
                 }
@@ -105,12 +138,12 @@ export class WhatsAppUserFlow {
             
             return {
                 shouldCreateChannel: false,
-                needsInteractive: 'pronouns_list'
+                response: 'תודה על הסכמתכם לתנאי השימוש!'
             };
         } else if (buttonId === 'terms_decline') {
             return {
                 shouldCreateChannel: false,
-                response: 'לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו.'
+                response: 'לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו:'
             };
         } else {
             // Fallback for text responses  
@@ -121,6 +154,7 @@ export class WhatsAppUserFlow {
                     { 
                         $set: { 
                             hasAcceptedTerms: true,
+                            termsStep: 'accepted',
                             updatedAt: new Date()
                         }
                     }
@@ -128,12 +162,12 @@ export class WhatsAppUserFlow {
                 
                 return {
                     shouldCreateChannel: false,
-                    needsInteractive: 'pronouns_list'
+                    response: 'תודה על הסכמתכם לתנאי השימוש!'
                 };
             } else if (normalizedText === 'לא מאשר' || normalizedText === '2') {
                 return {
                     shouldCreateChannel: false,
-                    response: 'לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו.'
+                    response: 'לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו:'
                 };
             } else {
                 return {
@@ -144,20 +178,8 @@ export class WhatsAppUserFlow {
         }
     }
 
-    private async getPronounsMessage(): Promise<string> {
-        return `תודה על הסכמתכם לתנאי השימוש! 
-
-איך תרצו שנפנה אליכם?
-
-1️⃣ את - לשון נקבה
-2️⃣ אתה - לשון זכר  
-3️⃣ אתם - לשון רבים
-4️⃣ לא משנה לי - ללא העדפה
-
-השיבו עם המספר (1-4) או הטקסט המלא.`;
-    }
-
     private async handlePronounsResponse(phoneNumber: string, messageText: string, buttonId?: string): Promise<{ shouldCreateChannel: boolean, response?: string, needsInteractive?: 'buttons' | 'pronouns_list' | 'topics_list' }> {
+        const user = await DataBase.whatsappUsersCollection.findOne({ phoneNumber });
         const normalizedText = messageText.trim();
         const validPronouns: Array<'את' | 'אתה' | 'אתם' | 'לא משנה לי'> = ['את', 'אתה', 'אתם', 'לא משנה לי'];
         
@@ -187,6 +209,8 @@ export class WhatsAppUserFlow {
                 { 
                     $set: { 
                         pronouns: selectedPronoun,
+                        pronounsStep: 'completed',
+                        topicsStep: 'sent',
                         updatedAt: new Date()
                     }
                 }
@@ -194,32 +218,31 @@ export class WhatsAppUserFlow {
             
             return {
                 shouldCreateChannel: false,
-                needsInteractive: 'topics_list'
-            };
-        } else {
-            return {
-                shouldCreateChannel: false,
-                response: 'אנא השיבו עם מספר (1-4) או הטקסט המלא: "את", "אתה", "אתם", או "לא משנה לי"'
+                response: 'אנא בחרו את נושא הפנייה:\n1. משפחה\n2. חברים\n3. אהבה וזוגיות\n4. יחסי מין\n5. גוף ונפש\n6. בריאות ותזונה\n7. קריירה\n8. צבא\n9. לימודים\n10. כסף\n11. אחר'
             };
         }
-    }
-
-    private async getTopicSelectionMessage(): Promise<string> {
-        return `תודה! כעת אנא בחרו את נושא הפנייה:
-
-1️⃣ משפחה - נושאים הקשורים למשפחה
-2️⃣ חברים - יחסים חברתיים וחברויות
-3️⃣ אהבה וזוגיות - יחסים רומנטיים
-4️⃣ יחסי מין - נושאים אינטימיים
-5️⃣ גוף ונפש - בריאות נפשית ופיזית
-6️⃣ בריאות ותזונה - נושאי בריאות כלליים
-7️⃣ קריירה - עבודה ופיתוח מקצועי
-8️⃣ צבא - שירות צבאי
-9️⃣ לימודים - חינוך והשכלה
-🔟 כסף - נושאים כלכליים
-1️⃣1️⃣ אחר - נושאים אחרים
-
-השיבו עם המספר (1-11) או שם הנושא:`;
+        
+        // Check if topics prompt should be sent
+        if (user?.topicsStep === 'sent') {
+            await DataBase.whatsappUsersCollection.updateOne(
+                { phoneNumber },
+                { 
+                    $set: { 
+                        topicsStep: 'waiting_for_response',
+                        updatedAt: new Date()
+                    }
+                }
+            );
+            return {
+                shouldCreateChannel: false,
+                response: 'השיבו עם המספר (1-11) או שם הנושא.'
+            };
+        }
+        
+        return {
+            shouldCreateChannel: false,
+            response: 'אנא השיבו עם מספר (1-4) או הטקסט המלא: "את", "אתה", "אתם", או "לא משנה לי"'
+        };
     }
 
     async getUserPronouns(phoneNumber: string): Promise<string | undefined> {

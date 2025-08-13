@@ -274,20 +274,17 @@ export class WhatsAppMessageHandler {
 
     private async getTopicPrompt(): Promise<string> {
         return `אנא בחרו את נושא הפנייה:
-
-1️⃣ משפחה - נושאים הקשורים למשפחה
-2️⃣ חברים - יחסים חברתיים וחברויות
-3️⃣ אהבה וזוגיות - יחסים רומנטיים
-4️⃣ יחסי מין - נושאים אינטימיים
-5️⃣ גוף ונפש - בריאות נפשית ופיזית
-6️⃣ בריאות ותזונה - נושאי בריאות כלליים
-7️⃣ קריירה - עבודה ופיתוח מקצועי
-8️⃣ צבא - שירות צבאי
-9️⃣ לימודים - חינוך והשכלה
-🔟 כסף - נושאים כלכליים
-1️⃣1️⃣ אחר - נושאים אחרים
-
-השיבו עם המספר (1-11) או שם הנושא:`;
+1. משפחה
+2. חברים
+3. אהבה וזוגיות
+4. יחסי מין
+5. גוף ונפש
+6. בריאות ותזונה
+7. קריירה
+8. צבא
+9. לימודים
+10. כסף
+11. אחר`;
     }
 
     private async sendInteractiveMessage(phoneNumber: string, type: 'buttons' | 'pronouns_list' | 'topics_list'): Promise<void> {
@@ -300,12 +297,15 @@ export class WhatsAppMessageHandler {
                     break;
                     
                 case 'pronouns_list':
-                    message = await this.getPronounsMessage();
-                    break;
+                    // This case is now handled directly in the user flow
+                    return;
                     
                 case 'topics_list':
                     message = await this.getTopicPrompt();
-                    break;
+                    await this.sendToWhatsApp(phoneNumber, message);
+                    // Send the second message immediately after
+                    await this.sendToWhatsApp(phoneNumber, 'השיבו עם המספר (1-11) או שם הנושא.');
+                    return;
                     
                 default:
                     throw new Error(`Unknown interactive message type: ${type}`);
@@ -319,37 +319,15 @@ export class WhatsAppMessageHandler {
     }
 
     private async getTermsMessage(): Promise<string> {
-        return `ברוכים הבאים לשירות התמיכה שלנו! 📱
-
-לפני שנתחיל, אנחנו חייבים לקבל את הסכמתכם לתנאי השימוש:
-
-השימוש בבוט הוא לא תחלופה לעזרה מקצועית.
-הנהלת השרת מורשית לסגור צ'אטים בכל עת, ואף להשעות משתמשים משימוש בבוט ו/או מהשרת לפי שיקול דעתה.
-במקרים חריגים מאוד הנהלת השרת תעביר מידע ושיחות לגורמים חיצוניים.
-הבוט נועד לספק תמיכה בלבד. אין להשתמש בו לשיחות חולין, בדיחות או ניהול שיחות לא רציניות עם הצוות.
-לשמירה על בטיחותכם, אין לשתף פרטים מזהים כמו שם מלא, כתובת, מספר טלפון, או כל פרט אישי אחר בצ'אטים.
-לא מובטח מענה להודעות בכל שעות היממה.
-
-אנא בחרו מהאפשרויות הבאות:
-
-✅ מאשר - להסכמה לתנאים
-❌ לא מאשר - לביטול השירות
-
-השיבו עם: "מאשר" או "לא מאשר"`;
+        return `לפני שמתחילים, חשוב שתקראו ותאשרו את תנאי השימוש:
+1. השימוש בבוט הוא לא תחלופה לעזרה מקצועית.
+2. הצוות מורשה לסגור צ'אטים בכל עת, ואף להשעות משתמשים משימוש בבוט לפי שיקול דעתו.
+3. במקרים חריגים מאוד הנהלת השרת תעביר מידע ושיחות לגורמים חיצוניים.
+4. הבוט נועד לספק תמיכה בלבד. אין להשתמש בו לשיחות חולין, בדיחות או ניהול שיחות לא רציניות עם הצוות.
+5. לשמירה על בטיחותכם, אין לשתף פרטים מזהים כמו שם מלא, כתובת, מספר טלפון, או כל פרט אישי אחר בצ'אטים.
+6. לא מובטח מענה להודעות בכל שעות היממה.`;
     }
 
-    private async getPronounsMessage(): Promise<string> {
-        return `תודה על הסכמתכם לתנאי השימוש! ✅
-
-איך תרצו שנפנה אליכם?
-
-1️⃣ את - לשון נקבה
-2️⃣ אתה - לשון זכר  
-3️⃣ אתם - לשון רבים
-4️⃣ לא משנה לי - ללא העדפה
-
-השיבו עם המספר (1-4) או הטקסט המלא.`;
-    }
 
     async banPhoneNumber(phoneNumber: string, reason: string): Promise<void> {
         await this.userFlow.banUser(phoneNumber, reason);

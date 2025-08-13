@@ -95,7 +95,10 @@ export interface Config {
 export interface WhatsAppUser extends DatabaseDocument {
     phoneNumber: string;
     hasAcceptedTerms: boolean;
+    termsStep?: 'sent' | 'waiting_for_response' | 'accepted';
     pronouns?: 'את' | 'אתה' | 'אתם' | 'לא משנה לי';
+    pronounsStep?: 'sent' | 'waiting_for_response' | 'completed';
+    topicsStep?: 'sent' | 'waiting_for_response' | 'completed';
     isBanned: boolean;
     bannedReason?: string;
     bannedDate?: Date;
