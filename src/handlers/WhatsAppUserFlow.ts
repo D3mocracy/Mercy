@@ -164,7 +164,7 @@ export class WhatsAppUserFlow {
                     shouldCreateChannel: false,
                     response: 'תודה על הסכמתכם לתנאי השימוש!'
                 };
-            } else if (normalizedText === 'לא מאשר' || normalizedText === '2') {
+            } else if (normalizedText === 'לא מאשר') {
                 return {
                     shouldCreateChannel: false,
                     response: 'לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו:'
@@ -172,7 +172,7 @@ export class WhatsAppUserFlow {
             } else {
                 return {
                     shouldCreateChannel: false,
-                    response: 'אנא השיבו "1" (מאשר) או "2" (לא מאשר) בלבד או השתמשו בכפתורים.'
+                    response: 'כתבו: "מאשר" או "לא מאשר".'
                 };
             }
         }
