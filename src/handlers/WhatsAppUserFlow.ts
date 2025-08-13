@@ -43,64 +43,13 @@ export class WhatsAppUserFlow {
             };
         }
 
-        // Check if terms were just sent, now ask for confirmation
-        if (user?.termsStep === 'sent') {
-            await DataBase.whatsappUsersCollection.updateOne(
-                { phoneNumber },
-                {
-                    $set: {
-                        termsStep: 'waiting_for_response',
-                        updatedAt: new Date()
-                    }
-                }
-            );
-            return {
-                shouldCreateChannel: false,
-                response: 'כתבו: "מאשר" או "לא מאשר".'
-            };
-        }
-
         // If user hasn't accepted terms, handle terms response
-        if (!user.hasAcceptedTerms || user.termsStep === 'waiting_for_response') {
+        if (!user.hasAcceptedTerms) {
             return await this.handleTermsResponse(phoneNumber, messageText, buttonId);
         }
 
-        // If user accepted terms but needs pronouns prompt
-        if (user.hasAcceptedTerms && user.termsStep === 'accepted' && !user.pronounsStep) {
-            await DataBase.whatsappUsersCollection.updateOne(
-                { phoneNumber },
-                {
-                    $set: {
-                        pronounsStep: 'sent',
-                        updatedAt: new Date()
-                    }
-                }
-            );
-            return {
-                shouldCreateChannel: false,
-                response: 'תודה על הסכמתכם לתנאי השימוש!\n\nאיך תרצו שנפנה אליכם?\n1. את - לשון נקבה\n2. אתה - לשון זכר\n3. אתם - לשון רבים\n4. לא משנה לי - ללא העדפה'
-            };
-        }
-
-        // If pronouns prompt was sent, ask for response
-        if (user?.pronounsStep === 'sent') {
-            await DataBase.whatsappUsersCollection.updateOne(
-                { phoneNumber },
-                {
-                    $set: {
-                        pronounsStep: 'waiting_for_response',
-                        updatedAt: new Date()
-                    }
-                }
-            );
-            return {
-                shouldCreateChannel: false,
-                response: 'השיבו עם המספר (1-4) או הטקסט המלא.'
-            };
-        }
-
         // If user doesn't have pronouns set, handle pronouns selection
-        if (!user.pronouns || user.pronounsStep === 'waiting_for_response') {
+        if (!user.pronouns) {
             return await this.handlePronounsResponse(phoneNumber, messageText, buttonId);
         }
 
@@ -149,7 +98,7 @@ https://discord.gg/notalone`
             };
         } else {
             // Fallback for text responses  
-            const normalizedText = messageText.trim().toLowerCase();
+            const normalizedText = messageText.trim();
             if (normalizedText === 'מאשר') {
                 await DataBase.whatsappUsersCollection.updateOne(
                     { phoneNumber },
@@ -222,24 +171,7 @@ https://discord.gg/notalone`
 
             return {
                 shouldCreateChannel: false,
-                response: 'אנא בחרו את נושא הפנייה:\n1. משפחה\n2. חברים\n3. אהבה וזוגיות\n4. יחסי מין\n5. גוף ונפש\n6. בריאות ותזונה\n7. קריירה\n8. צבא\n9. לימודים\n10. כסף\n11. אחר'
-            };
-        }
-
-        // Check if topics prompt should be sent
-        if (user?.topicsStep === 'sent') {
-            await DataBase.whatsappUsersCollection.updateOne(
-                { phoneNumber },
-                {
-                    $set: {
-                        topicsStep: 'waiting_for_response',
-                        updatedAt: new Date()
-                    }
-                }
-            );
-            return {
-                shouldCreateChannel: false,
-                response: 'השיבו עם המספר (1-11) או שם הנושא.'
+                needsInteractive: 'topics_list'
             };
         }
 
