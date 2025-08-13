@@ -294,7 +294,10 @@ export class WhatsAppMessageHandler {
             switch (type) {
                 case 'buttons':
                     message = await this.getTermsMessage();
-                    break;
+                    await this.sendToWhatsApp(phoneNumber, message);
+                    // Send the second message immediately after
+                    await this.sendToWhatsApp(phoneNumber, 'כתבו: "מאשר" או "לא מאשר".');
+                    return;
                     
                 case 'pronouns_list':
                     // This case is now handled directly in the user flow

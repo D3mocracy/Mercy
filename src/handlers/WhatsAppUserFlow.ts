@@ -39,7 +39,24 @@ export class WhatsAppUserFlow {
             await this.createNewUser(phoneNumber);
             return {
                 shouldCreateChannel: false,
-                response: 'לפני שמתחילים, חשוב שתקראו ותאשרו את תנאי השימוש:\n1. השימוש בבוט הוא לא תחלופה לעזרה מקצועית.\n2. הצוות מורשה לסגור צ\'אטים בכל עת, ואף להשעות משתמשים משימוש בבוט לפי שיקול דעתו.\n3. במקרים חריגים מאוד הנהלת השרת תעביר מידע ושיחות לגורמים חיצוניים.\n4. הבוט נועד לספק תמיכה בלבד. אין להשתמש בו לשיחות חולין, בדיחות או ניהול שיחות לא רציניות עם הצוות.\n5. לשמירה על בטיחותכם, אין לשתף פרטים מזהים כמו שם מלא, כתובת, מספר טלפון, או כל פרט אישי אחר בצ\'אטים.\n6. לא מובטח מענה להודעות בכל שעות היממה.\n\nכתבו: "מאשר" או "לא מאשר".'
+                needsInteractive: 'buttons'
+            };
+        }
+
+        // Check if terms were just sent, now ask for confirmation
+        if (user?.termsStep === 'sent') {
+            await DataBase.whatsappUsersCollection.updateOne(
+                { phoneNumber },
+                { 
+                    $set: { 
+                        termsStep: 'waiting_for_response',
+                        updatedAt: new Date()
+                    }
+                }
+            );
+            return {
+                shouldCreateChannel: false,
+                response: 'כתבו: "מאשר" או "לא מאשר".'
             };
         }
 
@@ -95,7 +112,7 @@ export class WhatsAppUserFlow {
         const user: Omit<WhatsAppUser, '_id'> = {
             phoneNumber,
             hasAcceptedTerms: false,
-            termsStep: 'waiting_for_response',
+            termsStep: 'sent',
             isBanned: false,
             createdAt: new Date(),
             updatedAt: new Date()
