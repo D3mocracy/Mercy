@@ -300,7 +300,9 @@ export class WhatsAppMessageHandler {
                     return;
                     
                 case 'pronouns_list':
-                    // This case is now handled directly in the user flow
+                    await this.sendToWhatsApp(phoneNumber, 'תודה על הסכמתכם לתנאי השימוש!');
+                    await this.sendToWhatsApp(phoneNumber, 'איך תרצו שנפנה אליכם?\n1. את - לשון נקבה\n2. אתה - לשון זכר\n3. אתם - לשון רבים\n4. לא משנה לי - ללא העדפה');
+                    await this.sendToWhatsApp(phoneNumber, 'השיבו עם המספר (1-4) או הטקסט המלא.');
                     return;
                     
                 case 'topics_list':

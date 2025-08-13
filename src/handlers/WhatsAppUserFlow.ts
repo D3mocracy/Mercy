@@ -2,11 +2,11 @@ import { WhatsAppUser } from '../utils/types';
 import DataBase from '../utils/db';
 
 export class WhatsAppUserFlow {
-    constructor() {}
+    constructor() { }
 
     async handleUserMessage(phoneNumber: string, messageText: string, buttonId?: string): Promise<{ shouldCreateChannel: boolean, response?: string, needsInteractive?: 'buttons' | 'pronouns_list' | 'topics_list' }> {
         let user = await DataBase.whatsappUsersCollection.findOne({ phoneNumber });
-        
+
         // Check if user is banned
         if (user?.isBanned) {
             return {
@@ -18,14 +18,14 @@ export class WhatsAppUserFlow {
         // Check for Discord-based punishments (timeout/ban)
         const whatsappUserId = `whatsapp_${phoneNumber}`;
         const activePunishments = await this.checkActivePunishments(whatsappUserId);
-        
+
         if (activePunishments.isBanned) {
             return {
                 shouldCreateChannel: false,
                 response: `אתם חסומים מהשירות. סיבה: ${activePunishments.reason}`
             };
         }
-        
+
         if (activePunishments.isMuted) {
             const timeLeft = activePunishments.muteExpiry ? Math.ceil((activePunishments.muteExpiry.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
             return {
@@ -47,8 +47,8 @@ export class WhatsAppUserFlow {
         if (user?.termsStep === 'sent') {
             await DataBase.whatsappUsersCollection.updateOne(
                 { phoneNumber },
-                { 
-                    $set: { 
+                {
+                    $set: {
                         termsStep: 'waiting_for_response',
                         updatedAt: new Date()
                     }
@@ -69,8 +69,8 @@ export class WhatsAppUserFlow {
         if (user.hasAcceptedTerms && user.termsStep === 'accepted' && !user.pronounsStep) {
             await DataBase.whatsappUsersCollection.updateOne(
                 { phoneNumber },
-                { 
-                    $set: { 
+                {
+                    $set: {
                         pronounsStep: 'sent',
                         updatedAt: new Date()
                     }
@@ -86,8 +86,8 @@ export class WhatsAppUserFlow {
         if (user?.pronounsStep === 'sent') {
             await DataBase.whatsappUsersCollection.updateOne(
                 { phoneNumber },
-                { 
-                    $set: { 
+                {
+                    $set: {
                         pronounsStep: 'waiting_for_response',
                         updatedAt: new Date()
                     }
@@ -127,23 +127,25 @@ export class WhatsAppUserFlow {
         if (buttonId === 'terms_accept') {
             await DataBase.whatsappUsersCollection.updateOne(
                 { phoneNumber },
-                { 
-                    $set: { 
+                {
+                    $set: {
                         hasAcceptedTerms: true,
                         termsStep: 'accepted',
+                        pronounsStep: 'waiting_for_response',
                         updatedAt: new Date()
                     }
                 }
             );
-            
+
             return {
                 shouldCreateChannel: false,
-                response: 'תודה על הסכמתכם לתנאי השימוש!'
+                needsInteractive: 'pronouns_list'
             };
         } else if (buttonId === 'terms_decline') {
             return {
                 shouldCreateChannel: false,
-                response: 'לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו:'
+                response: `לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו:
+https://discord.gg/notalone`
             };
         } else {
             // Fallback for text responses  
@@ -151,23 +153,25 @@ export class WhatsAppUserFlow {
             if (normalizedText === 'מאשר') {
                 await DataBase.whatsappUsersCollection.updateOne(
                     { phoneNumber },
-                    { 
-                        $set: { 
+                    {
+                        $set: {
                             hasAcceptedTerms: true,
                             termsStep: 'accepted',
+                            pronounsStep: 'waiting_for_response',
                             updatedAt: new Date()
                         }
                     }
                 );
-                
+
                 return {
                     shouldCreateChannel: false,
-                    response: 'תודה על הסכמתכם לתנאי השימוש!'
+                    needsInteractive: 'pronouns_list'
                 };
             } else if (normalizedText === 'לא מאשר') {
                 return {
                     shouldCreateChannel: false,
-                    response: 'לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו:'
+                    response: `לא ניתן להמשיך בלי לאשר את תנאי השימוש. אם תרצו לדבר איתנו או לקבל תמיכה, נא אשרו את התנאים ונשמח לעזור לכם כאן או בשרת הדיסקורד שלנו:
+https://discord.gg/notalone`
                 };
             } else {
                 return {
@@ -182,7 +186,7 @@ export class WhatsAppUserFlow {
         const user = await DataBase.whatsappUsersCollection.findOne({ phoneNumber });
         const normalizedText = messageText.trim();
         const validPronouns: Array<'את' | 'אתה' | 'אתם' | 'לא משנה לי'> = ['את', 'אתה', 'אתם', 'לא משנה לי'];
-        
+
         // Map numbers to pronouns
         const pronounMap: Record<string, 'את' | 'אתה' | 'אתם' | 'לא משנה לי'> = {
             '1': 'את',
@@ -190,9 +194,9 @@ export class WhatsAppUserFlow {
             '3': 'אתם',
             '4': 'לא משנה לי'
         };
-        
+
         let selectedPronoun: 'את' | 'אתה' | 'אתם' | 'לא משנה לי' | undefined;
-        
+
         // Handle text response (interactive buttons not supported on WhatsApp Web)
         {
             // Handle text response
@@ -202,12 +206,12 @@ export class WhatsAppUserFlow {
                 selectedPronoun = normalizedText as 'את' | 'אתה' | 'אתם' | 'לא משנה לי';
             }
         }
-        
+
         if (selectedPronoun) {
             await DataBase.whatsappUsersCollection.updateOne(
                 { phoneNumber },
-                { 
-                    $set: { 
+                {
+                    $set: {
                         pronouns: selectedPronoun,
                         pronounsStep: 'completed',
                         topicsStep: 'sent',
@@ -215,19 +219,19 @@ export class WhatsAppUserFlow {
                     }
                 }
             );
-            
+
             return {
                 shouldCreateChannel: false,
                 response: 'אנא בחרו את נושא הפנייה:\n1. משפחה\n2. חברים\n3. אהבה וזוגיות\n4. יחסי מין\n5. גוף ונפש\n6. בריאות ותזונה\n7. קריירה\n8. צבא\n9. לימודים\n10. כסף\n11. אחר'
             };
         }
-        
+
         // Check if topics prompt should be sent
         if (user?.topicsStep === 'sent') {
             await DataBase.whatsappUsersCollection.updateOne(
                 { phoneNumber },
-                { 
-                    $set: { 
+                {
+                    $set: {
                         topicsStep: 'waiting_for_response',
                         updatedAt: new Date()
                     }
@@ -238,7 +242,7 @@ export class WhatsAppUserFlow {
                 response: 'השיבו עם המספר (1-11) או שם הנושא.'
             };
         }
-        
+
         return {
             shouldCreateChannel: false,
             response: 'אנא השיבו עם מספר (1-4) או הטקסט המלא: "את", "אתה", "אתם", או "לא משנה לי"'
@@ -253,8 +257,8 @@ export class WhatsAppUserFlow {
     async banUser(phoneNumber: string, reason: string): Promise<void> {
         await DataBase.whatsappUsersCollection.updateOne(
             { phoneNumber },
-            { 
-                $set: { 
+            {
+                $set: {
                     isBanned: true,
                     bannedReason: reason,
                     bannedDate: new Date(),
@@ -268,8 +272,8 @@ export class WhatsAppUserFlow {
     async unbanUser(phoneNumber: string): Promise<void> {
         await DataBase.whatsappUsersCollection.updateOne(
             { phoneNumber },
-            { 
-                $set: { 
+            {
+                $set: {
                     isBanned: false,
                     bannedReason: undefined,
                     bannedDate: undefined,
@@ -305,12 +309,12 @@ export class WhatsAppUserFlow {
                 const punishment = latestPunishment as any;
                 const now = new Date();
                 const punishDate = new Date(latestPunishment.punishDate);
-                
+
                 // Use the actual timeout duration stored in the punishment record
                 // If not available (for old records), fall back to 27 days
                 const timeoutDays = punishment.timeoutDays || 27;
                 const expiryDate = new Date(punishDate.getTime() + (timeoutDays * 24 * 60 * 60 * 1000));
-                
+
                 if (now < expiryDate) {
                     return {
                         isBanned: false,
