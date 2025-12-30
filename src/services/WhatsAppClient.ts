@@ -15,21 +15,35 @@ export class WhatsAppClient {
         if (!this.client) return;
 
         this.client.onMessage(async (message: any) => {
+            console.log('📨 Received WhatsApp message:', {
+                from: message.from,
+                type: message.type,
+                isGroupMsg: message.isGroupMsg,
+                fromMe: message.fromMe,
+                isReady: this.isReady,
+                body: message.body?.substring(0, 50)
+            });
+
             if (this.isReady && !message.isGroupMsg && !message.fromMe && message.type === 'chat') {
                 try {
+                    console.log('✅ Processing message...');
                     await this.messageHandler.handleIncomingMessage(message);
                 } catch (error) {
                     await ErrorHandler.handleAsyncError(error, 'WhatsApp message handling');
                 }
+            } else {
+                console.log('❌ Message filtered out - isReady:', this.isReady, 'isGroupMsg:', message.isGroupMsg, 'fromMe:', message.fromMe, 'type:', message.type);
             }
         });
 
         this.client.onStateChange((state: string) => {
             console.log('📱 WhatsApp State changed:', state);
-            if (state === 'CONNECTED') {
+            // wppconnect states: CONFLICT, CONNECTED, DEPRECATED_VERSION, OPENING, PAIRING, PROXYBLOCK, SMB_TOS_BLOCK, TIMEOUT, TOS_BLOCK, UNLAUNCHED, UNPAIRED, UNPAIRED_IDLE
+            // Also check for inChat status which indicates ready state
+            if (state === 'CONNECTED' || state.includes('MAIN') || state === 'inChat') {
                 console.log('✅ WhatsApp Client is ready!');
                 this.isReady = true;
-            } else if (state === 'DISCONNECTED') {
+            } else if (state === 'DISCONNECTED' || state === 'CONFLICT') {
                 console.log('❌ WhatsApp Client disconnected');
                 this.isReady = false;
             }
@@ -68,9 +82,13 @@ export class WhatsAppClient {
                     ]
                 }
             });
-            
+
             this.setupEventHandlers();
-            console.log('✅ WhatsApp Client initialized successfully!');
+
+            // Set as ready since we've successfully initialized
+            // The state is already MAIN (NORMAL) by the time we register handlers
+            this.isReady = true;
+            console.log('✅ WhatsApp Client initialized successfully! isReady:', this.isReady);
         } catch (error) {
             console.error('❌ Failed to initialize WhatsApp Client:', error);
             throw error;
