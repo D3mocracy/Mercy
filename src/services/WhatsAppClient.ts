@@ -1,6 +1,7 @@
 import * as wppconnect from '@wppconnect-team/wppconnect';
 import { WhatsAppMessageHandler } from '../handlers/WhatsAppMessageHandler';
 import { ErrorHandler } from '../utils/ErrorHandler';
+import * as qrcode from 'qrcode-terminal';
 
 export class WhatsAppClient {
     private client: wppconnect.Whatsapp | null = null;
@@ -55,21 +56,45 @@ export class WhatsAppClient {
             console.log('🔄 Starting WhatsApp Client...');
             this.client = await wppconnect.create({
                 session: 'mercy-bot',
-                catchQR: (base64Qrimg: string, asciiQR: string) => {
-                    console.log('📱 WhatsApp QR Code:');
-                    console.log('RAW QR CODE TEXT:');
+                catchQR: (base64Qrimg: string, asciiQR: string, attempts: number, urlCode?: string) => {
+                    console.log('\n===========================================');
+                    console.log('📱 WhatsApp QR Code - Scan with your phone!');
+                    console.log('===========================================\n');
+
+                    // Display QR code in terminal
+                    qrcode.generate(asciiQR, { small: true });
+
+                    console.log('\n===========================================');
+                    console.log(`Attempt ${attempts}/5`);
+                    console.log('\n🔗 QR CODE TEXT (copy this to QR generator):');
+                    console.log('-------------------------------------------');
                     console.log(asciiQR);
-                    console.log('Copy the text above and paste it into: https://qr-code-generator.com');
-                    console.log('Then scan the generated QR with WhatsApp on phone number: +972529772722');
+                    console.log('-------------------------------------------');
+                    console.log('\n📋 Copy the text above and paste it into:');
+                    console.log('   https://www.qr-code-generator.com/');
+                    console.log('   OR https://www.the-qrcode-generator.com/');
+                    console.log('\nThen scan the generated QR with WhatsApp');
+                    console.log('Phone: +972529772722');
+                    if (urlCode) {
+                        console.log('Or visit:', urlCode);
+                    }
+                    console.log('===========================================\n');
                 },
                 statusFind: (statusSession: string, session: string) => {
                     console.log('📱 Status Session:', statusSession);
+                    if (statusSession === 'qrReadFail') {
+                        console.log('⚠️  QR Code scan failed - will retry...');
+                    } else if (statusSession === 'disconnectedMobile') {
+                        console.log('⚠️  Phone disconnected - please reconnect...');
+                    }
                 },
                 headless: true,
                 devtools: false,
                 useChrome: true,
                 debug: false,
                 logQR: true,
+                autoClose: 300000, // 5 minutes instead of 60s
+                disableWelcome: true,
                 puppeteerOptions: {
                     args: [
                         '--no-sandbox',
