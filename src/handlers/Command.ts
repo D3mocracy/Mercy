@@ -4,6 +4,7 @@ import ConfigHandler from "./Config";
 import { ImportantLinksMessageUtils } from "../utils/MessageUtils/ImportantLinks";
 import { Utils } from "../utils/Utils";
 import DataBase from "../utils/db";
+import { conversationRepo } from "../repositories/ConversationRepository";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 import { Conversation } from "../utils/types";
 import { BaseHandler } from "./BaseHandler";
@@ -201,27 +202,25 @@ class CommandHandler extends BaseHandler<ChatInputCommandInteraction | UserConte
     }
 
     async sendManageTools() {
-        const [numberOfConversation, conversation] = await Promise.all([
-            Utils.getNumberOfConversationFromDB(),
-            DataBase.conversationsCollection.findOne({
-                userId: this.interaction.user.id,
-                open: true,
-            }),
-        ]);
-
         if (Utils.isConversationChannel(this.interaction.channel as TextChannel)) {
+            const channelConversation = await conversationRepo.findByChannelId(this.interaction.channelId!);
             await this.respondSafely({
                 embeds: [
                     ConversationManageMessageUtils.EmbedMessages.newChatStaff(
-                        `צ'אט ${numberOfConversation + 1}`,
-                        `משתמש פתח צ'אט בנושא ${conversation?.subject}, נא לתת סיוע בהתאם!`
+                        `צ'אט ${channelConversation?.channelNumber ?? '?'}`,
+                        `משתמש פתח צ'אט בנושא ${channelConversation?.subject}, נא לתת סיוע בהתאם!`
                     ),
                 ],
                 components: [ConversationManageMessageUtils.Actions.supporterTools],
             });
-        } else if (this.interaction.channel?.isDMBased() && !!conversation?.subject) {
+        } else if (this.interaction.channel?.isDMBased()) {
+            const userConversation = await conversationRepo.findOpenByUserId(this.interaction.user.id);
+            if (!userConversation?.subject) {
+                await this.respondSafely({ content: "שגיאה בביצוע הפקודה: שימוש שגוי בפקודה", ephemeral: true });
+                return;
+            }
             await this.respondSafely({
-                embeds: [MessageUtils.EmbedMessages.newChatUser(numberOfConversation)],
+                embeds: [MessageUtils.EmbedMessages.newChatUser(userConversation.channelNumber!)],
                 components: [
                     new ActionRowBuilder<ButtonBuilder>().addComponents(
                         ConversationManageMessageUtils.Actions.tools_close

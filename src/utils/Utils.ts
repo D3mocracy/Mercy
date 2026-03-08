@@ -4,17 +4,20 @@ import { Conversation } from "./types";
 import ConfigHandler from "../handlers/Config";
 import { ConversationManageMessageUtils } from "./MessageUtils/ConversationManage";
 import Logger from "../handlers/Logger";
+import { CONSTANTS } from "./Constants";
+import { conversationRepo } from "../repositories/ConversationRepository";
 export namespace Utils {
 
     export async function hasOpenConversation(userId: string) {
-        return !!(await DataBase.conversationsCollection.findOne({ userId, open: true }));
+        return conversationRepo.hasOpenConversation(userId);
     }
 
     export async function getOpenConversation(userId: string) {
-        const coversation = (await DataBase.conversationsCollection.findOne({ userId, open: true }));
-        return coversation ? coversation : undefined;
+        const conversation = await conversationRepo.findOpenByUserId(userId);
+        return conversation ?? undefined;
     }
 
+    /** @deprecated Used by legacy WhatsApp code only. Discord code uses DataBase.getNextConversationNumber(). */
     export async function getNumberOfConversationFromDB() {
         return (await DataBase.conversationsCollection.find({
             subject: { $exists: true }
@@ -52,7 +55,7 @@ export namespace Utils {
     export function getGenderByUserId(userId: string) {
         const member = ConfigHandler.config.guild?.members.cache.get(userId);
         return member?.roles.cache.find(role =>
-            (role.id === "1148302562009813122" || role.id === "1148302563196805231" || role.id === "1148302566640324639"));
+            (role.id === CONSTANTS.ROLE_IDS.PRONOUN_FEMALE || role.id === CONSTANTS.ROLE_IDS.PRONOUN_MALE || role.id === CONSTANTS.ROLE_IDS.PRONOUN_NEUTRAL));
     }
 
     export async function updatePermissionToChannel(conversation: Conversation) {

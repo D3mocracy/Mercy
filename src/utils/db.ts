@@ -113,6 +113,24 @@ class DatabaseManager {
         return this.database.collection('WhatsAppSessions');
     }
 
+    get countersCollection(): Collection<{ _id: string; seq: number }> {
+        return this.database.collection('Counters');
+    }
+
+    async getNextConversationNumber(): Promise<number> {
+        const result = await this.countersCollection.findOneAndUpdate(
+            { _id: 'conversationNumber' },
+            { $inc: { seq: 1 } },
+            { upsert: true, returnDocument: 'after' }
+        );
+        return result.value!.seq;
+    }
+
+    async getCurrentConversationNumber(): Promise<number> {
+        const counter = await this.countersCollection.findOne({ _id: 'conversationNumber' });
+        return counter?.seq ?? await this.conversationsCollection.countDocuments({ subject: { $exists: true } });
+    }
+
     // Health check method
     async healthCheck(): Promise<boolean> {
         try {
@@ -154,6 +172,13 @@ class DatabaseManager {
 
             // WhatsApp Sessions indexes
             await this.whatsappSessionsCollection.createIndex({ sessionId: 1 }, { unique: true });
+
+            // Seed conversation counter if it doesn't exist yet
+            const existing = await this.countersCollection.findOne({ _id: 'conversationNumber' });
+            if (!existing) {
+                const count = await this.conversationsCollection.countDocuments({ subject: { $exists: true } });
+                await this.countersCollection.insertOne({ _id: 'conversationNumber', seq: count });
+            }
 
             console.log('Database indexes created successfully');
         } catch (error) {

@@ -1,11 +1,11 @@
 import { Client, Interaction, RepliableInteraction, PermissionsBitField } from "discord.js";
 import Logger from "./Logger";
 import { Conversation } from "../utils/types";
-import DataBase from "../utils/db";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import { Utils } from "../utils/Utils";
 import { ResponseHandler, SafeInteraction } from "../utils/ResponseHandler";
 import { ErrorHandler } from "../utils/ErrorHandler";
+import { conversationRepo } from "../repositories/ConversationRepository";
 
 export abstract class BaseHandler<T extends Interaction = Interaction> {
     protected conversation?: Conversation;
@@ -31,10 +31,7 @@ export abstract class BaseHandler<T extends Interaction = Interaction> {
 
     protected async loadConversationByUser(userId: string): Promise<Conversation | null> {
         try {
-            const conversation = await DataBase.conversationsCollection.findOne({
-                userId: userId,
-                open: true,
-            }) as Conversation | null;
+            const conversation = await conversationRepo.findOpenByUserId(userId);
 
             if (!conversation) {
                 throw new CantLoadConversationFromDB();
@@ -50,10 +47,7 @@ export abstract class BaseHandler<T extends Interaction = Interaction> {
 
     protected async loadConversationByChannel(channelId: string): Promise<Conversation | null> {
         try {
-            const conversation = await DataBase.conversationsCollection.findOne({
-                channelId: channelId,
-                open: true,
-            }) as Conversation | null;
+            const conversation = await conversationRepo.findOpenByChannelId(channelId);
 
             if (!conversation) {
                 throw new CantLoadConversationFromDB();
@@ -81,11 +75,7 @@ export abstract class BaseHandler<T extends Interaction = Interaction> {
         }
 
         try {
-            const { _id, ...updateData } = this.conversation;
-            await DataBase.conversationsCollection.updateOne(
-                { _id: _id },
-                { $set: updateData }
-            );
+            await conversationRepo.save(this.conversation);
         } catch (error: unknown) {
             await Logger.logError(error as Error);
             throw error;

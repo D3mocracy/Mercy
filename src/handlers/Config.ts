@@ -28,9 +28,7 @@ class ConfigHandler {
     const configDocument: ConfigDocument = (
       await DataBase.configCollection.find({}).toArray()
     )[0] as any;
-    const guild: Guild = client.guilds.cache.get(
-      process.env.GuildID as string
-    ) as Guild;
+    const guild: Guild = client.guilds.cache.get(configDocument.guildId) as Guild;
 
     return (ConfigHandler.config = {
       get guild() {

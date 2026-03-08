@@ -3,24 +3,31 @@ import {
   Client,
   TextChannel,
 } from "discord.js";
-import { ObjectId } from "mongodb";
-import DataBase from "../utils/db";
 import { MessageUtils } from "../utils/MessageUtils";
-import { Conversation } from "../utils/types";
 import { Utils } from "../utils/Utils";
 import Logger from "./Logger";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import ConfigHandler from "./Config";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
+import { conversationRepo } from "../repositories/ConversationRepository";
+import { BaseHandler } from "./BaseHandler";
 
-class ConversationManageHandler {
+class ConversationManageHandler extends BaseHandler<ButtonInteraction> {
   channel: TextChannel = {} as any;
-  conversation: Conversation = {} as any;
 
-  private constructor(
-    private client: Client,
-    private interaction: ButtonInteraction
-  ) { }
+  // Expose conversation publicly for use in InteractionRouter
+  get conversationData() {
+    return this.conversation!;
+  }
+
+  protected constructor(client: Client, interaction: ButtonInteraction) {
+    super(client, interaction);
+  }
+
+  // Override as public so InteractionRouter can call it
+  async saveConversation(): Promise<void> {
+    return super.saveConversation();
+  }
 
   static async createHandler(client: Client, interaction: ButtonInteraction) {
     const handler = new ConversationManageHandler(client, interaction);
@@ -36,73 +43,40 @@ class ConversationManageHandler {
 
   async loadConversation(): Promise<void> {
     if (this.interaction.channel?.isDMBased()) {
-      // In DMs, first try to find the open conversation
-      this.conversation = (await DataBase.conversationsCollection.findOne({
-        userId: this.interaction.user.id,
-        open: true,
-      })) as any;
-      
-      // If no open conversation found, this means they're clicking on an old message
-      if (!this.conversation) {
-        throw new CantLoadConversationFromDB();
-      }
+      const conv = await conversationRepo.findOpenByUserId(this.interaction.user.id);
+      if (!conv) throw new CantLoadConversationFromDB();
+      this.conversation = conv;
     } else {
-      // In guild channels, load by channel ID (can be closed or open)
-      this.conversation = (await DataBase.conversationsCollection.findOne({
-        channelId: this.interaction.channelId,
-      })) as any;
+      // Load by channel ID — can be closed or open (needed for post-close actions)
+      const conv = await conversationRepo.findByChannelId(this.interaction.channelId);
+      if (!conv) throw new CantLoadConversationFromDB();
+      this.conversation = conv;
     }
-    
-    if (this.conversation) {
-      this.channel = Utils.getChannelById(
-        this.client,
-        this.conversation.channelId
-      ) as TextChannel;
-    } else {
-      throw new CantLoadConversationFromDB();
-    }
+
+    this.channel = Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel;
   }
 
   async loadConversationById(conversationId: string): Promise<void> {
     try {
-      this.conversation = (await DataBase.conversationsCollection.findOne({
-        _id: new ObjectId(conversationId)
-      })) as any;
-      
-      if (this.conversation) {
-        this.channel = Utils.getChannelById(
-          this.client,
-          this.conversation.channelId
-        ) as TextChannel;
-      } else {
-        throw new CantLoadConversationFromDB();
-      }
-    } catch (error) {
+      const conv = await conversationRepo.findById(conversationId);
+      if (!conv) throw new CantLoadConversationFromDB();
+      this.conversation = conv;
+      this.channel = Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel;
+    } catch {
       throw new CantLoadConversationFromDB();
     }
-  }
-
-  async saveConversation() {
-    const { _id, ...updateData } = this.conversation;
-    await DataBase.conversationsCollection.updateOne(
-      { channelId: this.conversation.channelId },
-      { $set: updateData },
-      { upsert: true }
-    );
   }
 
   async sendSureMessageToClose() {
     await this.interaction.reply({
       embeds: [MessageUtils.EmbedMessages.sureMessageToClose],
-      components: [
-        ConversationManageMessageUtils.Actions.tools_sure_close_yes_no(),
-      ],
+      components: [ConversationManageMessageUtils.Actions.tools_sure_close_yes_no()],
       ephemeral: true
     });
   }
 
   async openRefferSupervisorModal() {
-    if ((!this.conversation.staffMemberId?.includes(this.interaction.user.id)
+    if ((!this.conversation!.staffMemberId?.includes(this.interaction.user.id)
       && Utils.isHelper(this.interaction.user.id)
       && !Utils.isAdministrator(this.interaction.user.id)) || Utils.isSupervisor(this.interaction.user.id)) {
       await this.interaction.reply({
@@ -111,21 +85,20 @@ class ConversationManageHandler {
       });
       return;
     } else {
-      await this.interaction.showModal(MessageUtils.Modals.referManagerModal)
+      await this.interaction.showModal(MessageUtils.Modals.referManagerModal);
     }
   }
 
   async closeConversation(closedBy: string) {
-    // Check if conversation is already closed
-    if (!this.conversation.open) {
+    if (!this.conversation!.open) {
       await this.interaction.reply({
         content: "הצ'אט הזה כבר נסגר. לא ניתן לסגור צ'אט שכבר סגור.",
         ephemeral: true
       });
       return;
     }
-    
-    if (!this.conversation.staffMemberId?.includes(this.interaction.user.id)
+
+    if (!this.conversation!.staffMemberId?.includes(this.interaction.user.id)
       && Utils.isHelper(this.interaction.user.id)
       && !this.interaction.channel?.isDMBased()
       && !Utils.isAdministrator(this.interaction.user.id)) {
@@ -135,55 +108,39 @@ class ConversationManageHandler {
       });
       return;
     }
+
     const closedMessage = {
-      embeds: [
-        ConversationManageMessageUtils.EmbedMessages.chatClosed(
-          closedBy,
-          this.channel?.name
-        ),
-      ],
+      embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed(closedBy, this.channel?.name)],
     };
-    this.conversation.open = false;
+    this.conversation!.open = false;
     await this.channel.send(closedMessage);
-    
-    // Check if this is a WhatsApp conversation
-    if (this.conversation.source === 'whatsapp' && this.conversation.whatsappNumber) {
-      // Send WhatsApp notification to user
+
+    if (this.conversation!.source === 'whatsapp' && this.conversation!.whatsappNumber) {
       try {
-        await this.sendWhatsAppNotification(this.conversation.whatsappNumber, "השיחה נסגרה על ידי איש צוות");
+        await this.sendWhatsAppNotification(this.conversation!.whatsappNumber, "השיחה נסגרה על ידי איש צוות");
       } catch (error) {
         console.error('Failed to send WhatsApp closure notification:', error);
       }
     } else {
-      // Send Discord DM notification (original behavior)
-      const user = this.client.users.cache.get(this.conversation.userId);
-      Promise.all([
+      const user = this.client.users.cache.get(this.conversation!.userId);
+      await Promise.all([
         Logger.logTicket(this.channel, user),
         user?.send(closedMessage) || "",
-      ])
-        .catch((error) => {
-          console.log("Can not send message to this user - This Error is fine");
-          Logger.logError(error);
-        });
+      ]).catch((error) => {
+        console.log("Can not send message to this user - This Error is fine");
+        Logger.logError(error);
+      });
     }
-    
-    // Always log the ticket and delete the channel
-    await Logger.logTicket(this.channel);
+
     await this.channel.delete();
-  };
+  }
 
   private async sendWhatsAppNotification(phoneNumber: string, message: string): Promise<void> {
-    // This is a placeholder - we need to access the global WhatsApp client
-    // For now, let's create a database record that can be picked up by a WhatsApp service
-    // or find another way to access the WhatsApp client
-    
     try {
-      // Import the WhatsApp service/client here
       const { sendWhatsAppMessage } = await import('../utils/WhatsAppUtils');
       await sendWhatsAppMessage(phoneNumber, message);
     } catch (error) {
       console.error('WhatsApp notification failed:', error);
-      // Silently fail - this is not critical to the core functionality
     }
   }
 
@@ -195,20 +152,14 @@ class ConversationManageHandler {
       });
       return;
     }
-    if (
-      !this.conversation.staffMemberId
-      || this.conversation.staffMemberId.length === 0
-      || Utils.isSeniorStaff(this.interaction.user.id)
-    ) {
-      this.conversation.staffMemberId = [staffMemberId];
+    if (!this.conversation!.staffMemberId
+      || this.conversation!.staffMemberId.length === 0
+      || Utils.isSeniorStaff(this.interaction.user.id)) {
+      this.conversation!.staffMemberId = [staffMemberId];
       await Promise.all([
-        Utils.updatePermissionToChannel(this.conversation),
+        Utils.updatePermissionToChannel(this.conversation!),
         this.interaction.reply({
-          embeds: [
-            ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(
-              this.interaction.user.toString()
-            ),
-          ],
+          embeds: [ConversationManageMessageUtils.EmbedMessages.staffMemberAttached(this.interaction.user.toString())],
         }),
       ]);
       return;
@@ -220,11 +171,7 @@ class ConversationManageHandler {
   }
 
   async revealUser() {
-    if (
-      !ConfigHandler.config.guild?.members.cache
-        .get(this.interaction.user.id)
-        ?.permissions.has("Administrator")
-    ) {
+    if (!ConfigHandler.config.guild?.members.cache.get(this.interaction.user.id)?.permissions.has("Administrator")) {
       await this.interaction.reply({
         content: "אין לך מספיק הרשאות כדי לבצע פעולה זו",
         ephemeral: true,
@@ -235,16 +182,16 @@ class ConversationManageHandler {
       ephemeral: true,
       embeds: [
         await ConversationManageMessageUtils.EmbedMessages.revealUserMessage(
-          this.conversation.userId,
-          this.conversation
+          this.conversation!.userId,
+          this.conversation!
         ),
       ],
     });
   }
 
   async resetHelpers() {
-    this.conversation.staffMemberId = [];
-    await Utils.updatePermissionToChannel(this.conversation);
+    this.conversation!.staffMemberId = [];
+    await Utils.updatePermissionToChannel(this.conversation!);
     await (this.interaction.channel as TextChannel).send({
       embeds: [ConversationManageMessageUtils.EmbedMessages.helpersReseted],
     });
@@ -252,7 +199,6 @@ class ConversationManageHandler {
 
   async changeHelpersMessage() {
     const helpersList = ConfigHandler.config.helperRole?.members.map((m) => m);
-
     if (helpersList?.length) {
       await this.interaction.reply({
         ephemeral: true,
@@ -271,16 +217,13 @@ class ConversationManageHandler {
   }
 
   async sendPunishMessage() {
-    const isWhatsAppConversation = this.conversation.source === 'whatsapp';
+    const isWhatsAppConversation = this.conversation!.source === 'whatsapp';
     await this.interaction.reply({
       embeds: [ConversationManageMessageUtils.EmbedMessages.punishMessage],
       components: [ConversationManageMessageUtils.Actions.punishMenu(isWhatsAppConversation)],
       ephemeral: true
     });
-
   }
-
-
 }
 
 export default ConversationManageHandler;

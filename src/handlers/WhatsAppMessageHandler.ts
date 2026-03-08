@@ -177,7 +177,7 @@ export class WhatsAppMessageHandler {
 
         // Get next conversation number (same as Discord conversations)
         const numberOfConversation = (await Utils.getNumberOfConversationFromDB()) + 1;
-        
+
         const channel = await guild.channels.create({
             name: `צ'אט ${numberOfConversation}`,
             type: ChannelType.GuildText,

@@ -1,11 +1,11 @@
-import { 
-    ChatInputCommandInteraction, 
-    ModalSubmitInteraction, 
-    StringSelectMenuInteraction, 
-    Client, 
-    ButtonInteraction, 
+import {
+    ChatInputCommandInteraction,
+    ModalSubmitInteraction,
+    StringSelectMenuInteraction,
+    Client,
+    ButtonInteraction,
     UserContextMenuCommandInteraction,
-    MessageContextMenuCommandInteraction 
+    MessageContextMenuCommandInteraction
 } from "discord.js";
 import ChangeHelperHandler from "./ChangeHelper";
 import CommandHandler from "./Command";
@@ -22,412 +22,412 @@ import { ConversationManageMessageUtils } from "../utils/MessageUtils/Conversati
 import { Utils } from "../utils/Utils";
 import PunishmentManager from "./PunishmentManager";
 
-type InteractionHandler = () => Promise<void>;
+type RouterContext = {
+    conversationId: string | null;
+};
+
+type InteractionConfig = {
+    handler: (interaction: any, ctx: RouterContext) => Promise<void>;
+    deferral?: 'update' | 'reply' | 'none' | 'modal';
+};
 
 export class InteractionRouter {
-    private actionHandlers: Map<string, InteractionHandler>;
+    private interactionConfigs: Map<string, InteractionConfig>;
 
     constructor(private client: Client) {
-        this.actionHandlers = this.initializeHandlers();
+        this.interactionConfigs = this.buildConfigs();
     }
 
-    private initializeHandlers(): Map<string, InteractionHandler> {
-        return new Map([
-            // Conversation Actions
-            ['openChatButton', () => this.handleOpenChat()],
-            ['select_subject', () => this.handleSelectSubject()],
-            
-            // Staff Tools
-            ['manager_attach_report', () => this.handleManagerAttachReport()],
-            ['manager_mark_as_done', () => this.handleManagerMarkAsDone()],
-            ['manager_in_progress', () => this.handleManagerInProgress()],
-            
-            // Conversation Management
-            ['tools_attach', () => this.handleToolsAttach()],
-            ['tools_close', () => this.handleToolsClose()],
-            ['sure_yes', () => this.handleSureYes()],
-            ['sure_no', () => this.handleSureNo()],
-            ['tools_manager', () => this.handleToolsManager()],
-            ['tools_manager_reveal', () => this.handleToolsManagerReveal()],
-            ['tools_manager_change_supporter', () => this.handleToolsManagerChangeSupporter()],
-            ['tools_manager_punish', () => this.handleToolsManagerPunish()],
-            ['tools_reset_helpers', () => this.handleToolsResetHelpers()],
-            ['tools_refer_manager', () => this.handleToolsReferManager()],
-            
-            // User Actions
-            ['user_report_helper', () => this.handleUserReportHelper()],
-            ['user_volunteer', () => this.handleUserVolunteer()],
-            ['user_suggest', () => this.handleUserSuggest()],
-            
-            // Modal Submissions
-            ['reportHelperModal', () => this.handleReportHelperModal()],
-            ['referManager', () => this.handleReferManagerModal()],
-            ['volunteer_modal', () => this.handleVolunteerModal()],
-            ['suggestIdea', () => this.handleSuggestIdeaModal()],
-            ['vacationModal', () => this.handleVacationModal()],
-            ['criticalChatModal', () => this.handleCriticalChatModal()],
-            
-            // Select Menu Actions
-            ['helpers_list', () => this.handleHelpersList()],
-            ['punish_menu', () => this.handlePunishMenu()],
-            ['punish_history', () => this.handlePunishHistory()],
-            
-            // Punishment Modals
-            ['punishBanModal', () => this.handlePunishBanModal()],
-            ['punishMuteModal', () => this.handlePunishMuteModal()],
-            
-            // Inactive Conversation Actions
-            ['unactive_continue_chat', () => this.handleUnactiveContinueChat()],
-            ['unactive_close_chat', () => this.handleUnactiveCloseChat()],
-            
-            // Commands
-            ['openchat', () => this.handleOpenChatCommand()],
-            ['חבר הצוות של החודש', () => this.handleHelperOfTheMonthMale()],
-            ['חברת הצוות של החודש', () => this.handleHelperOfTheMonthFemale()],
-            ['אשר חופשה', () => this.handleApproveVacation()],
-            ['דיווח כצ\'אט קריטי', () => this.handleCriticalChat()],
-            ['manage', () => this.handleManageCommand()],
-            ['importantlinks', () => this.handleImportantLinksCommand()],
-            ['sendstaffmessage', () => this.handleSendStaffMessageCommand()],
-            ['chat-info', () => this.handleChannelInfoCommand()],
-            ['reopen', () => this.handleReopenCommand()],
-            ['vacation', () => this.handleVacationCommand()],
-            ['punishment', () => this.handlePunishmentCommand()],
+    private buildConfigs(): Map<string, InteractionConfig> {
+        const client = this.client;
+        return new Map<string, InteractionConfig>([
+            // ── Conversation start ──────────────────────────────────────────
+            ['openChatButton', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const handler = await StartConversation.createHandler(interaction as ButtonInteraction);
+                    await handler.handle();
+                }
+            }],
+            ['select_subject', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const handler = await CreateConversationHandler.createHandler(interaction as StringSelectMenuInteraction);
+                    await handler.handle();
+                }
+            }],
+
+            // ── Staff report tools ──────────────────────────────────────────
+            ['manager_attach_report', {
+                deferral: 'update',
+                handler: async (interaction) => {
+                    await new ConversationStaffToolsHandler(interaction as ButtonInteraction).managerAttachReport();
+                }
+            }],
+            ['manager_mark_as_done', {
+                deferral: 'update',
+                handler: async (interaction) => {
+                    await new ConversationStaffToolsHandler(interaction as ButtonInteraction).managerMarkRequestAsDone();
+                }
+            }],
+            ['manager_in_progress', {
+                deferral: 'update',
+                handler: async (interaction) => {
+                    await new ConversationStaffToolsHandler(interaction as ButtonInteraction).supervisorInProgress();
+                }
+            }],
+
+            // ── Conversation management ─────────────────────────────────────
+            ['tools_attach', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const mgr = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+                    await mgr.attachHelper(interaction.user.id);
+                    await mgr.saveConversation();
+                }
+            }],
+            ['tools_close', {
+                deferral: 'none',
+                handler: async (interaction, ctx) => {
+                    try {
+                        const mgr = ctx.conversationId
+                            ? await ConversationManageHandler.createHandlerWithId(client, interaction as ButtonInteraction, ctx.conversationId)
+                            : await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+
+                        if (!mgr.conversationData.open) {
+                            await (interaction as ButtonInteraction).reply({
+                                content: "הצ'אט הזה כבר נסגר. לא ניתן לבצע פעולות על צ'אטים סגורים.",
+                                ephemeral: true
+                            });
+                            return;
+                        }
+                        await mgr.sendSureMessageToClose();
+                    } catch {
+                        await (interaction as ButtonInteraction).reply({
+                            content: "הצ'אט הזה לא זמין עוד. לא ניתן לבצע פעולות על צ'אטים שנסגרו.",
+                            ephemeral: true
+                        });
+                    }
+                }
+            }],
+            ['sure_yes', {
+                deferral: 'update',
+                handler: async (interaction, ctx) => {
+                    try {
+                        const mgr = ctx.conversationId
+                            ? await ConversationManageHandler.createHandlerWithId(client, interaction as ButtonInteraction, ctx.conversationId)
+                            : await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+                        await mgr.closeConversation(interaction.channel?.isDMBased() ? "משתמש" : "איש צוות");
+                        await mgr.saveConversation();
+                    } catch {
+                        if (interaction.channel && 'send' in interaction.channel) {
+                            await interaction.channel.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
+                        }
+                    }
+                }
+            }],
+            ['sure_no', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    try {
+                        const mgr = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+                        if (!mgr.conversationData.open) {
+                            await (interaction as ButtonInteraction).reply({
+                                content: "הצ'אט הזה כבר נסגר. הפעולה לא רלוונטית עוד.",
+                                ephemeral: true
+                            });
+                            return;
+                        }
+                        await (interaction as ButtonInteraction).reply({
+                            embeds: [ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat],
+                            ephemeral: true
+                        });
+                    } catch {
+                        await (interaction as ButtonInteraction).reply({
+                            content: "הצ'אט הזה לא זמין עוד. לא ניתן לבצע פעולות על צ'אטים שנסגרו.",
+                            ephemeral: true
+                        });
+                    }
+                }
+            }],
+            ['tools_manager', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    if (Utils.isSeniorStaff(interaction.user.id)) {
+                        await (interaction as ButtonInteraction).reply({
+                            ephemeral: true,
+                            embeds: [ConversationManageMessageUtils.EmbedMessages.ManagerTools],
+                            components: [ConversationManageMessageUtils.Actions.managerTools]
+                        });
+                    } else {
+                        await (interaction as ButtonInteraction).reply({
+                            content: "אין לך הרשאות להשתמש בהגדרות ניהול",
+                            ephemeral: true
+                        });
+                    }
+                }
+            }],
+            ['tools_manager_reveal', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const mgr = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+                    await mgr.revealUser();
+                }
+            }],
+            ['tools_manager_change_supporter', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const mgr = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+                    await mgr.changeHelpersMessage();
+                }
+            }],
+            ['tools_manager_punish', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const mgr = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+                    await mgr.sendPunishMessage();
+                }
+            }],
+            ['tools_reset_helpers', {
+                deferral: 'update',
+                handler: async (interaction) => {
+                    const mgr = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+                    await mgr.resetHelpers();
+                    await mgr.saveConversation();
+                }
+            }],
+            ['tools_refer_manager', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const mgr = await ConversationManageHandler.createHandler(client, interaction as ButtonInteraction);
+                    await mgr.openRefferSupervisorModal();
+                }
+            }],
+
+            // ── User action buttons ─────────────────────────────────────────
+            ['user_report_helper', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+                }
+            }],
+            ['user_volunteer', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+                }
+            }],
+            ['user_suggest', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new OpenModalHandler(interaction as ButtonInteraction).openModal();
+                }
+            }],
+
+            // ── Modal submissions ───────────────────────────────────────────
+            ['reportHelperModal', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new ModalSubmitHandler(client, interaction as ModalSubmitInteraction).reportHelper();
+                }
+            }],
+            ['referManager', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new ModalSubmitHandler(client, interaction as ModalSubmitInteraction).referManager();
+                }
+            }],
+            ['volunteer_modal', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new ModalSubmitHandler(client, interaction as ModalSubmitInteraction).sendVolunteerMessage();
+                }
+            }],
+            ['suggestIdea', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new ModalSubmitHandler(client, interaction as ModalSubmitInteraction).suggestIdea();
+                }
+            }],
+            ['vacationModal', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new ModalSubmitHandler(client, interaction as ModalSubmitInteraction).sendVacationMessage();
+                }
+            }],
+            ['criticalChatModal', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new ModalSubmitHandler(client, interaction as ModalSubmitInteraction).criticalChat();
+                }
+            }],
+
+            // ── Select menu actions ─────────────────────────────────────────
+            ['helpers_list', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new ChangeHelperHandler(interaction as StringSelectMenuInteraction).handle();
+                }
+            }],
+            ['punish_menu', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new OpenModalHandler(interaction as StringSelectMenuInteraction).openModal();
+                }
+            }],
+            ['punish_history', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await PunishMemberHandler.sendPunishmentHistory(interaction as StringSelectMenuInteraction);
+                }
+            }],
+
+            // ── Punishment modals ───────────────────────────────────────────
+            ['punishBanModal', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const handler = await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction);
+                    await handler.ban();
+                }
+            }],
+            ['punishMuteModal', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    const handler = await PunishMemberHandler.createHandler(interaction as ModalSubmitInteraction);
+                    await handler.timeout();
+                }
+            }],
+
+            // ── Inactive conversation buttons ───────────────────────────────
+            ['unactive_continue_chat', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new UnactiveConversationHandler().continueConversation(interaction as ButtonInteraction);
+                }
+            }],
+            ['unactive_close_chat', {
+                deferral: 'none',
+                handler: async (interaction) => {
+                    await new UnactiveConversationHandler().stopConversation(interaction as ButtonInteraction);
+                }
+            }],
+
+            // ── Slash / context-menu commands ───────────────────────────────
+            ['openchat', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as ChatInputCommandInteraction).openChat();
+                }
+            }],
+            ['חבר הצוות של החודש', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as UserContextMenuCommandInteraction).makeHelperOfTheMonth("helper");
+                }
+            }],
+            ['חברת הצוות של החודש', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as UserContextMenuCommandInteraction).makeHelperOfTheMonth("helperit");
+                }
+            }],
+            ['אשר חופשה', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as MessageContextMenuCommandInteraction).approveVacation();
+                }
+            }],
+            ['דיווח כצ\'אט קריטי', {
+                deferral: 'modal',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as UserContextMenuCommandInteraction).criticalChat();
+                }
+            }],
+            ['manage', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as ChatInputCommandInteraction).sendManageTools();
+                }
+            }],
+            ['importantlinks', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as ChatInputCommandInteraction).importantLinks();
+                }
+            }],
+            ['sendstaffmessage', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as ChatInputCommandInteraction).sendStaffMessage();
+                }
+            }],
+            ['chat-info', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as ChatInputCommandInteraction).findChannel();
+                }
+            }],
+            ['reopen', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new CommandHandler(client, interaction as ChatInputCommandInteraction).reopenChat();
+                }
+            }],
+            ['vacation', {
+                deferral: 'modal',
+                handler: async (interaction) => {
+                    await (interaction as ChatInputCommandInteraction).showModal(MessageUtils.Modals.vacationModal);
+                }
+            }],
+            ['punishment', {
+                deferral: 'reply',
+                handler: async (interaction) => {
+                    await new PunishmentManager(interaction as ChatInputCommandInteraction).handleCommand();
+                }
+            }],
         ]);
     }
 
     async handleInteraction(interaction: any): Promise<void> {
         const rawAction = interaction.isCommand() ? interaction.commandName : interaction.customId;
-        
-        // Handle conversation-specific close buttons
+
         let action = rawAction;
-        let conversationId = null;
-        if (rawAction.startsWith('tools_close_')) {
+        let conversationId: string | null = null;
+        if (rawAction?.startsWith('tools_close_')) {
             action = 'tools_close';
             conversationId = rawAction.replace('tools_close_', '');
         }
-        
+
         console.log('InteractionRouter handling action:', action, conversationId ? `with conversation ID: ${conversationId}` : '');
-        
-        const handler = this.actionHandlers.get(action);
-        if (!handler) {
+
+        const config = this.interactionConfigs.get(action);
+        if (!config) {
             console.log('No handler found for action:', action);
             return;
         }
 
-        // For most slash commands, defer immediately to prevent timeout
-        // Some commands like vacation need special handling (showModal)
-        const commandsWithModal = ['vacation', 'דיווח כצ\'אט קריטי'];
-        if (interaction.isCommand() && !commandsWithModal.includes(action) && !interaction.replied && !interaction.deferred) {
-            try {
-                await interaction.deferReply({ ephemeral: true });
-                console.log('Successfully deferred interaction in router for:', action);
-            } catch (deferError: any) {
-                console.log('Failed to defer in router:', deferError.message);
-                if (deferError.code === 10062 || deferError.code === 40060) {
-                    console.log('Interaction invalid or already handled, skipping');
-                    return;
+        // Apply deferral based on config
+        if (config.deferral && config.deferral !== 'none' && config.deferral !== 'modal') {
+            if (!interaction.replied && !interaction.deferred) {
+                try {
+                    if (config.deferral === 'reply') {
+                        await interaction.deferReply({ ephemeral: true });
+                        console.log('Successfully deferred interaction in router for:', action);
+                    } else if (config.deferral === 'update') {
+                        await interaction.deferUpdate();
+                        console.log('Successfully deferred button update for:', action);
+                    }
+                } catch (deferError: any) {
+                    console.log('Failed to defer in router:', deferError.message);
+                    if (deferError.code === 10062 || deferError.code === 40060) {
+                        console.log('Interaction invalid or already handled, skipping');
+                        return;
+                    }
                 }
             }
         }
 
-        // For button interactions that need deferUpdate, defer early
-        // Some buttons use reply/showModal and handle their own acknowledgment
-        const buttonsWithReply = [
-            'openChatButton', 'sure_no', 'tools_manager', 'tools_close',
-            'user_report_helper', 'user_volunteer', 'user_suggest',
-            'punish_timeout', 'punish_ban',
-            'unactive_continue_chat', 'unactive_close_chat', 'helpers_list',
-            'tools_refer_manager', 'tools_attach', 'tools_manager_reveal',
-            'tools_manager_change_supporter', 'tools_manager_punish',
-            'manager_attach_report', 'manager_mark_as_done', 'manager_in_progress',
-            'select_subject', 'punish_menu', 'punish_history'
-        ];
-        
-        if (interaction.isButton() && !buttonsWithReply.includes(action) && !interaction.replied && !interaction.deferred) {
-            try {
-                await interaction.deferUpdate();
-                console.log('Successfully deferred button update for:', action);
-            } catch (deferError: any) {
-                console.log('Failed to defer button update:', deferError.message);
-                if (deferError.code === 10062 || deferError.code === 40060) {
-                    console.log('Button interaction invalid or already handled, skipping');
-                    return;
-                }
-            }
-        }
-        
         console.log('Found handler for action:', action);
-        this.setCurrentInteraction(interaction, conversationId);
-        await handler();
-    }
-
-    private currentInteraction: any;
-    private currentConversationId: string | null = null;
-    
-    private setCurrentInteraction(interaction: any, conversationId: string | null = null) {
-        this.currentInteraction = interaction;
-        this.currentConversationId = conversationId;
-    }
-
-    // Conversation Actions
-    private async handleOpenChat(): Promise<void> {
-        const handler = await StartConversation.createHandler(this.currentInteraction as ButtonInteraction);
-        await handler.handle();
-    }
-
-    private async handleSelectSubject(): Promise<void> {
-        const handler = await CreateConversationHandler.createHandler(this.currentInteraction as StringSelectMenuInteraction);
-        await handler.handle();
-    }
-
-    // Staff Tools
-    private async handleManagerAttachReport(): Promise<void> {
-        await new ConversationStaffToolsHandler(this.currentInteraction as ButtonInteraction).managerAttachReport();
-    }
-
-    private async handleManagerMarkAsDone(): Promise<void> {
-        await new ConversationStaffToolsHandler(this.currentInteraction as ButtonInteraction).managerMarkRequestAsDone();
-    }
-
-    private async handleManagerInProgress(): Promise<void> {
-        await new ConversationStaffToolsHandler(this.currentInteraction as ButtonInteraction).supervisorInProgress();
-    }
-
-    // Conversation Management
-    private async handleToolsAttach(): Promise<void> {
-        const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-        await conversationManage.attachHelper(this.currentInteraction.user.id);
-        await conversationManage.saveConversation();
-    }
-
-    private async handleToolsClose(): Promise<void> {
-        try {
-            const conversationManage = this.currentConversationId 
-                ? await ConversationManageHandler.createHandlerWithId(this.client, this.currentInteraction as ButtonInteraction, this.currentConversationId)
-                : await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-            
-            // Check if conversation is already closed before showing confirmation
-            if (!conversationManage.conversation.open) {
-                await (this.currentInteraction as ButtonInteraction).reply({
-                    content: "הצ'אט הזה כבר נסגר. לא ניתן לבצע פעולות על צ'אטים סגורים.",
-                    ephemeral: true
-                });
-                return;
-            }
-            
-            await conversationManage.sendSureMessageToClose();
-        } catch (error) {
-            await (this.currentInteraction as ButtonInteraction).reply({
-                content: "הצ'אט הזה לא זמין עוד. לא ניתן לבצע פעולות על צ'אטים שנסגרו.",
-                ephemeral: true
-            });
-        }
-    }
-
-    private async handleSureYes(): Promise<void> {
-        try {
-            const conversationManage = this.currentConversationId 
-                ? await ConversationManageHandler.createHandlerWithId(this.client, this.currentInteraction as ButtonInteraction, this.currentConversationId)
-                : await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-            await conversationManage.closeConversation(this.currentInteraction.channel?.isDMBased() ? "משתמש" : "איש צוות");
-            await conversationManage.saveConversation();
-        } catch (error) {
-            if (this.currentInteraction.channel && 'send' in this.currentInteraction.channel) {
-                await this.currentInteraction.channel.send({ embeds: [MessageUtils.EmbedMessages.chatIsNotAvailable] });
-            }
-        }
-    }
-
-    private async handleSureNo(): Promise<void> {
-        try {
-            // Try to load conversation to check if it's still valid
-            const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-            
-            // Check if conversation is already closed
-            if (!conversationManage.conversation.open) {
-                await (this.currentInteraction as ButtonInteraction).reply({
-                    content: "הצ'אט הזה כבר נסגר. הפעולה לא רלוונטית עוד.",
-                    ephemeral: true
-                });
-                return;
-            }
-            
-            await (this.currentInteraction as ButtonInteraction).reply({ 
-                embeds: [ConversationManageMessageUtils.EmbedMessages.actionCancelledCloseChat], 
-                ephemeral: true 
-            });
-        } catch (error) {
-            await (this.currentInteraction as ButtonInteraction).reply({
-                content: "הצ'אט הזה לא זמין עוד. לא ניתן לבצע פעולות על צ'אטים שנסגרו.",
-                ephemeral: true
-            });
-        }
-    }
-
-    private async handleToolsManager(): Promise<void> {
-        if (Utils.isSeniorStaff(this.currentInteraction.user.id)) {
-            await (this.currentInteraction as ButtonInteraction).reply({
-                ephemeral: true, 
-                embeds: [ConversationManageMessageUtils.EmbedMessages.ManagerTools],
-                components: [ConversationManageMessageUtils.Actions.managerTools]
-            });
-        } else {
-            await (this.currentInteraction as ButtonInteraction).reply({ 
-                content: "אין לך הרשאות להשתמש בהגדרות ניהול", 
-                ephemeral: true 
-            });
-        }
-    }
-
-    private async handleToolsManagerReveal(): Promise<void> {
-        const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-        await conversationManage.revealUser();
-    }
-
-    private async handleToolsManagerChangeSupporter(): Promise<void> {
-        const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-        await conversationManage.changeHelpersMessage();
-    }
-
-    private async handleToolsManagerPunish(): Promise<void> {
-        const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-        await conversationManage.sendPunishMessage();
-    }
-
-    private async handleToolsResetHelpers(): Promise<void> {
-        const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-        await conversationManage.resetHelpers();
-        await conversationManage.saveConversation();
-    }
-
-    private async handleToolsReferManager(): Promise<void> {
-        const conversationManage = await ConversationManageHandler.createHandler(this.client, this.currentInteraction as ButtonInteraction);
-        await conversationManage.openRefferSupervisorModal();
-    }
-
-    // User Actions
-    private async handleUserReportHelper(): Promise<void> {
-        await new OpenModalHandler(this.currentInteraction as ButtonInteraction).openModal();
-    }
-
-    private async handleUserVolunteer(): Promise<void> {
-        await new OpenModalHandler(this.currentInteraction as ButtonInteraction).openModal();
-    }
-
-    private async handleUserSuggest(): Promise<void> {
-        await new OpenModalHandler(this.currentInteraction as ButtonInteraction).openModal();
-    }
-
-    // Modal Submissions
-    private async handleReportHelperModal(): Promise<void> {
-        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).reportHelper();
-    }
-
-    private async handleReferManagerModal(): Promise<void> {
-        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).referManager();
-    }
-
-    private async handleVolunteerModal(): Promise<void> {
-        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).sendVolunteerMessage();
-    }
-
-    private async handleSuggestIdeaModal(): Promise<void> {
-        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).suggestIdea();
-    }
-
-    private async handleVacationModal(): Promise<void> {
-        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).sendVacationMessage();
-    }
-
-    private async handleCriticalChatModal(): Promise<void> {
-        await new ModalSubmitHandler(this.client, this.currentInteraction as ModalSubmitInteraction).criticalChat();
-    }
-
-
-    // Select Menu Actions
-    private async handleHelpersList(): Promise<void> {
-        await new ChangeHelperHandler(this.currentInteraction as StringSelectMenuInteraction).handle();
-    }
-
-    private async handlePunishMenu(): Promise<void> {
-        await new OpenModalHandler(this.currentInteraction as StringSelectMenuInteraction).openModal();
-    }
-
-    private async handlePunishHistory(): Promise<void> {
-        await PunishMemberHandler.sendPunishmentHistory(this.currentInteraction as StringSelectMenuInteraction);
-    }
-
-    // Punishment Modals
-    private async handlePunishBanModal(): Promise<void> {
-        const handler = await PunishMemberHandler.createHandler(this.currentInteraction as ModalSubmitInteraction);
-        await handler.ban();
-    }
-
-    private async handlePunishMuteModal(): Promise<void> {
-        const handler = await PunishMemberHandler.createHandler(this.currentInteraction as ModalSubmitInteraction);
-        await handler.timeout();
-    }
-
-    // Inactive Conversation Actions
-    private async handleUnactiveContinueChat(): Promise<void> {
-        const handler = new UnactiveConversationHandler();
-        await handler.continueConversation(this.currentInteraction as ButtonInteraction);
-    }
-
-    private async handleUnactiveCloseChat(): Promise<void> {
-        const handler = new UnactiveConversationHandler();
-        await handler.stopConversation(this.currentInteraction as ButtonInteraction);
-    }
-
-    // Commands
-    private async handleOpenChatCommand(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).openChat();
-    }
-
-    private async handleHelperOfTheMonthMale(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as UserContextMenuCommandInteraction).makeHelperOfTheMonth("helper");
-    }
-
-    private async handleHelperOfTheMonthFemale(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as UserContextMenuCommandInteraction).makeHelperOfTheMonth("helperit");
-    }
-
-    private async handleApproveVacation(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as MessageContextMenuCommandInteraction).approveVacation();
-    }
-
-    private async handleCriticalChat(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as UserContextMenuCommandInteraction).criticalChat();
-    }
-
-    private async handleManageCommand(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).sendManageTools();
-    }
-
-    private async handleImportantLinksCommand(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).importantLinks();
-    }
-
-    private async handleSendStaffMessageCommand(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).sendStaffMessage();
-    }
-
-    private async handleChannelInfoCommand(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).findChannel();
-        console.log('CommandHandler.findChannel completed');
-    }
-
-    private async handleReopenCommand(): Promise<void> {
-        await new CommandHandler(this.client, this.currentInteraction as ChatInputCommandInteraction).reopenChat();
-    }
-
-    private async handleVacationCommand(): Promise<void> {
-        await (this.currentInteraction as ChatInputCommandInteraction).showModal(MessageUtils.Modals.vacationModal);
-    }
-
-    private async handlePunishmentCommand(): Promise<void> {
-        const punishmentManager = new PunishmentManager(this.currentInteraction as ChatInputCommandInteraction);
-        await punishmentManager.handleCommand();
+        await config.handler(interaction, { conversationId });
     }
 }

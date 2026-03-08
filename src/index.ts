@@ -61,25 +61,28 @@ client.once('ready', async () => {
         await config.guild?.members.fetch();
         console.log(`Configuration loaded successfully! Current Date: ${new Date()}`);
         
-        // Initialize WhatsApp Client
-        try {
-            whatsappClient = new WhatsAppClient();
-            // Get the message handler from the WhatsApp client and set up clients
-            const handler = (whatsappClient as any).messageHandler;
-            if (handler) {
-                if (typeof handler.setDiscordClient === 'function') {
-                    handler.setDiscordClient(client);
+        // Initialize WhatsApp Client (only if enabled)
+        if (process.env.WHATSAPP_ENABLED === 'true') {
+            try {
+                whatsappClient = new WhatsAppClient();
+                const handler = (whatsappClient as any).messageHandler;
+                if (handler) {
+                    if (typeof handler.setDiscordClient === 'function') {
+                        handler.setDiscordClient(client);
+                    }
+                    if (typeof handler.setWhatsAppClient === 'function') {
+                        handler.setWhatsAppClient(whatsappClient);
+                    }
                 }
-                if (typeof handler.setWhatsAppClient === 'function') {
-                    handler.setWhatsAppClient(whatsappClient);
-                }
+                await whatsappClient.initialize();
+                setWhatsAppClient(whatsappClient);
+                console.log('WhatsApp Client initialized successfully!');
+            } catch (error) {
+                console.error('Failed to initialize WhatsApp Client:', error);
+                console.log('Continuing without WhatsApp integration...');
             }
-            await whatsappClient.initialize();
-            setWhatsAppClient(whatsappClient);
-            console.log('WhatsApp Client initialized successfully!');
-        } catch (error) {
-            console.error('Failed to initialize WhatsApp Client:', error);
-            console.log('Continuing without WhatsApp integration...');
+        } else {
+            console.log('WhatsApp integration disabled (WHATSAPP_ENABLED != true)');
         }
         
         const unactiveConversationHandler = new UnactiveConversationHandler();

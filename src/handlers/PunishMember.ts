@@ -3,8 +3,10 @@ import { ConversationManageMessageUtils } from "../utils/MessageUtils/Conversati
 import { Conversation } from "../utils/types";
 import DataBase from "../utils/db";
 import { Utils } from "../utils/Utils";
+import { CONSTANTS } from "../utils/Constants";
 import Logger from "./Logger";
 import { ObjectId } from "mongodb";
+import { conversationRepo } from "../repositories/ConversationRepository";
 
 class PunishMemberHandler {
     conversation: Conversation = {} as any;
@@ -24,7 +26,7 @@ class PunishMemberHandler {
         if (!this.interaction.channelId) {
             throw new Error("Channel ID is required");
         }
-        this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.interaction.channelId }) as any;
+        this.conversation = await conversationRepo.findByChannelId(this.interaction.channelId) as any;
     }
 
     async savePunish() {
@@ -51,7 +53,7 @@ class PunishMemberHandler {
             throw new Error("Channel ID is required");
         }
 
-        const conversation: Conversation = await DataBase.conversationsCollection.findOne({ channelId: interaction.channelId }) as any;
+        const conversation: Conversation = await conversationRepo.findByChannelId(interaction.channelId) as any;
         const member = Utils.getMemberByID(conversation.userId);
         const punishments = await DataBase.punishmentsCollection.find({ userId: member?.id }).toArray();
 
@@ -75,9 +77,9 @@ class PunishMemberHandler {
 
         console.log(isNaN(+time), +time > 27, +time < 1);
 
-        if (isNaN(+time) || +time > 27 || +time < 1) {
+        if (isNaN(+time) || +time > CONSTANTS.TIMERS.TIMEOUT_MAX_DAYS || +time < CONSTANTS.TIMERS.TIMEOUT_MIN_DAYS) {
             this.interaction.reply({
-                content: "שגיאה בכמות הימים - יש לכתוב ערך מספרי שלם בין 1 ל27 בלבד!",
+                content: `שגיאה בכמות הימים - יש לכתוב ערך מספרי שלם בין ${CONSTANTS.TIMERS.TIMEOUT_MIN_DAYS} ל${CONSTANTS.TIMERS.TIMEOUT_MAX_DAYS} בלבד!`,
                 ephemeral: true
             })
             return;
@@ -144,11 +146,10 @@ class PunishMemberHandler {
         const channel: TextChannel = Utils.getChannelByIdNoClient(this.conversation.channelId) as any;
         const closedMessage = { embeds: [ConversationManageMessageUtils.EmbedMessages.chatClosed("משתמש שיצא", channel.name)] };
         this.conversation.open = false;
-        const { _id, ...updateData } = this.conversation;
         await Promise.all([
             channel.send(closedMessage),
             Logger.logTicket(channel),
-            DataBase.conversationsCollection.updateOne({ channelId: this.conversation.channelId }, { $set: updateData }, { upsert: true })
+            conversationRepo.save(this.conversation),
         ]);
         await channel.delete();
     }

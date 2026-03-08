@@ -1,10 +1,10 @@
-import DataBase from "../utils/db";
 import { Conversation } from "../utils/types";
 import { ChannelType, Message, TextChannel, Client, ActionRowBuilder, ButtonBuilder, PartialMessage, DMChannel } from "discord.js"
 import { Utils } from "../utils/Utils";
 import { CantLoadConversationFromDB } from "../utils/Errors";
 import { ConversationManageMessageUtils } from "../utils/MessageUtils/ConversationManage";
 import WhatsAppClient from "../services/WhatsAppClient";
+import { conversationRepo } from "../repositories/ConversationRepository";
 
 class CommunicateConversationHandler {
     private conversation: Conversation = {} as any;
@@ -17,9 +17,9 @@ class CommunicateConversationHandler {
 
     async loadConversation(): Promise<void> {
         if (this.message.channel.type === ChannelType.DM) {
-            this.conversation = await DataBase.conversationsCollection.findOne({ userId: this.message.author.id, open: true }) as any;
+            this.conversation = await conversationRepo.findOpenByUserId(this.message.author.id) as any;
         } else if (this.message.channel.type === ChannelType.GuildText) {
-            this.conversation = await DataBase.conversationsCollection.findOne({ channelId: this.message.channel.id, open: true }) as any;
+            this.conversation = await conversationRepo.findOpenByChannelId(this.message.channel.id) as any;
         } else {
             throw new CantLoadConversationFromDB();
         }
@@ -53,7 +53,7 @@ class CommunicateConversationHandler {
         if (this.message.channel.type === ChannelType.DM) {
             const channel = (Utils.getChannelById(this.client, this.conversation.channelId) as TextChannel);
             await channel.sendTyping();
-            channel.send(this.message.content);
+            await channel.send(this.message.content);
 
         } else if (this.message.channel.type === ChannelType.GuildText) {
             // Check if this is a WhatsApp conversation
@@ -73,12 +73,12 @@ class CommunicateConversationHandler {
             } else {
                 // Send to Discord DM (original behavior)
                 await this.client.users.cache.get(this.conversation.userId)?.dmChannel?.sendTyping();
-                this.client.users.send(this.conversation.userId, this.message.content)
-                    .catch(() => {
-                        this.message.reply({
+                await this.client.users.send(this.conversation.userId, this.message.content)
+                    .catch(async () => {
+                        await this.message.reply({
                             content: "המשתמש ביטל את האפשרות לכתיבת הודעות לאחר פתיחת הצ'אט",
                             components: [new ActionRowBuilder<ButtonBuilder>().addComponents(ConversationManageMessageUtils.Actions.tools_close)]
-                        })
+                        });
                     });
             }
         }

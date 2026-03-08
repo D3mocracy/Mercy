@@ -4,9 +4,12 @@ export const CONSTANTS = {
         TELL_ABOUT_YOURSELF: "1148286189925838858"
     },
     
-    // Role IDs  
+    // Role IDs
     ROLE_IDS: {
-        MEMBER_ROLE: '1164995639743090718'
+        MEMBER_ROLE: '1164995639743090718',
+        PRONOUN_FEMALE: '1148302562009813122',
+        PRONOUN_MALE: '1148302563196805231',
+        PRONOUN_NEUTRAL: '1148302566640324639',
     },
     
     // Database
@@ -35,6 +38,8 @@ export const CONSTANTS = {
     // Timers (in milliseconds)
     TIMERS: {
         UNACTIVE_CHECK_INTERVAL: 1000 * 60 * 60, // 1 hour
+        TIMEOUT_MAX_DAYS: 27,
+        TIMEOUT_MIN_DAYS: 1,
     },
     
     // Bot Configuration
